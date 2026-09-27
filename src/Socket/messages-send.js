@@ -1266,13 +1266,12 @@ export const makeMessagesSocket = (config) => {
         sendMessage: async (jid, content, options = {}) => {
             const userJid = authState.creds.me.id;
 
-            if (content?.image && content?.video && !Array.isArray(jid)) {
-                return sendImgVid(jid, content, options);
+            if (content?.hd && (content.image || content.video) && !Array.isArray(jid)) {
+                return sendHD(jid, content, options);
             }
 
-            const wantsHD = content?.hd !== false && (content?.hd === true || !!content?.image);
-            if (wantsHD && (content?.image || content?.video) && !Array.isArray(jid)) {
-                return sendHD(jid, content, options);
+            if (content?.image && content?.video && !Array.isArray(jid)) {
+                return sendImgVid(jid, content, options);
             }
 
             if (Array.isArray(jid)) {
