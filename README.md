@@ -3135,6 +3135,26 @@ Satu album butuh setidaknya dua item media gambar/video.
 
 ---
 
+## 🎞️ Foto + Video Berpasangan (imgvid)
+
+Mengirim satu foto sebagai induk lalu satu video sebagai anak yang tertaut ke foto itu, mirip motion photo. Cukup berikan `image` dan `video` sekaligus di satu `sendMessage`:
+
+```js
+await sock.sendMessage(jid, {
+  image: { url: 'https://files.catbox.moe/s72odd.jpeg' },
+  video: { url: 'https://files.catbox.moe/ttpfrr.mp4' },
+  caption: 'Foto yang bisa diputar'
+})
+```
+
+`caption` menempel di foto induk. Di balik layar library mengirim dua pesan: foto sebagai induk, lalu video sebagai anak yang membawa `messageContextInfo.messageAssociation` dengan `associationType` `MOTION_PHOTO` dan `parentMessageKey` menunjuk ke foto induk. Penerima yang mendukung akan menautkan keduanya sehingga foto bisa diputar videonya.
+
+Jalur ini hanya aktif kalau `image` dan `video` sama-sama ada dan `jid` bukan array. Kalau salah satu hilang, kirim seperti media biasa.
+
+**Catatan jujur.** Ini penautan media lewat association, bukan motion photo asli berbentuk JPEG dengan MP4 tertanam. Apakah tampil sebagai "foto yang bisa diputar" sepenuhnya tergantung dukungan klien penerima — kalau belum mendukung, keduanya tampil sebagai foto dan video terpisah. Tidak ada yang bisa dipaksa dari sisi pengirim.
+
+---
+
 ## 📸 Status
 
 Status dikirim ke jid khusus `status@broadcast`, dan yang menerimanya adalah orang-orang yang kamu daftar di `statusJidList`. Daftar itu seluruh mekanisme audiensnya — tidak ada pengaturan privasi terpisah yang bisa dibalik dari sini.
