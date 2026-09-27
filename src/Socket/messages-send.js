@@ -1534,6 +1534,7 @@ export const makeMessagesSocket = (config) => {
                 }
                 if ('album' in content) {
                     const { delayMs = 1500 } = options;
+                    await delay(delayMs);
                     for (const albumMedia of content.album) {
                         const albumMsg = await generateWAMessage(jid, albumMedia, {
                             logger,
