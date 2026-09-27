@@ -65,7 +65,7 @@ jobs:
         id: changes
         shell: bash
         run: |
-          git add lib/Defaults/index.js lib/Utils/generics.js
+          git add src/Defaults/index.js src/Utils/generics.js
 
           if git diff --staged --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -113,6 +113,20 @@ jobs:
             }
           }
 
+          function carry(major, minor, patch) {
+            if (patch > 9) {
+              patch = 0
+              minor += 1
+            }
+
+            if (minor > 9) {
+              minor = 0
+              major += 1
+            }
+
+            return { major, minor, patch }
+          }
+
           function bumpStable(version, type) {
             const v = parse(version)
 
@@ -121,10 +135,12 @@ jobs:
             }
 
             if (type === 'minor') {
-              return `${v.major}.${v.minor + 1}.0`
+              const c = carry(v.major, v.minor + 1, 0)
+              return `${c.major}.${c.minor}.0`
             }
 
-            return `${v.major}.${v.minor}.${v.patch + 1}`
+            const c = carry(v.major, v.minor, v.patch + 1)
+            return `${c.major}.${c.minor}.${c.patch}`
           }
 
           function bumpVersion(version, type) {
@@ -139,7 +155,8 @@ jobs:
             }
 
             if (type === 'minor') {
-              return `${v.major}.${v.minor + 1}.0-${v.tag}.1`
+              const c = carry(v.major, v.minor + 1, 0)
+              return `${c.major}.${c.minor}.0-${v.tag}.1`
             }
 
             return `${v.major}.${v.minor}.${v.patch}-${v.tag}.${v.prerelease + 1}`
@@ -166,7 +183,7 @@ jobs:
 
           VERSION=$(node -p 'require("./package.json").version')
 
-          git add package.json lib/Defaults/index.js lib/Utils/generics.js
+          git add package.json src/Defaults/index.js src/Utils/generics.js
 
           git commit -m "chore: release v${VERSION} — WA update $(date -u +%Y-%m-%d)"
 
