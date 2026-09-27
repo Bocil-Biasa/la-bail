@@ -1116,7 +1116,8 @@ export const makeMessagesSocket = (config) => {
             throw new Boom('sendHD needs { image } or { video }', { statusCode: 400 });
         }
         const hdSource = (content.hd && content.hd !== true) ? content.hd : media;
-        const caption = content.caption;
+        const parentContent = { ...content };
+        delete parentContent.hd;
         const mediaKey = isVideo ? 'videoMessage' : 'imageMessage';
         const parentPaired = isVideo ? proto.ContextInfo.PairedMediaType.SD_VIDEO_PARENT : proto.ContextInfo.PairedMediaType.SD_IMAGE_PARENT;
         const childPaired = isVideo ? proto.ContextInfo.PairedMediaType.HD_VIDEO_CHILD : proto.ContextInfo.PairedMediaType.HD_IMAGE_CHILD;
@@ -1140,7 +1141,7 @@ export const makeMessagesSocket = (config) => {
                 process.nextTick(() => { messageMutex.mutex(() => upsertMessage(message, 'append')); });
             }
         };
-        const parent = await generateWAMessage(jid, isVideo ? { video: media, caption } : { image: media, caption }, { ...genOpts, messageId: generateMessageIDV2(userJid) });
+        const parent = await generateWAMessage(jid, parentContent, { ...genOpts, messageId: generateMessageIDV2(userJid) });
         parent.message[mediaKey].contextInfo = { ...(parent.message[mediaKey].contextInfo || {}), pairedMediaType: parentPaired };
         await relayMessage(jid, parent.message, { messageId: parent.key.id, ...relayOpts });
         emit(parent);
@@ -1265,12 +1266,13 @@ export const makeMessagesSocket = (config) => {
         sendMessage: async (jid, content, options = {}) => {
             const userJid = authState.creds.me.id;
 
-            if (content?.hd && (content.image || content.video) && !Array.isArray(jid)) {
-                return sendHD(jid, content, options);
-            }
-
             if (content?.image && content?.video && !Array.isArray(jid)) {
                 return sendImgVid(jid, content, options);
+            }
+
+            const wantsHD = content?.hd !== false && (content?.hd === true || !!content?.image);
+            if (wantsHD && (content?.image || content?.video) && !Array.isArray(jid)) {
+                return sendHD(jid, content, options);
             }
 
             if (Array.isArray(jid)) {
