@@ -174,6 +174,11 @@ export declare class AIRich extends BaseBuilder {
   addProduct(data?: any, options?: AIRichItemOptions): this;
   addPost(data?: any, options?: AIRichItemOptions): this;
   addMetadata(text: string, options?: AIRichItemOptions): this;
+  addHtmlCard(html: string, options?: AIRichItemOptions & { mimeType?: string; width?: number; height?: number; cardType?: number; sandbox?: string }): this;
+  addSelectableText(text: string, options?: AIRichItemOptions & { selectionId?: string }): this;
+  addQuiz(question: string, options?: any[], config?: AIRichItemOptions & { explanation?: string }): this;
+  addComparisonTable(columns?: string[], rows?: any[], options?: AIRichItemOptions & { highlightLabel?: string }): this;
+  addSports(games?: any, options?: AIRichItemOptions & { league?: string }): this;
   addTip(text: string, options?: AIRichItemOptions): this;
   addWidget(data: any, options?: AIRichItemOptions & { layout?: string }): this;
   addFooterAction(data: any, options?: AIRichItemOptions & { layout?: string }): this;

@@ -2035,6 +2035,123 @@ class AIRich extends BaseBuilder {
 		});
 	}
 
+	addHtmlCard(html, { mimeType = 'text/html', width = 300, height = 200, cardType, sandbox, id, replace, insertAt } = {}) {
+		if (typeof html !== 'string') {
+			throw new TypeError('html must be a string');
+		}
+
+		const section = AIRich.newLayout('Single', {
+			html,
+			mime_type: mimeType,
+			width,
+			height,
+			card_type: cardType,
+			sandbox,
+			__typename: 'GenAIHtmlCardPrimitive',
+		});
+
+		const submessage = this.createAlert('GenAIHtmlCardPrimitive');
+
+		return this._addContent(section, submessage, {
+			id,
+			replace,
+			insertAt,
+		});
+	}
+
+	addSelectableText(text, { selectionId, id, replace, insertAt } = {}) {
+		if (typeof text !== 'string') {
+			throw new TypeError('text must be a string');
+		}
+
+		const section = AIRich.newLayout('Single', {
+			selectable_text: text,
+			selection_id: selectionId,
+			__typename: 'GenAISelectableTextPrimitive',
+		});
+
+		const submessage = {
+			messageType: 2,
+			messageText: text,
+		};
+
+		return this._addContent(section, submessage, {
+			id,
+			replace,
+			insertAt,
+		});
+	}
+
+	addQuiz(question, options = [], { explanation, id, replace, insertAt } = {}) {
+		if (typeof question !== 'string') {
+			throw new TypeError('question must be a string');
+		}
+
+		if (!Array.isArray(options) || !options.length) {
+			throw new TypeError('options must be a non-empty array');
+		}
+
+		const section = AIRich.newLayout('Single', {
+			question,
+			options: options.map((option) =>
+				typeof option === 'string'
+					? { option_text: option, is_correct: false }
+					: { option_text: option.text ?? option.option_text ?? '', is_correct: !!(option.correct ?? option.is_correct) },
+			),
+			explanation,
+			__typename: 'GenAIQuizPrimitive',
+		});
+
+		const submessage = this.createAlert('GenAIQuizPrimitive');
+
+		return this._addContent(section, submessage, {
+			id,
+			replace,
+			insertAt,
+		});
+	}
+
+	addComparisonTable(columns = [], rows = [], { highlightLabel, id, replace, insertAt } = {}) {
+		if (!Array.isArray(columns) || !Array.isArray(rows)) {
+			throw new TypeError('columns and rows must be arrays');
+		}
+
+		const section = AIRich.newLayout('Single', {
+			columns,
+			rows: rows.map((row) => (Array.isArray(row) ? { cells: row } : row)),
+			highlight_label: highlightLabel,
+			__typename: 'GenAIFusedComparisonTablePrimitive',
+		});
+
+		const submessage = this.createAlert('GenAIFusedComparisonTablePrimitive');
+
+		return this._addContent(section, submessage, {
+			id,
+			replace,
+			insertAt,
+		});
+	}
+
+	addSports(games = [], { league, id, replace, insertAt } = {}) {
+		const items = Array.isArray(games) ? games : [games];
+
+		if (!items.length) {
+			throw new TypeError('addSports needs at least one game');
+		}
+
+		const primitives = items.map((game) => ({ ...game, league: game.league ?? league, __typename: 'GenAISportsWidgetPrimitive' }));
+
+		const section = AIRich.newLayout(items.length > 1 ? 'HScroll' : 'Single', items.length > 1 ? primitives : primitives[0]);
+
+		const submessage = this.createAlert('GenAISportsWidgetPrimitive');
+
+		return this._addContent(section, submessage, {
+			id,
+			replace,
+			insertAt,
+		});
+	}
+
 	addTip(text, { id, replace, insertAt } = {}) {
 		if (typeof text !== 'string') {
 			throw new TypeError('Text must be a string');
