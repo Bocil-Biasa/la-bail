@@ -3879,6 +3879,12 @@ export namespace proto {
         }
 
         interface IExternalAdReplyInfo {
+            containsCtwaPromo?: (boolean|null);
+            ctwaPromoAdEntryId?: (string|null);
+            ctwaPromoOfferId?: (string|null);
+            ctwaPromoResponseExpiresAtSeconds?: (number|Long|null);
+            ctwaPromoResponseId?: (string|null);
+            ctwaPromoSchemaVersion?: (number|null);
             productId?: (string|null);
             containsCtwaFlowsAutoLabel?: (boolean|null);
             title?: (string|null);
@@ -3916,6 +3922,12 @@ export namespace proto {
         }
 
         class ExternalAdReplyInfo implements IExternalAdReplyInfo {
+            public containsCtwaPromo?: (boolean|null);
+            public ctwaPromoAdEntryId?: (string|null);
+            public ctwaPromoOfferId?: (string|null);
+            public ctwaPromoResponseExpiresAtSeconds?: (number|Long|null);
+            public ctwaPromoResponseId?: (string|null);
+            public ctwaPromoSchemaVersion?: (number|null);
             public productId?: (string|null);
             public containsCtwaFlowsAutoLabel?: (boolean|null);
             constructor(p?: proto.ContextInfo.IExternalAdReplyInfo);
@@ -4603,6 +4615,7 @@ export namespace proto {
         }
 
         interface IHistorySyncConfig {
+            supportUniversalReachChat?: (boolean|null);
             supportNewsletter?: (boolean|null);
             fullSyncDaysLimit?: (number|null);
             fullSyncSizeMbLimit?: (number|null);
@@ -4631,6 +4644,7 @@ export namespace proto {
         }
 
         class HistorySyncConfig implements IHistorySyncConfig {
+            public supportUniversalReachChat?: (boolean|null);
             public supportNewsletter?: (boolean|null);
             constructor(p?: proto.DeviceProps.IHistorySyncConfig);
             public fullSyncDaysLimit?: (number|null);
@@ -6030,6 +6044,7 @@ export namespace proto {
     }
 
     interface IMessage {
+        botGroupParticipantMessage?: (proto.Message.IFutureProofMessage|null);
         audioStickerMessage?: (proto.Message.IFutureProofMessage|null);
         acp2SettingMessage?: (proto.Message.IFutureProofMessage|null);
         newsletterFollowerInviteMessage?: (proto.Message.INewsletterFollowerInviteMessage|null);
@@ -6148,6 +6163,7 @@ export namespace proto {
     }
 
     class Message implements IMessage {
+        public botGroupParticipantMessage?: (proto.Message.IFutureProofMessage|null);
         public audioStickerMessage?: (proto.Message.IFutureProofMessage|null);
         public acp2SettingMessage?: (proto.Message.IFutureProofMessage|null);
         public newsletterFollowerInviteMessage?: (proto.Message.INewsletterFollowerInviteMessage|null);
@@ -7333,6 +7349,9 @@ export namespace proto {
         }
 
         interface IEventInviteMessage {
+            coverImageHandle?: (string|null);
+            lastUpdatedTsUsec?: (number|Long|null);
+            locationName?: (string|null);
             contextInfo?: (proto.IContextInfo|null);
             eventId?: (string|null);
             eventTitle?: (string|null);
@@ -7345,6 +7364,9 @@ export namespace proto {
         }
 
         class EventInviteMessage implements IEventInviteMessage {
+            public coverImageHandle?: (string|null);
+            public lastUpdatedTsUsec?: (number|Long|null);
+            public locationName?: (string|null);
             constructor(p?: proto.Message.IEventInviteMessage);
             public contextInfo?: (proto.IContextInfo|null);
             public eventId?: (string|null);

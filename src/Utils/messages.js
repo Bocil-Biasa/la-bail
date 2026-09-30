@@ -1816,6 +1816,7 @@ export const FUTURE_PROOF_MESSAGE_KEYS = [
     'associatedChildMessage',
     'audioStickerMessage',
     'botForwardedMessage',
+    'botGroupParticipantMessage',
     'botInvokeMessage',
     'botPlatformRegistrationSuccessMessage',
     'botTaskMessage',
