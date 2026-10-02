@@ -18175,6 +18175,7 @@ export const proto = $root.proto = (() => {
             ParticipantInfo.prototype.userJid = null;
             ParticipantInfo.prototype.callResult = null;
 
+            ParticipantInfo.prototype.guestInfo = null;
             let $oneOfFields;
 
             // Virtual OneOf for proto3 optional field
@@ -18189,6 +18190,11 @@ export const proto = $root.proto = (() => {
                 set: $util.oneOfSetter($oneOfFields)
             });
 
+            Object.defineProperty(ParticipantInfo.prototype, "_guestInfo", {
+                get: $util.oneOfGetter($oneOfFields = ["guestInfo"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
             ParticipantInfo.create = function create(properties) {
                 return new ParticipantInfo(properties);
             };
@@ -18200,6 +18206,8 @@ export const proto = $root.proto = (() => {
                     w.uint32(10).string(m.userJid);
                 if (m.callResult != null && Object.hasOwnProperty.call(m, "callResult"))
                     w.uint32(16).int32(m.callResult);
+                if (m.guestInfo != null && Object.hasOwnProperty.call(m, "guestInfo"))
+                    $root.proto.CallLogRecord.GuestInfo.encode(m.guestInfo, w.uint32(26).fork()).ldelim();
                 return w;
             };
 
@@ -18222,6 +18230,10 @@ export const proto = $root.proto = (() => {
                         }
                     case 2: {
                             m.callResult = r.int32();
+                            break;
+                        }
+                    case 3: {
+                            m.guestInfo = $root.proto.CallLogRecord.GuestInfo.decode(r, r.uint32(), undefined, n + 1);
                             break;
                         }
                     default:
@@ -18295,6 +18307,11 @@ export const proto = $root.proto = (() => {
                     m.callResult = 10;
                     break;
                 }
+                if (d.guestInfo != null) {
+                    if (typeof d.guestInfo !== "object")
+                        throw TypeError(".proto.guestInfo: object expected");
+                    m.guestInfo = $root.proto.CallLogRecord.GuestInfo.fromObject(d.guestInfo, n + 1);
+                }
                 return m;
             };
 
@@ -18311,6 +18328,11 @@ export const proto = $root.proto = (() => {
                     d.callResult = o.enums === String ? $root.proto.CallLogRecord.CallResult[m.callResult] === undefined ? m.callResult : $root.proto.CallLogRecord.CallResult[m.callResult] : m.callResult;
                     if (o.oneofs)
                         d._callResult = "callResult";
+                }
+                if (m.guestInfo != null && m.hasOwnProperty("guestInfo")) {
+                    d.guestInfo = $root.proto.CallLogRecord.GuestInfo.toObject(m.guestInfo, o);
+                    if (o.oneofs)
+                        d._guestInfo = "guestInfo";
                 }
                 return d;
             };
@@ -18336,6 +18358,101 @@ export const proto = $root.proto = (() => {
             values[valuesById[2] = "PRIVACY"] = 2;
             values[valuesById[3] = "LIGHTWEIGHT"] = 3;
             return values;
+        })();
+
+        CallLogRecord.GuestInfo = (function() {
+
+            function GuestInfo(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            GuestInfo.prototype.pushName = null;
+
+            let $oneOfFields;
+
+            Object.defineProperty(GuestInfo.prototype, "_pushName", {
+                get: $util.oneOfGetter($oneOfFields = ["pushName"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            GuestInfo.create = function create(properties) {
+                return new GuestInfo(properties);
+            };
+
+            GuestInfo.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.pushName != null && Object.hasOwnProperty.call(m, "pushName"))
+                    w.uint32(10).string(m.pushName);
+                return w;
+            };
+
+            GuestInfo.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.CallLogRecord.GuestInfo();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.pushName = r.string();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            GuestInfo.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.CallLogRecord.GuestInfo)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.CallLogRecord.GuestInfo();
+                if (d.pushName != null) {
+                    m.pushName = String(d.pushName);
+                }
+                return m;
+            };
+
+            GuestInfo.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (m.pushName != null && m.hasOwnProperty("pushName")) {
+                    d.pushName = m.pushName;
+                    if (o.oneofs)
+                        d._pushName = "pushName";
+                }
+                return d;
+            };
+
+            GuestInfo.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            GuestInfo.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.CallLogRecord.GuestInfo";
+            };
+
+            return GuestInfo;
         })();
 
         return CallLogRecord;
@@ -97932,6 +98049,7 @@ export const proto = $root.proto = (() => {
         SyncActionValue.prototype.contactManagerMetadataAction = null;
         SyncActionValue.prototype.businessFolderActivationAction = null;
         SyncActionValue.prototype.groupHistoryToggleAction = null;
+        SyncActionValue.prototype.bbProPendingCustomerBaseAction = null;
         let $oneOfFields;
 
         // Virtual OneOf for proto3 optional field
@@ -98454,6 +98572,11 @@ export const proto = $root.proto = (() => {
             set: $util.oneOfSetter($oneOfFields)
         });
 
+        Object.defineProperty(SyncActionValue.prototype, "_bbProPendingCustomerBaseAction", {
+            get: $util.oneOfGetter($oneOfFields = ["bbProPendingCustomerBaseAction"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
         SyncActionValue.create = function create(properties) {
             return new SyncActionValue(properties);
         };
@@ -98637,6 +98760,8 @@ export const proto = $root.proto = (() => {
                 $root.proto.SyncActionValue.BusinessFolderActivationAction.encode(m.businessFolderActivationAction, w.uint32(770).fork()).ldelim();
             if (m.groupHistoryToggleAction != null && Object.hasOwnProperty.call(m, "groupHistoryToggleAction"))
                 $root.proto.SyncActionValue.GroupHistoryToggleAction.encode(m.groupHistoryToggleAction, w.uint32(778).fork()).ldelim();
+            if (m.bbProPendingCustomerBaseAction != null && Object.hasOwnProperty.call(m, "bbProPendingCustomerBaseAction"))
+                $root.proto.SyncActionValue.BBProPendingCustomerBaseAction.encode(m.bbProPendingCustomerBaseAction, w.uint32(786).fork()).ldelim();
             return w;
         };
 
@@ -99003,6 +99128,10 @@ export const proto = $root.proto = (() => {
                     }
                 case 97: {
                         m.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 98: {
+                        m.bbProPendingCustomerBaseAction = $root.proto.SyncActionValue.BBProPendingCustomerBaseAction.decode(r, r.uint32(), undefined, n + 1);
                         break;
                     }
                 default:
@@ -99466,6 +99595,11 @@ export const proto = $root.proto = (() => {
                     throw TypeError(".proto.groupHistoryToggleAction: object expected");
                 m.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.fromObject(d.groupHistoryToggleAction, n + 1);
             }
+            if (d.bbProPendingCustomerBaseAction != null) {
+                if (typeof d.bbProPendingCustomerBaseAction !== "object")
+                    throw TypeError(".proto.bbProPendingCustomerBaseAction: object expected");
+                m.bbProPendingCustomerBaseAction = $root.proto.SyncActionValue.BBProPendingCustomerBaseAction.fromObject(d.bbProPendingCustomerBaseAction, n + 1);
+            }
             return m;
         };
 
@@ -99915,6 +100049,11 @@ export const proto = $root.proto = (() => {
                 d.groupHistoryToggleAction = $root.proto.SyncActionValue.GroupHistoryToggleAction.toObject(m.groupHistoryToggleAction, o);
                 if (o.oneofs)
                     d._groupHistoryToggleAction = "groupHistoryToggleAction";
+            }
+            if (m.bbProPendingCustomerBaseAction != null && m.hasOwnProperty("bbProPendingCustomerBaseAction")) {
+                d.bbProPendingCustomerBaseAction = $root.proto.SyncActionValue.BBProPendingCustomerBaseAction.toObject(m.bbProPendingCustomerBaseAction, o);
+                if (o.oneofs)
+                    d._bbProPendingCustomerBaseAction = "bbProPendingCustomerBaseAction";
             }
             return d;
         };
@@ -113388,6 +113527,101 @@ export const proto = $root.proto = (() => {
             };
 
             return GroupHistoryToggleAction;
+        })();
+
+        SyncActionValue.BBProPendingCustomerBaseAction = (function() {
+
+            function BBProPendingCustomerBaseAction(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            BBProPendingCustomerBaseAction.prototype.pending = null;
+
+            let $oneOfFields;
+
+            Object.defineProperty(BBProPendingCustomerBaseAction.prototype, "_pending", {
+                get: $util.oneOfGetter($oneOfFields = ["pending"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            BBProPendingCustomerBaseAction.create = function create(properties) {
+                return new BBProPendingCustomerBaseAction(properties);
+            };
+
+            BBProPendingCustomerBaseAction.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.pending != null && Object.hasOwnProperty.call(m, "pending"))
+                    w.uint32(8).bool(m.pending);
+                return w;
+            };
+
+            BBProPendingCustomerBaseAction.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.SyncActionValue.BBProPendingCustomerBaseAction();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.pending = r.bool();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            BBProPendingCustomerBaseAction.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.SyncActionValue.BBProPendingCustomerBaseAction)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.SyncActionValue.BBProPendingCustomerBaseAction();
+                if (d.pending != null) {
+                    m.pending = Boolean(d.pending);
+                }
+                return m;
+            };
+
+            BBProPendingCustomerBaseAction.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (m.pending != null && m.hasOwnProperty("pending")) {
+                    d.pending = m.pending;
+                    if (o.oneofs)
+                        d._pending = "pending";
+                }
+                return d;
+            };
+
+            BBProPendingCustomerBaseAction.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            BBProPendingCustomerBaseAction.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.SyncActionValue.BBProPendingCustomerBaseAction";
+            };
+
+            return BBProPendingCustomerBaseAction;
         })();
 
         return SyncActionValue;
