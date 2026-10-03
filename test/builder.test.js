@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { proto } from '../WAProto/index.js';
-import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, decodeBloksWidget, sendA2UI, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
+import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, buildA2UISection, decodeBloksWidget, sendA2UI, sendA2UIBloks, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
 import { AIRich, Toolkit, ContentValidationError } from '../src/MessageBuilder/index.js';
 import { checkHtmlApp } from '../src/Utils/html-app.js';
 import { accountLinkingApp, accountLinkingSection, actionListRow, actionListSection, addonActionSection, calendarEvent, calendarWidgetSection, chainOfThoughtSection, chainingSuggestionSection, commentSection, compactEntitySection, contextualSourcesSection, customSection, locationPermissionSection, mapSection, mediaGridSection, mediaItem, multipleResponseSection, placeItem, plannerSnippetSection, plannerStep, productEntityItem, reminderSection, searchAdSection, searchPlannerSection, searchResultV2Section, sideBySideSurveyItem, socialEntityItem, sportsSection, threadSurfingItem, timestampPlaceholderSection, transparencySection, transparencySignal, videoSection, ActionListRowType, CompactEntityType, MapQueryStatus, MultipleResponseLayoutType, SearchPlannerStepStatus, SportsGameStatus, SportsLeague, forwardRichResponse, readSignedRichResponse, verifyRichResponseSignature } from '../src/MessageBuilder/metaai.js';
@@ -365,6 +365,45 @@ test('bloks-widget', async () => {
     rich._addContent(bloksSection(BLOKS_A2UI_TYPE, { title: 'kartu' }));
     await rich.send('2@s.whatsapp.net');
     assert.deepEqual(decodeAIRich({ message: richCalls[0].message }).typenames, ['FOABloksPrimitive']);
+});
+
+test('a2ui-bloks-rich', async () => {
+    const components = [
+        a2uiColumn('root', ['img', 't1']),
+        a2uiImage('img', 'https://files.catbox.moe/5hojci.jpg'),
+        a2uiText('t1', 'Elaina Bot')
+    ];
+
+    const section = buildA2UISection(components, { uuid: 'u-1' });
+    assert.equal(section.view_model.primitive.__typename, 'FOABloksPrimitive');
+    assert.equal(section.view_model.primitive.type, BLOKS_A2UI_TYPE);
+    const sectionData = JSON.parse(section.view_model.primitive.data);
+    assert.equal(sectionData.version, A2UI_VERSION);
+    assert.equal(sectionData.createSurface.root, 'root');
+    assert.equal(sectionData.createSurface.components.length, 3);
+
+    assert.throws(() => buildA2UISection([a2uiText('bukan-root', 'x')]), TypeError);
+
+    const calls = [];
+    const sock = { user: { id: '1@s.whatsapp.net' }, relayMessage: async (jid, message) => { calls.push({ jid, message }); } };
+    const msg = await sendA2UIBloks(sock, '2@s.whatsapp.net', components, { uuid: 'u-9' });
+
+    assert.ok(msg.key.id);
+    assert.equal(calls.length, 2, 'first relay, then the unified-response edit');
+    const rich = decodeAIRich(calls[0].message);
+    assert.deepEqual(rich.typenames, ['FOABloksPrimitive']);
+    assert.equal(rich.sections[0].view_model.primitive.type, BLOKS_A2UI_TYPE);
+
+    const info = readRichMessage(calls[0].message);
+    assert.equal(info.kind, 'a2ui');
+    assert.equal(info.a2ui.version, A2UI_VERSION);
+    assert.equal(info.a2ui.root, 'root');
+    assert.equal(info.a2ui.components.length, 3);
+    assert.equal(info.a2ui.catalogId, undefined);
+    assert.equal(info.text, 'Elaina Bot');
+
+    await assert.rejects(() => sendA2UIBloks(null, '2@s.whatsapp.net', components), TypeError);
+    await assert.rejects(() => sendA2UIBloks(sock, '', components), TypeError);
 });
 
 test('deeplink-item', async () => {

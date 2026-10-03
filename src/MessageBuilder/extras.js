@@ -936,6 +936,27 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
     return msg
 }
 
+export const buildA2UISection = (components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, data, initialResponse, versioningId } = {}) =>
+    bloksSection(
+        BLOKS_A2UI_TYPE,
+        data ?? a2uiSurface(components, { surfaceId, root, catalogId, sendDataModel, version, type, title }),
+        { uuid, initialResponse, versioningId }
+    )
+
+export const sendA2UIBloks = async (sock, jid, components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, data, initialResponse, versioningId, ...options } = {}) => {
+    if (!sock) {
+        throw new TypeError('sendA2UIBloks requires a socket as the first argument')
+    }
+    if (!jid) {
+        throw new TypeError('sendA2UIBloks requires a target jid')
+    }
+
+    const rich = new AIRich(sock)
+    rich.addSection(buildA2UISection(components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, data, initialResponse, versioningId }))
+
+    return rich.send(jid, options)
+}
+
 export const sendBloksWidget = async (sock, jid, { type, data, uuid, fallback = '', body, contextInfo, messageId, additionalNodes = [], ...options } = {}) => {
     if (!sock) {
         throw new TypeError('sendBloksWidget requires a socket as the first argument')
@@ -1105,6 +1126,18 @@ const readA2UIText = (components) => components
     .map(component => A2UI_TEXT_KEYS.map(key => component[key]).find(value => typeof value === 'string') ?? '')
     .filter(Boolean)
 
+const parseBloksParams = (data) => {
+    if (!data || typeof data !== 'string') {
+        return null
+    }
+    try {
+        return JSON.parse(data)
+    }
+    catch {
+        return null
+    }
+}
+
 export const readRichMessage = (msg) => {
     const raw = msg?.message ?? msg
     if (!raw || typeof raw !== 'object') {
@@ -1135,15 +1168,7 @@ export const readRichMessage = (msg) => {
         return { name: button?.name ?? '', params }
     })
 
-    const isA2UI = widget?.type === BLOKS_A2UI_TYPE
-    const surface = isA2UI ? widget.params?.createSurface : null
-    const a2uiComponents = Array.isArray(surface?.components) ? surface.components : []
-    const a2uiElement = isA2UI && !surface && widget.params && typeof widget.params === 'object' ? widget.params : undefined
-
-    const a2uiTextLines = readA2UIText(a2uiComponents)
-    const bodyText = interactive?.body?.text ?? ''
-    const widgetFallback = widget?.fallback ?? ''
-    const bodyDuplicatesWidget = bodyText !== '' && bodyText === widgetFallback
+    const isA2UIWidget = widget?.type === BLOKS_A2UI_TYPE
 
     const sectionPrimitives = sections => sections.flatMap(section => {
         const view = section?.view_model
@@ -1154,8 +1179,20 @@ export const readRichMessage = (msg) => {
     const primitives = sectionPrimitives(rich?.sections ?? [])
     const embeddedPrimitives = sectionPrimitives(rich?.embeddedSections ?? [])
 
+    const richBloks = primitives.find(primitive => primitive?.__typename === 'FOABloksPrimitive' && primitive?.type === BLOKS_A2UI_TYPE)
+    const a2uiParams = isA2UIWidget ? widget.params : parseBloksParams(richBloks?.data)
+    const surface = a2uiParams?.createSurface
+    const a2uiComponents = Array.isArray(surface?.components) ? surface.components : []
+    const a2uiElement = !surface && a2uiParams && typeof a2uiParams === 'object' ? a2uiParams : undefined
+    const isA2UI = isA2UIWidget || !!richBloks
+
+    const a2uiTextLines = readA2UIText(a2uiComponents)
+    const bodyText = interactive?.body?.text ?? ''
+    const widgetFallback = widget?.fallback ?? ''
+    const bodyDuplicatesWidget = bodyText !== '' && bodyText === widgetFallback
+
     const lines = [
-        ...primitives.map(readPrimitiveText),
+        ...primitives.filter(primitive => primitive !== richBloks).map(readPrimitiveText),
         ...a2uiTextLines,
         bodyDuplicatesWidget && a2uiTextLines.length ? '' : bodyText,
         interactive?.footer?.text ?? ''
@@ -1181,8 +1218,8 @@ export const readRichMessage = (msg) => {
                 surfaceId: surface?.surfaceId,
                 root: surface?.root,
                 catalogId: surface?.catalogId,
-                version: widget.params?.version,
-                type: widget.params?.type,
+                version: a2uiParams?.version,
+                type: a2uiParams?.type,
                 components: a2uiComponents.length ? a2uiComponents : undefined,
                 element: a2uiElement
             })
