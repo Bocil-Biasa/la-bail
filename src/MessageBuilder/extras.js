@@ -837,6 +837,30 @@ export const a2uiCard = (id, child) => {
     return a2uiNode('Card')(id, { child })
 }
 
+const a2uiElement = (type) => (element = {}) => {
+    if (element === null || typeof element !== 'object' || Array.isArray(element)) {
+        throw new TypeError('a2ui ' + type + ' element must be a plain object')
+    }
+    return { type, ...element }
+}
+
+export const a2uiInfoCard = a2uiElement('info_card')
+export const a2uiListCard = a2uiElement('list_card')
+
+const A2UI_FALLBACK_KEYS = Object.freeze(['text', 'title', 'label', 'body'])
+
+export const a2uiFallback = (components) => {
+    const list = Array.isArray(components)
+        ? components
+        : (components && typeof components === 'object' ? [components] : [])
+    return list
+        .map(component => A2UI_FALLBACK_KEYS
+            .map(key => component?.[key])
+            .find(value => typeof value === 'string' && value.trim() !== '') ?? '')
+        .filter(Boolean)
+        .join('\n')
+}
+
 export const a2uiSurface = (components, { surfaceId, root = A2UI_ROOT_ID, catalogId, sendDataModel, version = A2UI_VERSION, type, title } = {}) => {
     if (!Array.isArray(components) || components.length === 0) {
         throw new TypeError('a2uiSurface requires at least one component')
@@ -858,13 +882,14 @@ export const a2uiSurface = (components, { surfaceId, root = A2UI_ROOT_ID, catalo
     })
 }
 
-export const a2uiWidget = (components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, fallback = '' } = {}) => {
+export const a2uiWidget = (components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, fallback, data } = {}) => {
     const id = uuid ?? randomUUID()
+    const payload = data ?? a2uiSurface(components, { surfaceId: surfaceId ?? 'card-' + id, root, catalogId, sendDataModel, version, type, title })
     return bloksWidget({
         type: BLOKS_A2UI_TYPE,
         uuid: id,
-        fallback,
-        data: a2uiSurface(components, { surfaceId: surfaceId ?? 'card-' + id, root, catalogId, sendDataModel, version, type, title })
+        fallback: fallback === undefined ? a2uiFallback(Array.isArray(components) && components.length ? components : payload) : fallback,
+        data: payload
     })
 }
 
@@ -880,6 +905,7 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
     }
 
     const widget = a2uiWidget(components, options)
+    const text = widget.fallback
 
     const msg = generateWAMessageFromContent(
         jid,
@@ -887,6 +913,7 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
             interactiveMessage: trimEmpty({
                 nativeFlowMessage: { buttons, messageParamsJson: JSON.stringify({}), messageVersion: 1 },
                 bloksWidget: widget,
+                ...(text ? { body: { text } } : {}),
                 contextInfo
             })
         },
@@ -1112,6 +1139,11 @@ export const readRichMessage = (msg) => {
         ? widget.params.createSurface.components
         : []
 
+    const a2uiTextLines = readA2UIText(a2uiComponents)
+    const bodyText = interactive?.body?.text ?? ''
+    const widgetFallback = widget?.fallback ?? ''
+    const bodyDuplicatesWidget = bodyText !== '' && bodyText === widgetFallback
+
     const sectionPrimitives = sections => sections.flatMap(section => {
         const view = section?.view_model
         if (Array.isArray(view?.primitives)) return view.primitives
@@ -1123,8 +1155,8 @@ export const readRichMessage = (msg) => {
 
     const lines = [
         ...primitives.map(readPrimitiveText),
-        ...readA2UIText(a2uiComponents),
-        interactive?.body?.text ?? '',
+        ...a2uiTextLines,
+        bodyDuplicatesWidget && a2uiTextLines.length ? '' : bodyText,
         interactive?.footer?.text ?? ''
     ].filter(Boolean)
 

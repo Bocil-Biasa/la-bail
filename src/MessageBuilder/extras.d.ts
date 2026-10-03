@@ -242,10 +242,19 @@ export interface A2UIComponent {
     [key: string]: any;
 }
 
+export interface A2UIElement {
+    type: 'info_card' | 'list_card';
+    [key: string]: any;
+}
+
 export declare function a2uiText(id: string, text: string, options?: { variant?: string }): A2UIComponent;
 export declare function a2uiImage(id: string, url: string, options?: { variant?: string; fit?: string }): A2UIComponent;
 export declare function a2uiColumn(id: string, children?: string[]): A2UIComponent;
 export declare function a2uiRow(id: string, children?: string[]): A2UIComponent;
+export declare function a2uiCard(id: string, child: string): A2UIComponent;
+export declare function a2uiInfoCard(element?: Record<string, any>): A2UIElement;
+export declare function a2uiListCard(element?: Record<string, any>): A2UIElement;
+export declare function a2uiFallback(components: any[]): string;
 
 export declare function a2uiSurface(components: A2UIComponent[], options?: {
     surfaceId?: string;
@@ -267,6 +276,7 @@ export declare function a2uiWidget(components: A2UIComponent[], options?: {
     type?: string;
     title?: string;
     fallback?: string;
+    data?: any;
 }): BloksWidget;
 
 export declare function sendA2UI(sock: any, jid: string, components: A2UIComponent[], options?: {
