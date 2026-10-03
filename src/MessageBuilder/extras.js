@@ -837,31 +837,34 @@ export const a2uiCard = (id, child) => {
     return a2uiNode('Card')(id, { child })
 }
 
-export const a2uiSurface = (components, { surfaceId, catalogId = A2UI_BASIC_CATALOG, sendDataModel = false, version = A2UI_VERSION } = {}) => {
+export const a2uiSurface = (components, { surfaceId, root = A2UI_ROOT_ID, catalogId, sendDataModel, version = A2UI_VERSION, type, title } = {}) => {
     if (!Array.isArray(components) || components.length === 0) {
         throw new TypeError('a2uiSurface requires at least one component')
     }
-    if (!components.some(component => component?.id === A2UI_ROOT_ID)) {
-        throw new TypeError('a2ui components must include one with id "' + A2UI_ROOT_ID + '"')
+    if (!components.some(component => component?.id === root)) {
+        throw new TypeError('a2ui components must include one with id "' + root + '" to serve as the root')
     }
-    return {
+    return trimEmpty({
         version,
-        createSurface: {
+        type,
+        title,
+        createSurface: trimEmpty({
             surfaceId: surfaceId ?? 'card-' + randomUUID(),
+            root,
             catalogId,
-            sendDataModel: !!sendDataModel,
+            sendDataModel: sendDataModel === undefined ? undefined : !!sendDataModel,
             components
-        }
-    }
+        })
+    })
 }
 
-export const a2uiWidget = (components, { uuid, surfaceId, catalogId, sendDataModel, version, fallback = '' } = {}) => {
+export const a2uiWidget = (components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, fallback = '' } = {}) => {
     const id = uuid ?? randomUUID()
     return bloksWidget({
         type: BLOKS_A2UI_TYPE,
         uuid: id,
         fallback,
-        data: a2uiSurface(components, { surfaceId: surfaceId ?? 'card-' + id, catalogId, sendDataModel, version })
+        data: a2uiSurface(components, { surfaceId: surfaceId ?? 'card-' + id, root, catalogId, sendDataModel, version, type, title })
     })
 }
 
@@ -1143,6 +1146,7 @@ export const readRichMessage = (msg) => {
         a2ui: a2uiComponents.length
             ? {
                 surfaceId: widget.params.createSurface.surfaceId,
+                root: widget.params.createSurface.root,
                 catalogId: widget.params.createSurface.catalogId,
                 version: widget.params.version,
                 components: a2uiComponents

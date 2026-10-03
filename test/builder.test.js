@@ -42,9 +42,15 @@ test('a2ui', async () => {
     const surface = a2uiSurface(components, { surfaceId: 'card-1' });
     assert.equal(surface.version, 'v0.9');
     assert.equal(surface.createSurface.surfaceId, 'card-1');
-    assert.equal(surface.createSurface.catalogId, A2UI_BASIC_CATALOG);
-    assert.equal(surface.createSurface.sendDataModel, false);
+    assert.equal(surface.createSurface.root, 'root');
+    assert.equal('catalogId' in surface.createSurface, false);
+    assert.equal('sendDataModel' in surface.createSurface, false);
     assert.equal(surface.createSurface.components.length, 4);
+
+    const catalogued = a2uiSurface(components, { surfaceId: 'card-2', catalogId: A2UI_BASIC_CATALOG, sendDataModel: true });
+    assert.equal(catalogued.createSurface.catalogId, A2UI_BASIC_CATALOG);
+    assert.equal(catalogued.createSurface.sendDataModel, true);
+    assert.equal(catalogued.createSurface.root, 'root');
 
     assert.throws(() => a2uiSurface([]), TypeError);
     assert.throws(() => a2uiSurface('x'), TypeError);
@@ -56,6 +62,9 @@ test('a2ui', async () => {
     assert.equal(widget.fallback, '');
     assert.equal(typeof widget.data, 'string');
     assert.equal(JSON.parse(widget.data).createSurface.surfaceId, 'card-u-1');
+    assert.equal(JSON.parse(widget.data).createSurface.root, 'root');
+    assert.equal(JSON.parse(widget.data).version, 'v0.9');
+    assert.equal('catalogId' in JSON.parse(widget.data).createSurface, false);
 
     const encoded = proto.Message.encode({ interactiveMessage: { bloksWidget: widget } }).finish();
     const back = proto.Message.decode(encoded).interactiveMessage.bloksWidget;
@@ -1001,6 +1010,7 @@ test('read-rich', async () => {
     assert.equal(a2ui.kind, 'a2ui');
     assert.equal(a2ui.text, 'Welcome!\nHalo dunia');
     assert.equal(a2ui.a2ui.surfaceId, 'card-u-1');
+    assert.equal(a2ui.a2ui.root, 'root');
     assert.equal(a2ui.a2ui.version, 'v0.9');
     assert.equal(a2ui.a2ui.components.length, 3);
     assert.equal(a2ui.bloks.type, 'im_a2ui');
