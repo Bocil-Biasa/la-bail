@@ -1400,7 +1400,7 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-bai
 
 ### Satu impor, seluruh builder
 
-Permukaan builder-nya terdiri dari 198 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+Permukaan builder-nya terdiri dari 200 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2159,7 +2159,7 @@ await rich.send(jid)
 | `thinkingSection` | `GenAIBotThinkingStatusPrimitive` | `title`, `icon`, `is_in_progress`, `meta_search_apps`, `thought_duration_sec` |
 | `progressSection` | `GenAIBotProgressStatusPrimitive` | field-nya sama dengan thinking |
 
-Satu primitif di tabel renderer Web tidak punya pabrik di sini: `FOABloksPrimitive` menyebut satu layar Bloks yang diambil klien dari server Meta, bukan dibaca dari pesannya, jadi tidak ada field yang bisa diisi bot. `GenAIMetaSubsQuotaUpsellPrimitive` dulu juga ikut dikecualikan dengan alasan yang sama, dan itu salah: parser-nya membaca seluruh kartunya dari wire. Pabriknya ada sekarang — lihat [Kartu Penawaran Langganan](#kartu-penawaran-langganan).
+`FOABloksPrimitive` justru punya pabrik: `bloksSection`. Primitifnya membawa satu layar Bloks (`type: "im_a2ui"`) yang komponennya ikut di dalam `data`, bukan diambil klien dari server Meta — dan inilah pembungkus yang dipakai fixture A2UI resmi WhatsApp Web. Lihat [Kartu A2UI](#kartu-a2ui). `GenAIMetaSubsQuotaUpsellPrimitive` dulu ikut dikecualikan dengan alasan yang sama, dan itu juga salah: parser-nya membaca seluruh kartunya dari wire — pabriknya ada sekarang, lihat [Kartu Penawaran Langganan](#kartu-penawaran-langganan).
 
 ### Sisa Katalog Meta AI
 
@@ -2500,16 +2500,30 @@ Ia membuka view-once dan pembungkus lainnya dulu, jadi kartu di dalam `viewOnceM
 `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` menghasilkan kartu yang digambar klien **dari spesifikasi deklaratif yang dibawa pesannya**. Tanpa HTML, tanpa hosting, dan berbeda dari Bloks lainnya, tidak ada yang diambil dari Meta — komponennya berjalan di dalam `data` dan klien yang menata letaknya.
 
 > [!WARNING]
-> `sendA2UI` mengirim bentuk yang sama dengan fixture debug resmi WhatsApp Web (`WAWebInteractiveBloksWidgetDebug`): `createSurface` membawa `root` bersama `components`. Perlu diketahui bahwa **renderer pohon `createSurface` itu sendiri adalah modul yang dimuat malas** (`WAWebBloksEntryPoint.react`, lewat `WAWebBloksEntryPointLoadable`) dan tidak ikut dalam snapshot bundle, jadi bentuk `Column`/`Text`/`Image` belum bisa diverifikasi langsung dari bundle. Kartu tetap berada di belakang gerbang yang tidak kamu kendalikan: `im_bloks_widget_enable`, dan pada build yang menyalakan `im_a2ui_require_bot_attribution` pesannya harus datang sebagai bot 1P dengan atribusi (`bizBotType`, yang berasal dari field protobuf `WebMessageInfo.is1PBizBotMessage` nomor 56 — bukan bidang yang bisa disetel pengirim lewat `proto.Message`). Kalau gerbang itu tertutup, klien menggambar `fallback`-nya, bukan kartunya.
+> Ada dua pembungkus A2UI, dan **keduanya** harus dicoba kalau kartunya tidak muncul. (1) `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` — ini yang dipakai `sendA2UI`, dan pada build WhatsApp yang menyalakan `im_a2ui_require_bot_attribution` ia menuntut pesannya datang sebagai bot 1P dengan atribusi (`bizBotType`, dari field protobuf `WebMessageInfo.is1PBizBotMessage` nomor 56 — **tidak** bisa disetel pengirim lewat `proto.Message`). Kalau syarat itu tidak terpenuhi, klien hanya menggambar `fallback`, bukan kartunya. (2) `richResponseMessage` dengan primitif `FOABloksPrimitive`, `type: "im_a2ui"`, dan komponen di dalam `data` — **inilah bentuk yang dipakai fixture debug resmi WhatsApp Web** (`WAWebInteractiveBloksWidgetDebug.injectRichResponseTestMessage`: `richResponse` + `unifiedResponse` → section → `FOABloksPrimitive`), dan bentuk ini lewat `AIRich`, jadi tidak terkena syarat atribusi di atas. Kalau bentuk (1) tampil sebagai teks biasa, pakai `sendA2UIBloks`.
+>
+> Kedua bentuk tetap berada di belakang gerbang `im_bloks_widget_enable`. Renderer pohon `createSurface` sendiri (`WAWebBloksEntryPoint.react`) adalah modul yang dimuat malas dan tidak ikut dalam snapshot bundle, jadi bentuk `Column`/`Text`/`Image` belum bisa diverifikasi langsung dari bundle; yang bisa dibuktikan adalah bahwa payload-nya identik dengan fixture resmi dan selamat melewati round-trip protobuf.
 
 Ada dua bentuk A2UI, dan bedanya penting:
 
 | Bentuk | Isi `data` | Bukti |
 |---|---|---|
-| Elemen siap pakai | `{"type":"info_card", …}` dan `{"type":"list_card", …}` | Wa **Android** mengenal persis kedua jenis ini, dan AB prop `a2ui_supported_elements` milik WA Web berisi `"info_card, list_card"` |
+| Elemen siap pakai | `{"type":"info_card", …}` dan `{"type":"list_card", …}` | Android mengenal persis kedua jenis ini, dan AB prop `a2ui_supported_elements` milik WA Web berisi `"info_card, list_card"` |
 | Pohon `createSurface` | `{version, createSurface:{surfaceId, root, components}}` | Fixture debug WA Web; renderer-nya lazy-loaded sehingga belum terverifikasi dari bundle |
 
-Karena KLON Android hanya menggambar `info_card` dan `list_card`, gunakan elemen itu untuk jalur yang paling pasti. Helper `a2uiInfoCard`/`a2uiListCard` merakit objeknya, dan `sendA2UI` menerima elemen apa pun lewat `data`:
+Bentuk elemen bisa dilewatkan ke dua pembungkus. Ini juga alasan kenapa `sendA2UI` sering hanya muncul sebagai teks biasa di build tertentu: syarat atribusi bot 1P tidak terpenuhi. **Kalau begitu, pindah ke `sendA2UIBloks`**, yang mengirim elemen yang sama lewat `richResponseMessage`/`FOABloksPrimitive` seperti fixture debug resmi:
+
+```js
+await MB.sendA2UIBloks(sock, jid, [
+    MB.a2uiColumn('root', ['img', 't1']),
+    MB.a2uiImage('img', 'https://files.catbox.moe/5hojci.jpg'),
+    MB.a2uiText('t1', 'Elaina Bot')
+], { uuid: crypto.randomUUID() })
+```
+
+`sendA2UIBloks` menerima pohon `components` yang sama dengan `sendA2UI` (termasuk objek `data` mentah), lalu membungkusnya lewat `AIRich` + `bloksSection`. `buildA2UISection(components, options)` mengembalikan section-nya kalau kamu mau merangkai sendiri ke builder `AIRich`.
+
+Karena Android hanya menggambar `info_card` dan `list_card`, gunakan elemen itu untuk jalur yang paling pasti. Helper `a2uiInfoCard`/`a2uiListCard` merakit objeknya, dan kedua `sendA2UI`/`sendA2UIBloks` menerima elemen apa pun lewat `data`:
 
 ```js
 await MB.sendA2UI(sock, jid, [], {
@@ -2546,6 +2560,8 @@ Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus berna
 | `a2uiText(id, text, { variant })` | `Text` — `variant` bisa `h1`, `body`, dan seterusnya |
 | `a2uiImage(id, url, { variant, fit })` | `Image` — bawaannya `header` dan `cover` |
 | `a2uiCard(id, child)` | `Card` — menerima satu id anak, bukan array |
+| `a2uiInfoCard({ title, body, … })` | `{"type":"info_card", …}` — elemen siap pakai, bukan pohon `createSurface` |
+| `a2uiListCard({ title, body, … })` | `{"type":"list_card", …}` |
 
 Pembungkus `a2uiSurface` membangun payload-nya sendiri kalau kamu mau menulis tangan komponen yang belum dicakup helper-nya. `root` selalu ikut; `catalogId`, `sendDataModel`, dan `version` hanya dikirim kalau kamu mengisinya:
 

@@ -295,6 +295,35 @@ export declare function sendA2UI(sock: any, jid: string, components: A2UICompone
     [key: string]: any;
 }): Promise<any>;
 
+export declare function buildA2UISection(components: A2UIComponent[], options?: {
+    uuid?: string;
+    surfaceId?: string;
+    root?: string;
+    catalogId?: string;
+    sendDataModel?: boolean;
+    version?: string;
+    type?: string;
+    title?: string;
+    data?: any;
+    initialResponse?: string;
+    versioningId?: string;
+}): any;
+
+export declare function sendA2UIBloks(sock: any, jid: string, components: A2UIComponent[], options?: {
+    uuid?: string;
+    surfaceId?: string;
+    root?: string;
+    catalogId?: string;
+    sendDataModel?: boolean;
+    version?: string;
+    type?: string;
+    title?: string;
+    data?: any;
+    initialResponse?: string;
+    versioningId?: string;
+    [key: string]: any;
+}): Promise<any>;
+
 export declare const BLOKS_A2UI_TYPE: 'im_a2ui';
 export declare const BLOKS_A2UI_REPLY_ACTION: 'a2ui_reply_action';
 export declare const BLOKS_A2UI_SUPPORTED_ELEMENTS: readonly string[];
