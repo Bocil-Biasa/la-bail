@@ -1135,9 +1135,10 @@ export const readRichMessage = (msg) => {
         return { name: button?.name ?? '', params }
     })
 
-    const a2uiComponents = widget?.type === BLOKS_A2UI_TYPE && Array.isArray(widget.params?.createSurface?.components)
-        ? widget.params.createSurface.components
-        : []
+    const isA2UI = widget?.type === BLOKS_A2UI_TYPE
+    const surface = isA2UI ? widget.params?.createSurface : null
+    const a2uiComponents = Array.isArray(surface?.components) ? surface.components : []
+    const a2uiElement = isA2UI && !surface && widget.params && typeof widget.params === 'object' ? widget.params : undefined
 
     const a2uiTextLines = readA2UIText(a2uiComponents)
     const bodyText = interactive?.body?.text ?? ''
@@ -1160,7 +1161,7 @@ export const readRichMessage = (msg) => {
         interactive?.footer?.text ?? ''
     ].filter(Boolean)
 
-    const kind = a2uiComponents.length ? 'a2ui' : widget ? 'bloks' : rich ? 'airich' : 'interactive'
+    const kind = isA2UI ? 'a2ui' : widget ? 'bloks' : rich ? 'airich' : 'interactive'
 
     return trimEmpty({
         kind,
@@ -1175,14 +1176,16 @@ export const readRichMessage = (msg) => {
         embeddedTabs: rich?.embeddedTabs ?? [],
         submessages: rich?.submessages ?? [],
         responseId: rich?.responseId,
-        a2ui: a2uiComponents.length
-            ? {
-                surfaceId: widget.params.createSurface.surfaceId,
-                root: widget.params.createSurface.root,
-                catalogId: widget.params.createSurface.catalogId,
-                version: widget.params.version,
-                components: a2uiComponents
-            }
+        a2ui: isA2UI
+            ? trimEmpty({
+                surfaceId: surface?.surfaceId,
+                root: surface?.root,
+                catalogId: surface?.catalogId,
+                version: widget.params?.version,
+                type: widget.params?.type,
+                components: a2uiComponents.length ? a2uiComponents : undefined,
+                element: a2uiElement
+            })
             : undefined,
         bloks: widget ? { type: widget.type, uuid: widget.uuid, fallback: widget.fallback, params: widget.params } : undefined
     })

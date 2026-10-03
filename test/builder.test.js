@@ -118,6 +118,12 @@ test('a2ui', async () => {
     assert.equal(JSON.parse(elementWidget.data).type, 'info_card');
     assert.equal(calls[0].message.interactiveMessage.body.text, 'Menu');
 
+    const elementInfo = readRichMessage(calls[0].message);
+    assert.equal(elementInfo.kind, 'a2ui');
+    assert.deepEqual(elementInfo.a2ui.element, { type: 'info_card', title: 'Menu', body: 'Pilih' });
+    assert.equal(elementInfo.a2ui.components, undefined);
+    assert.equal(elementInfo.text, 'Menu');
+
     await assert.rejects(() => sendA2UI(null, '2@s.whatsapp.net', components), TypeError);
     await assert.rejects(() => sendA2UI(sock, '', components), TypeError);
     await assert.rejects(() => sendA2UI(sock, '2@s.whatsapp.net', components, { buttons: 'x' }), TypeError);
