@@ -1,4 +1,6 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
+/* Modified by Bocil-Biasa (c) 2026 - la-bail */
+
 import * as vm from 'node:vm';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -384,15 +386,17 @@ export class WasmEngine {
                 Promise.race([
                     this.#voipReadyPromise,
                     new Promise((r) => setTimeout(() => {
+                        console.warn("[VOIP] ⚠️ READY TIMEOUT");
                         this.#voipStackInitialized = true;
                         r();
-                    }, VOIP_READY_TIMEOUT_MS)),
+                    }, VOIP_READY_TIMEOUT_MS))
                 ]).finally(() => {
                     this.#voipStackInitPromise = null;
                     resolveInit();
                 });
-            }
-            catch {
+            } catch (err) {
+                console.error("[VOIP INIT STACK ERROR]", err);
+
                 this.#voipReadyResolver = null;
                 this.#voipReadyPromise = null;
                 this.#voipStackInitPromise = null;
@@ -438,10 +442,62 @@ export class WasmEngine {
         const pnUserJids = this.#makeStringList(options.pnUserJids ?? []);
         const lidUserJids = this.#makeStringList(options.lidUserJids ?? []);
         const deviceJidsCsv = this.#makeStringList(options.deviceJidsCsv ?? []);
+        let result;
+
         try {
-            return this.#instance.startVoipGroupCall(pnUserJids, lidUserJids, deviceJidsCsv, options.callId, options.isVideo ?? false, options.groupJid, options.isLightWeight ?? false, options.scheduleId ?? "", options.chatName ?? "", options.chatIcon ?? "", options.callFromUI ?? 0, options.lobbyEntryType ?? 0, options.username ?? "");
-        }
-        finally {
+            console.log("[VOIP STATE]", {
+                callId: options.callId,
+                groupJid: options.groupJid,
+                isVideo: options.isVideo ?? false,
+                isLightWeight: options.isLightWeight ?? false,
+                scheduleId: options.scheduleId ?? "",
+                chatName: options.chatName ?? "",
+                chatIcon: options.chatIcon ?? "",
+                callFromUI: options.callFromUI ?? 0,
+                lobbyEntryType: options.lobbyEntryType ?? 0,
+                username: options.username ?? ""
+            });
+
+            console.log("[VOIP INSTANCE]", {
+                startVoipGroupCall: typeof this.#instance.startVoipGroupCall,
+                own: Object.getOwnPropertyNames(this.#instance)
+                    .filter(x => /voip|call|rtc|debug/i.test(x)),
+                proto: Object.getOwnPropertyNames(
+                    Object.getPrototypeOf(this.#instance)
+                ).filter(x => /voip|call|rtc|debug/i.test(x))
+            });
+            result = this.#instance.startVoipGroupCall(
+                pnUserJids, 
+                lidUserJids, 
+                deviceJidsCsv, 
+                options.callId, 
+                options.isVideo ?? false, 
+                options.groupJid, 
+                options.isLightWeight ?? false, 
+                options.scheduleId ?? "", 
+                options.chatName ?? "", 
+                options.chatIcon ?? "", 
+                options.callFromUI ?? 0, 
+                options.lobbyEntryType ?? 0, 
+                options.username ?? ""
+            );
+
+            console.log("[VOIP NATIVE RESULT]", result);
+
+            try {
+                console.log(
+                    "[VOIP DEBUG STAT]",
+                    this.#instance.getDebugStatisticString()
+                );
+            } catch (e) {
+                console.log("[VOIP DEBUG STAT ERROR]", e);
+            }
+
+            return result;
+        } catch (e) {
+            console.log("[VOIP NATIVE THROW]", e);
+            throw e;
+        } finally {
             pnUserJids?.delete?.();
             lidUserJids?.delete?.();
             deviceJidsCsv?.delete?.();
@@ -1239,20 +1295,30 @@ export class WasmEngine {
                 },
                 spawnThread: (params) => {
                     const worker = this.#unusedWorkers.pop();
-                    if (!worker)
+
+                    console.log("[PTHREAD SPAWN]", {
+                        pthread_ptr: params.pthread_ptr,
+                        available: this.#unusedWorkers.length
+                    });
+                    if (!worker) {
+                        console.error("[PTHREAD SPAWN] ❌ NO WORKER");
                         return 6;
+                    }
+
                     this.#runningWorkers.push(worker);
                     this.#pthreads[params.pthread_ptr] = worker;
                     worker.pthread_ptr = params.pthread_ptr;
                     const pthreadTable = this.#instance?.PThread?.pthreads;
                     if (pthreadTable)
                         pthreadTable[params.pthread_ptr] = worker;
+
                     worker.postMessage({
                         cmd: "run",
                         start_routine: params.startRoutine,
                         arg: params.arg,
-                        pthread_ptr: params.pthread_ptr,
+                        pthread_ptr: params.pthread_ptr
                     });
+
                     return 0;
                 },
                 unusedWorkersCount: () => this.#unusedWorkers.length,

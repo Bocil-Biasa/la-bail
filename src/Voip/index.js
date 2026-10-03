@@ -1,4 +1,6 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
+/* Modified by Bocil-Biasa (c) 2026 - la-bail */
+
 import { EventEmitter } from 'node:events';
 import { createHmac, randomBytes } from 'node:crypto';
 import { WasmEngine } from './wasm-engine.js';
@@ -438,7 +440,20 @@ export class VoipClient {
                     isFromDialer: false,
                     extraData: tcToken
                 });
+
                 this._log("[RTC START CALL RESULT]", startResult);
+
+                if (typeof startResult === "number" && startResult < 0) {
+                    if (this._activeCall === call) {
+                        this._activeCall = null;
+                    }
+
+                    try {
+                        call._forceEnd(`start_group_call_failed:${startResult}`);
+                    } catch {}
+
+                    throw new Error(`WASM startVoipGroupCall() gagal dengan return code ${startResult}`);
+                }
             } catch (err) {
                 if (this._activeCall === call) this._activeCall = null;
                 try { call._forceEnd("start_call_failed"); } catch {}

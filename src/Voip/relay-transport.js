@@ -1,5 +1,10 @@
 /* Elaina Baileys maintained distribution. Upstream notices and license are preserved in LICENSE and NOTICE.md. */
+/* Modified by Bocil-Biasa (c) 2026 - la-bail */
+
 import { appendFileSync } from 'node:fs';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 const RELAY_PROTO_UDP = 0;
 const FAUX_WEB_CLIENT_RELAY_PORT = 3478;
