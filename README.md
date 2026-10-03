@@ -1400,7 +1400,7 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-bai
 
 ### Satu impor, seluruh builder
 
-Permukaan builder-nya terdiri dari 195 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+Permukaan builder-nya terdiri dari 198 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2500,7 +2500,26 @@ Ia membuka view-once dan pembungkus lainnya dulu, jadi kartu di dalam `viewOnceM
 `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` menghasilkan kartu yang digambar klien **dari spesifikasi deklaratif yang dibawa pesannya**. Tanpa HTML, tanpa hosting, dan berbeda dari Bloks lainnya, tidak ada yang diambil dari Meta — komponennya berjalan di dalam `data` dan klien yang menata letaknya.
 
 > [!WARNING]
-> Sejak perbaikan ini `sendA2UI` mengirim bentuk yang sama persis dengan fixture debug resmi WhatsApp Web (`WAWebInteractiveBloksWidgetDebug`): `createSurface` membawa `root` bersama `components`. Sebelumnya helper ini menaruh `catalogId` dan `sendDataModel` di dalam `createSurface` tapi **tidak pernah mengirim `root`**, dan itu sebabnya kartu yang dikirim lewatnya tidak pernah tergambar. Kartu tetap berada di belakang gerbang yang tidak kamu kendalikan: `im_bloks_widget_enable`, dan pada build yang menyalakan `im_a2ui_require_bot_attribution` pesannya harus datang sebagai bot 1P dengan atribusi. Kalau gerbang itu tertutup, klien menggambar `fallback`-nya, bukan kartunya.
+> `sendA2UI` mengirim bentuk yang sama dengan fixture debug resmi WhatsApp Web (`WAWebInteractiveBloksWidgetDebug`): `createSurface` membawa `root` bersama `components`. Perlu diketahui bahwa **renderer pohon `createSurface` itu sendiri adalah modul yang dimuat malas** (`WAWebBloksEntryPoint.react`, lewat `WAWebBloksEntryPointLoadable`) dan tidak ikut dalam snapshot bundle, jadi bentuk `Column`/`Text`/`Image` belum bisa diverifikasi langsung dari bundle. Kartu tetap berada di belakang gerbang yang tidak kamu kendalikan: `im_bloks_widget_enable`, dan pada build yang menyalakan `im_a2ui_require_bot_attribution` pesannya harus datang sebagai bot 1P dengan atribusi (`bizBotType`, yang berasal dari field protobuf `WebMessageInfo.is1PBizBotMessage` nomor 56 — bukan bidang yang bisa disetel pengirim lewat `proto.Message`). Kalau gerbang itu tertutup, klien menggambar `fallback`-nya, bukan kartunya.
+
+Ada dua bentuk A2UI, dan bedanya penting:
+
+| Bentuk | Isi `data` | Bukti |
+|---|---|---|
+| Elemen siap pakai | `{"type":"info_card", …}` dan `{"type":"list_card", …}` | Wa **Android** mengenal persis kedua jenis ini, dan AB prop `a2ui_supported_elements` milik WA Web berisi `"info_card, list_card"` |
+| Pohon `createSurface` | `{version, createSurface:{surfaceId, root, components}}` | Fixture debug WA Web; renderer-nya lazy-loaded sehingga belum terverifikasi dari bundle |
+
+Karena KLON Android hanya menggambar `info_card` dan `list_card`, gunakan elemen itu untuk jalur yang paling pasti. Helper `a2uiInfoCard`/`a2uiListCard` merakit objeknya, dan `sendA2UI` menerima elemen apa pun lewat `data`:
+
+```js
+await MB.sendA2UI(sock, jid, [], {
+    type: 'im_a2ui',
+    uuid: crypto.randomUUID(),
+    fallback: '✨ MENU ELAINA\nPilih kategori di bawah.',
+    data: MB.a2uiInfoCard({ title: '✨ MENU ELAINA', body: 'Pilih kategori di bawah.' })
+})
+```
+
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'

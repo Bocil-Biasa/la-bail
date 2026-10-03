@@ -1272,7 +1272,7 @@ test('airich-namespace', async () => {
 
     const members = [...Object.keys(extras), ...Object.keys(metaai)].filter(name => name !== 'default');
     assert.equal(new Set(members).size, members.length, 'extras and metaai must not export the same name twice');
-    assert.equal(members.length, 169, 'the README quotes this count, update both together');
+    assert.equal(members.length, 172, 'the README quotes this count, update both together');
 
     for (const name of members) {
         assert.equal(AIRich[name], (extras[name] ?? metaai[name]), `AIRich.${name} has to be the same member as the named export`);
@@ -1294,7 +1294,7 @@ test('airich-namespace', async () => {
         assert.equal(typeof MB[name], 'function', `MB.${name} has to be the class`);
     }
     assert.equal(MB.AIRich, AIRich, 'MB holds the same class, not a copy');
-    assert.equal(Object.keys(MB).length, 195, 'the README quotes this count, update both together');
+    assert.equal(Object.keys(MB).length, 198, 'the README quotes this count, update both together');
 
     const lib = await import('../src/index.js');
     for (const builder of [Button, ButtonV2, Carousel, AIRich, Toolkit]) {

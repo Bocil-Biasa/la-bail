@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { proto } from '../WAProto/index.js';
-import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiColumn, a2uiImage, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, decodeBloksWidget, sendA2UI, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
+import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, decodeBloksWidget, sendA2UI, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
 import { AIRich, Toolkit, ContentValidationError } from '../src/MessageBuilder/index.js';
 import { checkHtmlApp } from '../src/Utils/html-app.js';
 import { accountLinkingApp, accountLinkingSection, actionListRow, actionListSection, addonActionSection, calendarEvent, calendarWidgetSection, chainOfThoughtSection, chainingSuggestionSection, commentSection, compactEntitySection, contextualSourcesSection, customSection, locationPermissionSection, mapSection, mediaGridSection, mediaItem, multipleResponseSection, placeItem, plannerSnippetSection, plannerStep, productEntityItem, reminderSection, searchAdSection, searchPlannerSection, searchResultV2Section, sideBySideSurveyItem, socialEntityItem, sportsSection, threadSurfingItem, timestampPlaceholderSection, transparencySection, transparencySignal, videoSection, ActionListRowType, CompactEntityType, MapQueryStatus, MultipleResponseLayoutType, SearchPlannerStepStatus, SportsGameStatus, SportsLeague, forwardRichResponse, readSignedRichResponse, verifyRichResponseSignature } from '../src/MessageBuilder/metaai.js';
@@ -47,6 +47,13 @@ test('a2ui', async () => {
     assert.equal('sendDataModel' in surface.createSurface, false);
     assert.equal(surface.createSurface.components.length, 4);
 
+    const infoCard = a2uiInfoCard({ title: '✨ MENU', body: 'Pilih kategori' });
+    assert.deepEqual(infoCard, { type: 'info_card', title: '✨ MENU', body: 'Pilih kategori' });
+    assert.equal(a2uiListCard().type, 'list_card');
+    assert.throws(() => a2uiInfoCard([]), TypeError);
+    assert.equal(a2uiFallback([a2uiText('t', 'Halo'), { type: 'info_card', title: 'Judul' }]), 'Halo\nJudul');
+    assert.equal(a2uiFallback(null), '');
+
     const catalogued = a2uiSurface(components, { surfaceId: 'card-2', catalogId: A2UI_BASIC_CATALOG, sendDataModel: true });
     assert.equal(catalogued.createSurface.catalogId, A2UI_BASIC_CATALOG);
     assert.equal(catalogued.createSurface.sendDataModel, true);
@@ -59,7 +66,7 @@ test('a2ui', async () => {
     const widget = a2uiWidget(components, { uuid: 'u-1' });
     assert.equal(widget.type, BLOKS_A2UI_TYPE);
     assert.equal(widget.uuid, 'u-1');
-    assert.equal(widget.fallback, '');
+    assert.equal(widget.fallback, 'Welcome!\nHalo!');
     assert.equal(typeof widget.data, 'string');
     assert.equal(JSON.parse(widget.data).createSurface.surfaceId, 'card-u-1');
     assert.equal(JSON.parse(widget.data).createSurface.root, 'root');
@@ -95,11 +102,21 @@ test('a2ui', async () => {
     const decoded = decodeBloksWidget(calls[0].message);
     assert.equal(decoded.type, BLOKS_A2UI_TYPE);
     assert.equal(decoded.params.createSurface.components[2].text, 'Welcome!');
+    assert.equal(interactive.bloksWidget.fallback, 'Welcome!\nHalo!');
+    assert.equal(interactive.body.text, interactive.bloksWidget.fallback);
 
     calls.length = 0;
     await sendA2UI(sock, '2@s.whatsapp.net', components);
     assert.deepEqual(calls[0].message.interactiveMessage.nativeFlowMessage.buttons, []);
     assert.equal(calls[0].message.interactiveMessage.contextInfo, undefined);
+
+    calls.length = 0;
+    await sendA2UI(sock, '2@s.whatsapp.net', [], { uuid: 'u-el', data: a2uiInfoCard({ title: 'Menu', body: 'Pilih' }) });
+    const elementWidget = calls[0].message.interactiveMessage.bloksWidget;
+    assert.equal(elementWidget.type, BLOKS_A2UI_TYPE);
+    assert.equal(elementWidget.fallback, 'Menu');
+    assert.equal(JSON.parse(elementWidget.data).type, 'info_card');
+    assert.equal(calls[0].message.interactiveMessage.body.text, 'Menu');
 
     await assert.rejects(() => sendA2UI(null, '2@s.whatsapp.net', components), TypeError);
     await assert.rejects(() => sendA2UI(sock, '', components), TypeError);
