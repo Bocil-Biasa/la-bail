@@ -2500,7 +2500,7 @@ Ia membuka view-once dan pembungkus lainnya dulu, jadi kartu di dalam `viewOnceM
 `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` menghasilkan kartu yang digambar klien **dari spesifikasi deklaratif yang dibawa pesannya**. Tanpa HTML, tanpa hosting, dan berbeda dari Bloks lainnya, tidak ada yang diambil dari Meta — komponennya berjalan di dalam `data` dan klien yang menata letaknya.
 
 > [!WARNING]
-> Bentuk payload di bawah sudah terkonfirmasi: `bloksWidget` bentuk ini yang ditulis tangan tergambar di Android, dan klien menjawab yang cacat dengan `A2UIValidationException` bernama. Helper `sendA2UI` **belum** terkonfirmasi — kartu yang dikirim lewatnya belum pernah terlihat tergambar, dan penyebabnya masih terbuka. Sampai itu selesai, bangun `bloksWidget`-nya dengan tangan kalau kamu butuh ini bekerja.
+> Sejak perbaikan ini `sendA2UI` mengirim bentuk yang sama persis dengan fixture debug resmi WhatsApp Web (`WAWebInteractiveBloksWidgetDebug`): `createSurface` membawa `root` bersama `components`. Sebelumnya helper ini menaruh `catalogId` dan `sendDataModel` di dalam `createSurface` tapi **tidak pernah mengirim `root`**, dan itu sebabnya kartu yang dikirim lewatnya tidak pernah tergambar. Kartu tetap berada di belakang gerbang yang tidak kamu kendalikan: `im_bloks_widget_enable`, dan pada build yang menyalakan `im_a2ui_require_bot_attribution` pesannya harus datang sebagai bot 1P dengan atribusi. Kalau gerbang itu tertutup, klien menggambar `fallback`-nya, bukan kartunya.
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2518,7 +2518,7 @@ await MB.sendA2UI(sock, jid, [
 })
 ```
 
-Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus bernama `root`, dan kontainer menyebut anaknya lewat id ketimbang menyarangkannya. `sendA2UI` melempar error kalau `root` tidak ada.
+Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus bernama `root`, dan kontainer menyebut anaknya lewat id ketimbang menyarangkannya. `sendA2UI` melempar error kalau komponen `root` tidak ada. Nama `root` itu bisa diganti lewat opsi `root`, dan `createSurface.root` ikut menyesuaikan.
 
 | Builder | Memancarkan |
 |---|---|
@@ -2528,21 +2528,20 @@ Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus berna
 | `a2uiImage(id, url, { variant, fit })` | `Image` — bawaannya `header` dan `cover` |
 | `a2uiCard(id, child)` | `Card` — menerima satu id anak, bukan array |
 
-Pembungkus `a2uiSurface` membangun payload-nya sendiri kalau kamu mau menulis tangan komponen yang belum dicakup helper-nya:
+Pembungkus `a2uiSurface` membangun payload-nya sendiri kalau kamu mau menulis tangan komponen yang belum dicakup helper-nya. `root` selalu ikut; `catalogId`, `sendDataModel`, dan `version` hanya dikirim kalau kamu mengisinya:
 
 ```js
 {
   version: 'v0.9',
   createSurface: {
     surfaceId: 'card-<uuid>',
-    catalogId: 'https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json',
-    sendDataModel: false,
+    root: 'root',
     components: [ … ]
   }
 }
 ```
 
-`catalogId` menyebut kosakata komponennya, jadi komponen di luar katalog dasar tidak akan tergambar. `Column`, `Row`, `Text`, `Image`, dan `Card` sudah terkonfirmasi di perangkat — `Card` membungkus tepat satu anak dan memakai field tunggal `child`, itu sebabnya `a2uiCard` menolak array; katalognya mendaftar lebih banyak, dan `a2uiSurface` akan membawa objek apa pun yang kamu beri, tapi anggap sisanya belum teruji.
+Isi `catalogId` untuk menyebut kosakata komponennya. Fixture debug WhatsApp tidak mengirim `catalogId` sama sekali dan tetap tergambar, jadi biarkan kosong kalau komponennya dari katalog dasar. `Column`, `Row`, `Text`, `Image`, dan `Card` sudah terkonfirmasi di perangkat — `Card` membungkus tepat satu anak dan memakai field tunggal `child`, itu sebabnya `a2uiCard` menolak array; katalognya mendaftar lebih banyak, dan `a2uiSurface` akan membawa objek apa pun yang kamu beri, tapi anggap sisanya belum teruji.
 
 Kartu A2UI dan button native-flow hidup di `interactiveMessage` yang sama, dan begitulah kartunya mendapat baris button di bawahnya. `decodeBloksWidget(msg)` membacanya kembali, dengan `params` yang sudah di-parse.
 

@@ -249,17 +249,23 @@ export declare function a2uiRow(id: string, children?: string[]): A2UIComponent;
 
 export declare function a2uiSurface(components: A2UIComponent[], options?: {
     surfaceId?: string;
+    root?: string;
     catalogId?: string;
     sendDataModel?: boolean;
     version?: string;
+    type?: string;
+    title?: string;
 }): any;
 
 export declare function a2uiWidget(components: A2UIComponent[], options?: {
     uuid?: string;
     surfaceId?: string;
+    root?: string;
     catalogId?: string;
     sendDataModel?: boolean;
     version?: string;
+    type?: string;
+    title?: string;
     fallback?: string;
 }): BloksWidget;
 
@@ -268,8 +274,11 @@ export declare function sendA2UI(sock: any, jid: string, components: A2UICompone
     contextInfo?: any;
     uuid?: string;
     surfaceId?: string;
+    root?: string;
     catalogId?: string;
     sendDataModel?: boolean;
+    type?: string;
+    title?: string;
     fallback?: string;
     messageId?: string;
     additionalNodes?: any[];
@@ -327,7 +336,7 @@ export interface RichMessageRead {
     embeddedTabs: any[];
     submessages: any[];
     responseId?: string;
-    a2ui?: { surfaceId: string; catalogId: string; version: string; components: A2UIComponent[] };
+    a2ui?: { surfaceId: string; root?: string; catalogId?: string; version: string; components: A2UIComponent[] };
     bloks?: { type: string; uuid: string; fallback: string; params: any };
 }
 
