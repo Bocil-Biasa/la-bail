@@ -1400,7 +1400,7 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-bai
 
 ### Satu impor, seluruh builder
 
-Permukaan builder-nya terdiri dari 200 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+Permukaan builder-nya terdiri dari 212 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2164,6 +2164,22 @@ await rich.send(jid)
 ### Sisa Katalog Meta AI
 
 `AIRichMessage` adalah bentuk yang dikirim Meta AI sendiri, dan bot mencapainya dengan meneruskan salah satunya. Jadi katalognya jauh lebih besar daripada yang dicakup section di atas: klien WhatsApp mem-parse sekitar empat puluh primitif, dan `AI_RICH_PRIMITIVES` sekarang mendaftar semuanya, dengan `AI_RICH_ITEMS` untuk node item yang dibawa sebuah layout.
+
+Permukaan `AIRichMessage` merakit bentuk itu secara utuh, termasuk submessage dan konteks penerusan yang dicap generator resmi (`WAWebGenerateRichResponseMessageProto`). `sendAIRichMessage(sock, jid, options)` menerima `sections`, `text`, `nativeFlow`, dan `submessages` sekaligus:
+
+```js
+await MB.sendAIRichMessage(sock, jid, {
+    text: 'Halo dari AIRichMessage',
+    submessages: [
+        MB.AIRichMessage.inlineImage({ previewUrl: 'https://x/y.jpg', highResUrl: 'https://x/y-hi.jpg' }),
+        MB.AIRichMessage.table({ rows: [{ items: ['Harga', '10'], isHeading: true }] })
+    ]
+})
+```
+
+`AIRichMessage.text`, `inlineImage`, `table`, dan `contentItems` adalah pabrik submessage; `AIRichMessage.textSection` dan `nativeFlowSection` adalah pabrik section. `AIRichMessage.submessage(kind, payload)` memilih pabrik berdasarkan `AI_RICH_SUBMESSAGE_KINDS` (`text`, `inline_image`, `table`, `content_items`). Konteks penerusan yang dipasang `AIRich.build` kini menyertakan `botMessageSharingInfo` dengan `botEntryPointOrigin: 31` (`META_AI_FORWARD`) dan `forwardScore` yang sama dengan `forwardingScore`, persis dua field yang diisi generator resmi; keduanya bisa dimatikan lewat opsi `messageSharing`/`forwarded`. `AIRich.addSubmessage` juga sudah bisa dipakai tanpa section, jadi submessage bisa ditempel ke pesan yang sectionnya kosong.
+
+Peringatan render A2UI tetap berlaku untuk bentuk apa pun: lihat [Kartu A2UI](#kartu-a2ui).
 
 Satu catatan yang perlu diketahui sebelum kamu membangun kartu di sekitar salah satunya: katalog penuhnya tergambar di aplikasi WhatsApp, dan di situlah penerimamu berada. WA Web desktop yang tertinggal — ia membawa renderer untuk delapan belas nama dan memetakan sisanya ke node kosong. Pesannya tetap sampai bagaimanapun dan section lainnya tetap tergambar, jadi penonton di desktop melihat bolong, bukan kegagalan.
 

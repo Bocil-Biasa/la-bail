@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { proto } from '../WAProto/index.js';
-import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, buildA2UISection, decodeBloksWidget, sendA2UI, sendA2UIBloks, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
+import { A2UI_BASIC_CATALOG, A2UI_VERSION, AI_RICH_SUBMESSAGE_CONTENT_ITEMS, AI_RICH_SUBMESSAGE_INLINE_IMAGE, AI_RICH_SUBMESSAGE_KINDS, AI_RICH_SUBMESSAGE_TABLE, AI_RICH_SUBMESSAGE_TEXT, AIRichMessage, aiRichInlineImage, aiRichSubmessage, aiRichTable, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, buildA2UISection, decodeBloksWidget, sendA2UI, sendA2UIBloks, sendAIRichMessage, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
 import { AIRich, Toolkit, ContentValidationError } from '../src/MessageBuilder/index.js';
 import { checkHtmlApp } from '../src/Utils/html-app.js';
 import { accountLinkingApp, accountLinkingSection, actionListRow, actionListSection, addonActionSection, calendarEvent, calendarWidgetSection, chainOfThoughtSection, chainingSuggestionSection, commentSection, compactEntitySection, contextualSourcesSection, customSection, locationPermissionSection, mapSection, mediaGridSection, mediaItem, multipleResponseSection, placeItem, plannerSnippetSection, plannerStep, productEntityItem, reminderSection, searchAdSection, searchPlannerSection, searchResultV2Section, sideBySideSurveyItem, socialEntityItem, sportsSection, threadSurfingItem, timestampPlaceholderSection, transparencySection, transparencySignal, videoSection, ActionListRowType, CompactEntityType, MapQueryStatus, MultipleResponseLayoutType, SearchPlannerStepStatus, SportsGameStatus, SportsLeague, forwardRichResponse, readSignedRichResponse, verifyRichResponseSignature } from '../src/MessageBuilder/metaai.js';
@@ -1571,4 +1571,88 @@ test('new-airich-sections-2.26.37.6', async () => {
     assert.equal(fused.view_model.primitive.rows[0].__typename, 'GenAIFusedComparisonRow');
     assert.deepEqual(fused.view_model.primitive.rows[0].cells, ['10', '20']);
     assert.equal(fused.view_model.primitive.pin_label_column, true);
+});
+
+test('airich-message-surface', async () => {
+    assert.deepEqual(AI_RICH_SUBMESSAGE_KINDS, ['text', 'inline_image', 'table', 'content_items']);
+    assert.equal(AI_RICH_SUBMESSAGE_TEXT, 2);
+    assert.equal(AI_RICH_SUBMESSAGE_INLINE_IMAGE, 3);
+    assert.equal(AI_RICH_SUBMESSAGE_TABLE, 4);
+    assert.equal(AI_RICH_SUBMESSAGE_CONTENT_ITEMS, 9);
+
+    assert.deepEqual(AIRichMessage.text('halo'), { messageType: 2, messageText: 'halo' });
+    assert.equal(AIRichMessage.inlineImage({ previewUrl: 'https://x/y.jpg' }).messageType, 3);
+    assert.equal(AIRichMessage.inlineImage({ previewUrl: 'https://x/y.jpg' }).imageMetadata.imageUrl.imagePreviewUrl, 'https://x/y.jpg');
+    assert.deepEqual(AIRichMessage.table({ rows: [{ items: ['a', 'b'], isHeading: true }] }).tableMetadata.rows[0].items, ['a', 'b']);
+    assert.equal(AIRichMessage.contentItems({ items: [{ id: '1' }] }).messageType, 9);
+
+    assert.throws(() => aiRichSubmessage('tidak_ada'), TypeError);
+    assert.throws(() => aiRichInlineImage({}), TypeError);
+    assert.throws(() => aiRichTable({ rows: [] }), TypeError);
+
+    const textSection = AIRichMessage.textSection('Halo');
+    assert.equal(textSection.view_model.primitive.__typename, 'FOABloksPrimitive');
+    assert.equal(textSection.view_model.primitive.messageText, 'Halo');
+
+    const nativeFlow = AIRichMessage.nativeFlowSection('cta_url', { display_text: 'Buka', url: 'https://x' }, { uuid: 'u1' });
+    assert.equal(nativeFlow.view_model.primitive.type, 'cta_url');
+    assert.equal(nativeFlow.view_model.primitive.uuid, 'u1');
+
+    const calls = [];
+    const sock = { relayMessage: async (...args) => (calls.push(args), {}) };
+
+    const built = await sendAIRichMessage(sock, '628@s.whatsapp.net', {
+        text: 'Halo',
+        submessages: [aiRichInlineImage({ previewUrl: 'https://x/y.jpg' })]
+    });
+
+    const rich = richOf(built.message);
+    assert.equal(rich.messageType, 1);
+    assert.deepEqual(rich.submessages.map(s => s.messageType), [3]);
+    assert.equal(rich.contextInfo.isForwarded, true);
+    assert.equal(rich.contextInfo.forwardOrigin, 4, 'META_AI, the origin the official generator stamps');
+    assert.equal(rich.contextInfo.forwardedAiBotMessageInfo.botJid, AIRich.DEFAULT_BOT_JID);
+    assert.equal(rich.contextInfo.botMessageSharingInfo.botEntryPointOrigin, 31, 'META_AI_FORWARD');
+    assert.equal(rich.contextInfo.botMessageSharingInfo.forwardScore, 1);
+
+    const decoded = JSON.parse(Buffer.from(rich.unifiedResponse.data, 'base64').toString('utf8'));
+    assert.equal(decoded.sections[0].view_model.primitive.__typename, 'FOABloksPrimitive');
+
+    const wire = proto.Message.encode(proto.Message.fromObject(built.message)).finish();
+    const back = proto.Message.decode(wire);
+    assert.ok(back.botForwardedMessage.message.richResponseMessage, 'the AIRichMessage survives protobuf');
+    assert.equal(back.botForwardedMessage.message.richResponseMessage.contextInfo.forwardOrigin, 4);
+
+    await assert.rejects(() => sendAIRichMessage(sock, '628@s.whatsapp.net', {}), TypeError);
+    await assert.rejects(() => sendAIRichMessage(null, '628@s.whatsapp.net', { text: 'x' }), TypeError);
+    await assert.rejects(() => sendAIRichMessage(sock, '628@s.whatsapp.net', { nativeFlow: 'bukan objek' }), TypeError);
+
+    const a2uiViaAirich = await sendAIRichMessage(sock, '628@s.whatsapp.net', {
+        sections: [buildA2UISection([a2uiColumn('root', ['t']), a2uiText('t', 'Halo')], { uuid: 'a2ui-1' })]
+    });
+    const a2uiRich = richOf(a2uiViaAirich.message);
+    const a2uiDecoded = JSON.parse(Buffer.from(a2uiRich.unifiedResponse.data, 'base64').toString('utf8'));
+    assert.equal(a2uiDecoded.sections[0].view_model.primitive.type, BLOKS_A2UI_TYPE);
+    assert.equal(a2uiDecoded.sections[0].view_model.primitive.uuid, 'a2ui-1');
+});
+
+test('airich-submessage-without-section', async () => {
+    const rich = new AIRich({});
+    rich.addSubmessage({ messageType: 2, messageText: 'tanpa section' });
+
+    assert.equal(rich.sections.length, 0, 'a submessage can exist without a section');
+    assert.equal(rich.items.length, 0);
+
+    const built = await rich.build('628@s.whatsapp.net');
+    const decoded = richOf(built.message);
+    assert.equal(decoded.submessages.length, 1);
+    assert.equal(decoded.submessages[0].messageText, 'tanpa section');
+    const withoutSections = JSON.parse(Buffer.from(decoded.unifiedResponse.data, 'base64').toString('utf8'));
+    assert.deepEqual(withoutSections.sections, []);
+
+    const paired = new AIRich({});
+    paired.addSubmessage({ messageType: 2, messageText: 'a' }, { id: 'sub-a' });
+    assert.equal(paired.peek('sub-a').submessage.messageText, 'a');
+    assert.throws(() => paired.addSubmessage([{ messageType: 2, messageText: 'x' }, { messageType: 2, messageText: 'y' }], { id: 'satu' }), ContentValidationError);
+    assert.throws(() => rich.addSubmessage(null), ContentValidationError);
 });
