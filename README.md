@@ -2497,12 +2497,36 @@ Ia membuka view-once dan pembungkus lainnya dulu, jadi kartu di dalam `viewOnceM
 
 ### Kartu A2UI
 
-`interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` menghasilkan kartu yang digambar klien **dari spesifikasi deklaratif yang dibawa pesannya**. Tanpa HTML, tanpa hosting, dan berbeda dari Bloks lainnya, tidak ada yang diambil dari Meta — komponennya berjalan di dalam `data` dan klien yang menata letaknya.
+`interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` dimaksudkan menghasilkan kartu yang digambar klien dari spesifikasi deklaratif yang dibawa pesannya. Komponennya memang ikut di dalam `data` — tapi lihat peringatan di bawah: yang menggambarnya tetap Bloks app `im_a2ui` dari Meta, dan ada gerbang klien yang tidak bisa dilewati pengirim biasa.
 
 > [!WARNING]
-> Ada dua pembungkus A2UI, dan **keduanya** harus dicoba kalau kartunya tidak muncul. (1) `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` — ini yang dipakai `sendA2UI`, dan pada build WhatsApp yang menyalakan `im_a2ui_require_bot_attribution` ia menuntut pesannya datang sebagai bot 1P dengan atribusi (`bizBotType`, dari field protobuf `WebMessageInfo.is1PBizBotMessage` nomor 56 — **tidak** bisa disetel pengirim lewat `proto.Message`). Kalau syarat itu tidak terpenuhi, klien hanya menggambar `fallback`, bukan kartunya. (2) `richResponseMessage` dengan primitif `FOABloksPrimitive`, `type: "im_a2ui"`, dan komponen di dalam `data` — **inilah bentuk yang dipakai fixture debug resmi WhatsApp Web** (`WAWebInteractiveBloksWidgetDebug.injectRichResponseTestMessage`: `richResponse` + `unifiedResponse` → section → `FOABloksPrimitive`), dan bentuk ini lewat `AIRich`, jadi tidak terkena syarat atribusi di atas. Kalau bentuk (1) tampil sebagai teks biasa, pakai `sendA2UIBloks`.
+> **Tidak ada pembungkus A2UI yang bisa dirender oleh akun biasa, dan itu bukan bug payload.** Aku sudah menguji dua-duanya langsung: `sendA2UI` (bloksWidget) hanya menampilkan `fallback` sebagai teks, dan `sendA2UIBloks` (richResponse/`FOABloksPrimitive`) menghasilkan gelembung kosong. Sebabnya ada di klien, bukan di pesan:
 >
-> Kedua bentuk tetap berada di belakang gerbang `im_bloks_widget_enable`. Renderer pohon `createSurface` sendiri (`WAWebBloksEntryPoint.react`) adalah modul yang dimuat malas dan tidak ikut dalam snapshot bundle, jadi bentuk `Column`/`Text`/`Image` belum bisa diverifikasi langsung dari bundle; yang bisa dibuktikan adalah bahwa payload-nya identik dengan fixture resmi dan selamat melewati round-trip protobuf.
+> **(1) `bloksWidget` (`sendA2UI`).** `WAWebInteractiveBloksWidget.react` menghitung `O = isA2UIWidget && !isBizBot1pMessage && im_a2ui_require_bot_attribution`. Prop `im_a2ui_require_bot_attribution` default **true** (`WAWebABPropsConfigs`: `[34324,"bool",!1,!0]`; `getABPropConfigValue` mengembalikan elemen ke-3 sebagai default). Kalau `O` true, klien menggambar `fallback` saja. `isBizBot1pMessage` berasal dari `WAWebMsgGetters.getBizBotType(...) === BIZ_1P`, yaitu field protobuf `WebMessageInfo.is1PBizBotMessage` nomor 56 — dan itu **bagian dari `oneof` `WebMessageInfo`**, di-set **server** saat pesan tiba; jalur kirim pun membuangnya secara eksplisit (`parseWebMessageInfo({ ...t, is1PBizBotMessage: void 0 })`). Pengirim tidak bisa mengisinya lewat `proto.Message`. Inilah kenapa yang muncul hanya `[3/10] null: Menu Elaina` + fallback.
+>
+> **(2) `richResponse`/`FOABloksPrimitive` (`sendA2UIBloks`).** `cometComposedTextV2FoABloksPrimitiveParser` hanya memanggil `buildFoABloksNode` kalau `renderers.foABloksNodeRenderer` ada; kalau tidak, ia membangun node **"unsupported"** yang tidak menggambar apa pun (blank). Renderer itu diisi hanya kalau `isFoABloksNodeRendererEnabled()` — yaitu `gkx("6940")`, gatekeeper yang **tidak ada di tabel gkx** snapshot — bernilai true. Lebih dalam lagi, `foABloksNodeRenderer` merender dengan `<WAWebBloksEntryPointLoadable componentType="im_a2ui" componentData=… />`, dan `WAWebBloksEntryPointLoadable` memuat modul Bloks **dari Meta** (`JSResourceForInteraction("WAWebBloksEntryPoint.react").load()`). Jadi kartunya digambar oleh Bloks app bernama `im_a2ui` yang disediakan server, bukan oleh pesan.
+>
+> Konsekuensinya: menambal payload tidak akan menembus gerbang ini. Satu-satunya kombinasi yang lolos adalah A2UI yang dikirim sebagai **balasan ke pesan bot 1P asli** (pesan Meta AI sungguhan yang membawa `is1PBizBotMessage` dari server). Untuk memastikan gerbang di akunmu, jalankan di console WhatsApp Web:
+>
+> ```js
+> (() => {
+>   const t = __debug.modulesMap
+>   const ab = t['WAWebABPropsConfigs']?.exports?.ABPropConfigs
+>   const gkx = t['gkx']?.exports
+>   let gk
+>   try { gk = gkx('6940') } catch (e) { gk = 'undefined: ' + e.message }
+>   return { im_a2ui_require_bot_attribution: ab?.im_a2ui_require_bot_attribution, im_bloks_widget_enable: ab?.im_bloks_widget_enable, gk_6940: gk }
+> })()
+> ```
+>
+> Yang **bisa** dibuktikan dari sisi payload: struktur `richResponse`-ku identik dengan fixture debug resmi (`WAWebInteractiveBloksWidgetDebug.injectRichResponseTestMessage` — `response_id` + `sections` → `GenAISingleLayoutViewModel` → `FOABloksPrimitive` dengan `type: "im_a2ui"`), dan selamat melewati `proto.Message.encode/decode`. Untuk menguji bentuk `createSurface` tanpa jaringan, pakai fixture resmi di console WA Web:
+>
+> ```js
+> __debug.modulesMap['WAWebInteractiveBloksWidgetDebug'].exports.injectRichResponseTestMessage()
+> __debug.modulesMap['WAWebInteractiveBloksWidgetDebug'].exports.injectInteractiveMessageWithBloksWidget()
+> ```
+>
+> Fixture `bloksWidget` menyetel `bizBotType: BizBotType.BIZ_1P` dan fixture rich tidak menyetel apa pun — persis mencerminkan dua syarat di atas.
 
 Ada dua bentuk A2UI, dan bedanya penting:
 
@@ -2511,7 +2535,7 @@ Ada dua bentuk A2UI, dan bedanya penting:
 | Elemen siap pakai | `{"type":"info_card", …}` dan `{"type":"list_card", …}` | Android mengenal persis kedua jenis ini, dan AB prop `a2ui_supported_elements` milik WA Web berisi `"info_card, list_card"` |
 | Pohon `createSurface` | `{version, createSurface:{surfaceId, root, components}}` | Fixture debug WA Web; renderer-nya lazy-loaded sehingga belum terverifikasi dari bundle |
 
-Bentuk elemen bisa dilewatkan ke dua pembungkus. Ini juga alasan kenapa `sendA2UI` sering hanya muncul sebagai teks biasa di build tertentu: syarat atribusi bot 1P tidak terpenuhi. **Kalau begitu, pindah ke `sendA2UIBloks`**, yang mengirim elemen yang sama lewat `richResponseMessage`/`FOABloksPrimitive` seperti fixture debug resmi:
+`sendA2UI` dan `sendA2UIBloks` mengirim elemen yang sama lewat dua pembungkus berbeda. Keduanya tetap bergantung pada gerbang klien di atas, jadi anggap keduanya alat untuk memverifikasi bentuk payload — bukan cara yang dijamin tampil:
 
 ```js
 await MB.sendA2UIBloks(sock, jid, [
