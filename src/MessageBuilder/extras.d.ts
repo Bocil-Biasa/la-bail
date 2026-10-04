@@ -328,6 +328,59 @@ export declare const BLOKS_A2UI_TYPE: 'im_a2ui';
 export declare const BLOKS_A2UI_REPLY_ACTION: 'a2ui_reply_action';
 export declare const BLOKS_A2UI_SUPPORTED_ELEMENTS: readonly string[];
 
+export interface AIRichSubmessage {
+    messageType: number;
+    messageText?: string;
+    imageMetadata?: any;
+    tableMetadata?: any;
+    contentItemsMetadata?: any;
+    [key: string]: any;
+}
+
+export type AIRichSubmessageKind = 'text' | 'inline_image' | 'table' | 'content_items';
+
+export declare const AI_RICH_SUBMESSAGE_TEXT: 2;
+export declare const AI_RICH_SUBMESSAGE_INLINE_IMAGE: 3;
+export declare const AI_RICH_SUBMESSAGE_TABLE: 4;
+export declare const AI_RICH_SUBMESSAGE_CONTENT_ITEMS: 9;
+export declare const AI_RICH_SUBMESSAGE_KINDS: readonly AIRichSubmessageKind[];
+
+export declare function aiRichSubmessage(kind: AIRichSubmessageKind, payload?: any): AIRichSubmessage;
+export declare function aiRichText(text: string): AIRichSubmessage;
+export declare function aiRichInlineImage(image: {
+    previewUrl: string;
+    highResUrl?: string;
+    sourceUrl?: string;
+    text?: string;
+    alignment?: number;
+    tapLinkUrl?: string;
+}): AIRichSubmessage;
+export declare function aiRichTable(table: {
+    rows: { items: string[]; isHeading?: boolean }[];
+    title?: string;
+}): AIRichSubmessage;
+export declare function aiRichContentItems(content: { items: any[]; [key: string]: any }): AIRichSubmessage;
+
+export declare const AIRichMessage: {
+    SUBMESSAGE_KINDS: readonly AIRichSubmessageKind[];
+    text: typeof aiRichText;
+    inlineImage: typeof aiRichInlineImage;
+    table: typeof aiRichTable;
+    contentItems: typeof aiRichContentItems;
+    submessage: typeof aiRichSubmessage;
+    textSection: (text: string) => any;
+    nativeFlowSection: (name: string, params?: any, options?: { uuid?: string; initialResponse?: string; versioningId?: string }) => any;
+};
+
+export declare function sendAIRichMessage(sock: any, jid: string, options?: {
+    sections?: any[];
+    text?: string;
+    nativeFlow?: { name: string; params?: any };
+    submessages?: AIRichSubmessage[];
+    forwardWrapper?: boolean;
+    [key: string]: any;
+}): Promise<any>;
+
 export interface BloksWidget {
     type: string;
     data: string;

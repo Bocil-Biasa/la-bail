@@ -2173,14 +2173,22 @@ class AIRich extends BaseBuilder {
 
 	async build(
 		jid,
-		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
+		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, forwardingScore = 1, botEntryPointOrigin = AIRich.BOT_ENTRY_POINT_META_AI_FORWARD, messageSharing = true, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
 	) {
 		const forward = forwarded
 			? {
-					forwardingScore: 1,
+					forwardingScore,
 					isForwarded: true,
 					forwardedAiBotMessageInfo: { botJid },
-					forwardOrigin: 4,
+					forwardOrigin: AIRich.FORWARD_ORIGIN_META_AI,
+					...(messageSharing
+						? {
+								botMessageSharingInfo: {
+									botEntryPointOrigin,
+									forwardScore: forwardingScore,
+								},
+							}
+						: {}),
 				}
 			: {};
 
@@ -3151,6 +3159,10 @@ class AIRich extends BaseBuilder {
 
 	static DEFAULT_BOT_JID = '867051314767696@bot';
 
+	static FORWARD_ORIGIN_META_AI = 4;
+
+	static BOT_ENTRY_POINT_META_AI_FORWARD = 31;
+
 	static wrapRichResponse(richResponseMessage, forwardWrapper = true) {
 		return forwardWrapper ? { botForwardedMessage: { message: { richResponseMessage } } } : { richResponseMessage };
 	}
@@ -3465,14 +3477,75 @@ class AIRich extends BaseBuilder {
 		return this._addContent(section, paired, options);
 	}
 
-	addSubmessage(submessage, options = {}) {
+	addSubmessage(submessage, { id, replace, insertAt } = {}) {
 		const items = this._validateSubmessages(submessage);
 
 		if (!items.length) {
 			throw new ContentValidationError('At least one submessage is required');
 		}
 
-		return this._addContent(undefined, items, options);
+		const hasReplace = replace !== undefined && replace !== null && replace !== '';
+		const hasInsertAt = insertAt !== undefined && insertAt !== null && insertAt !== '';
+
+		if (hasReplace && hasInsertAt) {
+			throw new ContentValidationError('replace and insertAt cannot be used together');
+		}
+
+		if (id !== undefined && id !== null && id !== '' && items.length !== 1) {
+			throw new ContentValidationError('One id can only be assigned to one submessage', { id, submessageCount: items.length });
+		}
+
+		this._dropSignature();
+
+		const newNodes = items.map((item, index) => this._makeNode(index === 0 ? id : null, null, item));
+
+		if (hasReplace) {
+			if (newNodes.length !== 1) {
+				throw new ContentValidationError('replace only supports adding exactly one submessage');
+			}
+
+			const target = this._resolveNodeIndex(replace);
+			const oldNode = this._nodes[target.index];
+			const newNode = newNodes[0];
+
+			if (!newNode.id && oldNode?.id) {
+				newNode.id = oldNode.id;
+			}
+
+			this._unregisterId(oldNode);
+			this._nodes.splice(target.index, 1, newNode);
+
+			if (newNode.id) {
+				this._idIndex.set(newNode.id, newNode);
+			}
+
+			return this;
+		}
+
+		if (hasInsertAt) {
+			const target = this._resolveNodeIndex(insertAt);
+			const insertIndex = target.offset < 0 ? target.index : target.index + 1;
+
+			this._nodes.splice(insertIndex, 0, ...newNodes);
+
+			for (const node of newNodes) {
+				if (node.id) {
+					this._idIndex.set(node.id, node);
+				}
+			}
+
+			return this;
+		}
+
+		this._nodes.push(...newNodes);
+
+		for (const node of newNodes) {
+			if (node.id) {
+				this._idIndex.set(node.id, node);
+			}
+		}
+
+		return this;
 	}
 
 	delete(target) {

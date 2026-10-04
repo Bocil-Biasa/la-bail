@@ -957,6 +957,134 @@ export const sendA2UIBloks = async (sock, jid, components, { uuid, surfaceId, ro
     return rich.send(jid, options)
 }
 
+export const AI_RICH_SUBMESSAGE_TEXT = 2
+export const AI_RICH_SUBMESSAGE_INLINE_IMAGE = 3
+export const AI_RICH_SUBMESSAGE_TABLE = 4
+export const AI_RICH_SUBMESSAGE_CONTENT_ITEMS = 9
+
+const AIRICH_TYPENAME = 'FOABloksPrimitive'
+
+const AI_RICH_SUBMESSAGE_FACTORIES = Object.freeze({
+    text: (text) => ({
+        messageType: AI_RICH_SUBMESSAGE_TEXT,
+        messageText: String(text)
+    }),
+    inline_image: ({ previewUrl, highResUrl, sourceUrl, text = '', alignment, tapLinkUrl } = {}) => {
+        if (typeof previewUrl !== 'string' || previewUrl.trim() === '') {
+            throw new TypeError('inline_image requires a previewUrl')
+        }
+        return {
+            messageType: AI_RICH_SUBMESSAGE_INLINE_IMAGE,
+            imageMetadata: trimEmpty({
+                imageUrl: trimEmpty({
+                    imagePreviewUrl: previewUrl,
+                    imageHighResUrl: highResUrl,
+                    sourceUrl
+                }),
+                imageText: text,
+                alignment,
+                tapLinkUrl
+            })
+        }
+    },
+    table: ({ rows, title } = {}) => {
+        if (!Array.isArray(rows) || rows.length === 0) {
+            throw new TypeError('table requires a non-empty rows array')
+        }
+        return {
+            messageType: AI_RICH_SUBMESSAGE_TABLE,
+            tableMetadata: trimEmpty({
+                rows: rows.map(row => ({ items: row.items.map(String), isHeading: !!row.isHeading })),
+                title
+            })
+        }
+    },
+    content_items: ({ items, ...rest } = {}) => {
+        if (!Array.isArray(items) || items.length === 0) {
+            throw new TypeError('content_items requires a non-empty items array')
+        }
+        return {
+            messageType: AI_RICH_SUBMESSAGE_CONTENT_ITEMS,
+            contentItemsMetadata: { ...rest, items }
+        }
+    }
+})
+
+export const AI_RICH_SUBMESSAGE_KINDS = Object.freeze(Object.keys(AI_RICH_SUBMESSAGE_FACTORIES))
+
+export const aiRichSubmessage = (kind, payload = {}) => {
+    const factory = AI_RICH_SUBMESSAGE_FACTORIES[kind]
+
+    if (!factory) {
+        throw new TypeError('unknown AIRich submessage kind "' + kind + '"; expected one of ' + AI_RICH_SUBMESSAGE_KINDS.join(', '))
+    }
+
+    return factory(payload)
+}
+
+export const aiRichText = (text) => aiRichSubmessage('text', text)
+
+export const aiRichInlineImage = (image) => aiRichSubmessage('inline_image', image)
+
+export const aiRichTable = (table) => aiRichSubmessage('table', table)
+
+export const aiRichContentItems = (content) => aiRichSubmessage('content_items', content)
+
+export const AIRichMessage = {
+    SUBMESSAGE_KINDS: AI_RICH_SUBMESSAGE_KINDS,
+    text: aiRichText,
+    inlineImage: aiRichInlineImage,
+    table: aiRichTable,
+    contentItems: aiRichContentItems,
+    submessage: aiRichSubmessage,
+    textSection: (text) => AIRich.newLayout('Single', {
+        __typename: AIRICH_TYPENAME,
+        messageText: String(text)
+    }),
+    nativeFlowSection: (name, params, { uuid, initialResponse = '', versioningId = '' } = {}) =>
+        bloksSection(name, params, { uuid, initialResponse, versioningId })
+}
+
+export const sendAIRichMessage = async (
+    sock,
+    jid,
+    { sections = [], text, nativeFlow, submessages = [], forwardWrapper, ...options } = {}
+) => {
+    if (!sock) {
+        throw new TypeError('sendAIRichMessage requires a socket as the first argument')
+    }
+    if (!jid) {
+        throw new TypeError('sendAIRichMessage requires a target jid')
+    }
+
+    const rich = new AIRich(sock)
+    let sectionCount = 0
+
+    if (text !== undefined && text !== null && String(text) !== '') {
+        rich.addSection(AIRichMessage.textSection(text))
+        sectionCount += 1
+    }
+    for (const section of sections) {
+        rich.addSection(section)
+        sectionCount += 1
+    }
+    if (nativeFlow !== undefined) {
+        if (!nativeFlow || typeof nativeFlow !== 'object') {
+            throw new TypeError('sendAIRichMessage nativeFlow must be { name, params }')
+        }
+        rich.addSection(AIRichMessage.nativeFlowSection(nativeFlow.name, nativeFlow.params ?? {}))
+        sectionCount += 1
+    }
+    for (const submessage of submessages) {
+        rich.addSubmessage(submessage)
+    }
+    if (sectionCount === 0 && !submessages.length) {
+        throw new TypeError('sendAIRichMessage needs at least one section, text, nativeFlow, or submessage')
+    }
+
+    return rich.send(jid, { ...(forwardWrapper === undefined ? {} : { forwardWrapper }), ...options })
+}
+
 export const sendBloksWidget = async (sock, jid, { type, data, uuid, fallback = '', body, contextInfo, messageId, additionalNodes = [], ...options } = {}) => {
     if (!sock) {
         throw new TypeError('sendBloksWidget requires a socket as the first argument')
