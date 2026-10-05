@@ -2173,6 +2173,7 @@ class AIRich extends BaseBuilder {
 
 	async build(
 		jid,
+<<<<<<< HEAD
 		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, forwardingScore = 1, botEntryPointOrigin = AIRich.BOT_ENTRY_POINT_META_AI_FORWARD, messageSharing = true, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
 	) {
 		const forward = forwarded
@@ -2189,6 +2190,16 @@ class AIRich extends BaseBuilder {
 								},
 							}
 						: {}),
+=======
+		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
+	) {
+		const forward = forwarded
+			? {
+					forwardingScore: 1,
+					isForwarded: true,
+					forwardedAiBotMessageInfo: { botJid },
+					forwardOrigin: 4,
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 				}
 			: {};
 
@@ -3159,10 +3170,13 @@ class AIRich extends BaseBuilder {
 
 	static DEFAULT_BOT_JID = '867051314767696@bot';
 
+<<<<<<< HEAD
 	static FORWARD_ORIGIN_META_AI = 4;
 
 	static BOT_ENTRY_POINT_META_AI_FORWARD = 31;
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 	static wrapRichResponse(richResponseMessage, forwardWrapper = true) {
 		return forwardWrapper ? { botForwardedMessage: { message: { richResponseMessage } } } : { richResponseMessage };
 	}
@@ -3477,13 +3491,18 @@ class AIRich extends BaseBuilder {
 		return this._addContent(section, paired, options);
 	}
 
+<<<<<<< HEAD
 	addSubmessage(submessage, { id, replace, insertAt } = {}) {
+=======
+	addSubmessage(submessage, options = {}) {
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 		const items = this._validateSubmessages(submessage);
 
 		if (!items.length) {
 			throw new ContentValidationError('At least one submessage is required');
 		}
 
+<<<<<<< HEAD
 		const hasReplace = replace !== undefined && replace !== null && replace !== '';
 		const hasInsertAt = insertAt !== undefined && insertAt !== null && insertAt !== '';
 
@@ -3546,6 +3565,9 @@ class AIRich extends BaseBuilder {
 		}
 
 		return this;
+=======
+		return this._addContent(undefined, items, options);
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 	}
 
 	delete(target) {

@@ -23,7 +23,10 @@ const toBareJid = jid => {
     return `${user}@${value.slice(at + 1)}`;
 };
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 const computeHkdf = (key, salt, info, length) => {
     const effectiveSalt = salt && salt.length > 0 ? Buffer.from(salt) : Buffer.alloc(SHA256_LEN, 0);
     const prk = createHmac("sha256", effectiveSalt).update(key).digest();
@@ -42,7 +45,10 @@ const computeHkdf = (key, salt, info, length) => {
 
     return new Uint8Array(okm.buffer, okm.byteOffset, length);
 };
+<<<<<<< HEAD
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 const computeHmacSha256 = (data, key) => {
     const result = createHmac("sha256", Buffer.from(key)).update(data).digest();
     return new Uint8Array(result.buffer, result.byteOffset, result.byteLength);
@@ -335,7 +341,11 @@ export class VoipClient {
 
             const targetNumber = phoneNumber.replace(/\D/g, "");
             if (!targetNumber) {
+<<<<<<< HEAD
                 throw new Error("Nomor target tidak valid.");
+=======
+                throw new Error("Target number not valid.");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             }
 
             const targetPnJid = `${targetNumber}@s.whatsapp.net`;
@@ -344,7 +354,11 @@ export class VoipClient {
 
             const peerLid = await this._signaling.resolveLid(targetPnJid);
             if (!peerLid) {
+<<<<<<< HEAD
                 throw new Error(`Tidak bisa resolve LID untuk ${targetPnJid}. Pastikan target valid dan sudah tersimpan mapping LID/PN atau USync LID bisa diakses.`);
+=======
+                throw new Error(`Cannot resolve LID for ${targetPnJid}. Please ensure the target is valid and has a stored LID mapping or USync LID is accessible.`);
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             }
 
             const peerJid = peerLid;
@@ -452,7 +466,11 @@ export class VoipClient {
                         call._forceEnd(`start_group_call_failed:${startResult}`);
                     } catch {}
 
+<<<<<<< HEAD
                     throw new Error(`WASM startVoipGroupCall() gagal dengan return code ${startResult}`);
+=======
+                    throw new Error(`WASM startVoipCall() failed with return code ${startResult}`);
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
                 }
             } catch (err) {
                 if (this._activeCall === call) this._activeCall = null;
@@ -463,6 +481,25 @@ export class VoipClient {
             return call;
         };
 
+<<<<<<< HEAD
+=======
+        this._endPreviousCall = () => {
+            if (!this._activeCall && !this._feeder && !this._videoFeeder) return;
+            try { this._activeCall?._forceEnd("replaced"); } catch {}
+            try { this._engine?.endCall?.(0, true); } catch {}
+            try { this._feeder?.stop(); } catch {}
+            this._feeder = null;
+            try { this._videoFeeder?.stop(); } catch {}
+            this._videoFeeder = null;
+            if (this._audioStartTimer) {
+                clearTimeout(this._audioStartTimer);
+                this._audioStartTimer = null;
+            }
+            this._captureStartRequested = false;
+            this._activeCall = null;
+        };
+
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
         this.callGroup = async (groupJid, opts = {}) => {
             if (!this._engine || !this._signaling) {
                 throw new Error("Not connected. Call connect() first.");
@@ -471,6 +508,7 @@ export class VoipClient {
                 throw new Error(`${JSON.stringify(groupJid)} is not a group jid`);
             }
 
+<<<<<<< HEAD
             const metadata = opts.metadata ?? await this._sock.groupMetadata(groupJid);
             const selfPn = toBareJid(this._sock.authState?.creds?.me?.id ?? this._sock.user?.id ?? "");
             const selfLid = toBareJid(this._sock.authState?.creds?.me?.lid ?? "");
@@ -515,12 +553,97 @@ export class VoipClient {
             const flatDevices = deviceJidsCsv.join(",").split(",").filter(Boolean);
             try {
                 await this._signaling.ensureSessionsForPeers(flatDevices);
+=======
+            this._endPreviousCall();
+
+            const metadata = opts.metadata ?? await this._sock.groupMetadata(groupJid);
+            const selfPn = toBareJid(this._sock.authState?.creds?.me?.id ?? this._sock.user?.id ?? "") || "";
+            const selfLid = toBareJid(this._sock.authState?.creds?.me?.lid ?? "") || "";
+
+            // Satu entry per member: pn + lid attached, no duplicates, no self, no empty pn/lid.
+            const roster = (metadata?.participants ?? [])
+                .map(p => {
+                    const id = toBareJid(p.id ?? p.jid ?? "") || "";
+                    const pn = toBareJid(p.phoneNumber ?? (id.endsWith("@s.whatsapp.net") ? id : "")) || "";
+                    const lid = toBareJid(p.lid ?? (id.endsWith("@lid") ? id : "")) || "";
+                    return { pn, lid, devices: [] };
+                })
+                .filter(e => (e.pn || e.lid) && !(selfPn && e.pn === selfPn) && !(selfLid && e.lid === selfLid));
+
+            let entries = roster;
+            if (Array.isArray(opts.participants) && opts.participants.length) {
+                const wanted = new Set(opts.participants.map(toBareJid));
+                entries = roster.filter(e => wanted.has(e.pn) || wanted.has(e.lid));
+                for (const jid of wanted) {
+                    if (!entries.some(e => e.pn === jid || e.lid === jid)) {
+                        entries.push(jid.endsWith("@lid")
+                            ? { pn: "", lid: jid, devices: [] }
+                            : { pn: jid, lid: "", devices: [] });
+                    }
+                }
+            }
+
+            if (!entries.length) {
+                throw new Error(`no one to call in ${groupJid}`);
+            }
+
+            for (const entry of entries) {
+                if (!entry.lid && entry.pn) {
+                    entry.lid = (await this._signaling.resolveLid(entry.pn).catch(() => null)) || "";
+                }
+                if (!entry.lid) continue;
+                try {
+                    entry.devices = await this._signaling.discoverPeerDevices(entry.lid);
+                } catch (err) {
+                    this._log("[RTC GROUP DISCOVER DEVICES ERROR]", entry.lid, err?.message || err);
+                }
+                if (!entry.devices?.length) entry.devices = [entry.lid];
+            }
+
+            const usable = entries.filter(e => e.lid);
+            if (!usable.length) {
+                throw new Error(`could not resolve a LID for anyone in ${groupJid}`);
+            }
+
+            try {
+                await this._signaling.ensureSessionsForPeers(usable.flatMap(e => e.devices));
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             } catch (err) {
                 this._log("[RTC GROUP ENSURE SESSIONS WARNING]", err?.message || err);
             }
 
+<<<<<<< HEAD
             const callId = ("00" + randomBytes(16).toString("hex").slice(2)).toUpperCase();
             const call = new ActiveCall(callId, this._engine, opts.durationMs ?? 120000);
+=======
+            //The startVoipGroupCall argumments aren certain, so try them in order until one works.
+            //  parallel: three lists have the same length; empty pn values are filled with "" (defaultnya)
+            //  paired  : cuma members dengan pn AND lid
+            //  legacy  : old behavour (pn bernilai kosong sudah dihapus, lists can have differnt lengths)
+            const buildArgs = mode => {
+                if (mode === "legacy") {
+                    return {
+                        pnUserJids: usable.map(e => e.pn).filter(Boolean),
+                        lidUserJids: usable.map(e => e.lid),
+                        deviceJidsCsv: usable.map(e => e.devices.join(","))
+                    };
+                }
+                const list = mode === "paired" ? usable.filter(e => e.pn) : usable;
+                return {
+                    pnUserJids: list.map(e => e.pn),
+                    lidUserJids: list.map(e => e.lid),
+                    deviceJidsCsv: list.map(e => e.devices.join(","))
+                };
+            };
+
+            const knownModes = ["parallel", "paired", "legacy"];
+            const modes = opts.groupArgsMode && knownModes.includes(opts.groupArgsMode)
+                ? [opts.groupArgsMode]
+                : knownModes;
+
+            const newCallId = () => ("00" + randomBytes(16).toString("hex").slice(2)).toUpperCase();
+            const call = new ActiveCall(newCallId(), this._engine, opts.durationMs ?? 120000);
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
             call._audioSource = opts.audioSource ?? "silence";
             call._audioStartDelayMs = Number(opts.audioStartDelayMs ?? opts.audioDelayMs ?? 1800) || 0;
@@ -538,6 +661,7 @@ export class VoipClient {
                 if (this._activeCall === call) this._activeCall = null;
             });
 
+<<<<<<< HEAD
             this._log("[RTC START GROUP CALL PARAMS]", { groupJid, callId, pnUserJids, lidUserJids, deviceJidsCsv });
 
             try {
@@ -558,6 +682,72 @@ export class VoipClient {
             }
 
             return call;
+=======
+            let lastCode = null;
+
+            for (const mode of modes) {
+                const args = buildArgs(mode);
+                if (!args.lidUserJids.length) {
+                    this._log("[RTC START GROUP CALL] mode dilewati, list kosong:", mode);
+                    continue;
+                }
+
+                call.callId = newCallId();
+
+                this._log("[RTC START GROUP CALL PARAMS]", {
+                    mode,
+                    groupJid,
+                    callId: call.callId,
+                    counts: {
+                        pn: args.pnUserJids.length,
+                        lid: args.lidUserJids.length,
+                        devices: args.deviceJidsCsv.length
+                    },
+                    sample: {
+                        pn: args.pnUserJids.slice(0, 2),
+                        lid: args.lidUserJids.slice(0, 2),
+                        devices: args.deviceJidsCsv.slice(0, 2)
+                    }
+                });
+
+                let startResult;
+                try {
+                    startResult = this._engine.startGroupCall({
+                        ...args,
+                        callId: call.callId,
+                        isVideo: call._video,
+                        groupJid,
+                        chatName: metadata?.subject ?? ""
+                    });
+                } catch (err) {
+                    // Biasanya BindingError (argument count different).
+                    this._log("[RTC START GROUP CALL THROW]", mode, err?.message || err);
+                    if (this._activeCall === call) this._activeCall = null;
+                    try { call._forceEnd("start_group_call_failed"); } catch {}
+                    throw err;
+                }
+
+                this._log("[RTC START GROUP CALL RESULT]", { mode, startResult });
+
+                if (typeof startResult === "number" && startResult < 0) {
+                    lastCode = startResult;
+                    try { this._engine.endCall(0, false); } catch {}
+                    this._captureStartRequested = false;
+                    continue;
+                }
+
+                this._log("[RTC START GROUP CALL OK]", { mode, callId: call.callId });
+                return call;
+            }
+
+            if (this._activeCall === call) this._activeCall = null;
+            try { call._forceEnd(`start_group_call_failed:${lastCode}`); } catch {}
+
+            throw new Error(
+                `startVoipGroupCall() gagal di mode ${modes.join("/")}, code terakhir ${lastCode}. ` +
+                `Coba participants: [satu nomor] dan cek log [RTC START GROUP CALL PARAMS] + "[VOIP READY TIMEOUT]".`
+            );
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
         };
 
         this.joinGroupCall = async (invite, opts = {}) => {
@@ -657,7 +847,11 @@ export class VoipClient {
 
         this._initVoipStack = async () => {
             if (!this._sock) {
+<<<<<<< HEAD
                 throw new Error("Socket Baileys belum tersedia.");
+=======
+                throw new Error("Socket not available.");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             }
 
             this._signaling = new SignalingBridge({
@@ -713,7 +907,11 @@ export class VoipClient {
                 "";
 
             if (!selfPnJid) {
+<<<<<<< HEAD
                 throw new Error("Tidak bisa membaca JID bot dari socket utama.");
+=======
+                throw new Error("Cannot read bot JID from main Socket.");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             }
 
             this._log("[RTC SELF JID]", { selfPnJid, selfLidJid });
@@ -811,12 +1009,20 @@ export class VoipClient {
     this._captureStartRequested = true;
 
     if (this._activeCall?.state !== CallState.Active) {
+<<<<<<< HEAD
         this._log("[RTC AUDIO] capture siap, tunggu call active sebelum audio start");
+=======
+        this._log("[RTC AUDIO] capture ready, wait call active before audio start");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
         return;
     }
 
     if (!this._engine || !this._capturePtr) {
+<<<<<<< HEAD
         this._log("[RTC AUDIO] capturePtr belum siap, audio feeder batal start");
+=======
+        this._log("[RTC AUDIO] capturePtr not ready, audio feeder canceled to start");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
         return;
     }
 
@@ -873,7 +1079,11 @@ this._startVideoFeeder = (config, useDesktopCapture) => {
     const call = this._activeCall;
     const label = useDesktopCapture ? "SCREEN" : "VIDEO";
     if (!call?._video) {
+<<<<<<< HEAD
         this._log(`[RTC ${label}] capture diminta tapi call ini bukan video, diabaikan`);
+=======
+        this._log(`[RTC ${label}] Capture requested but call._video is false, feeder not created`);
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
         return;
     }
     if (this._videoFeeder) {
@@ -924,7 +1134,11 @@ this._handleAudioCaptureStart = () => {
     if (this._activeCall?.state === CallState.Active) {
         this._startAudioFeeder();
     } else {
+<<<<<<< HEAD
         this._log("[RTC AUDIO] startCaptureJS diterima sebelum active, audio ditahan dulu");
+=======
+        this._log("[RTC AUDIO] startCaptureJS accepted but call not active, wait call active before starting audio feeder");
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
     }
 };
 
@@ -949,4 +1163,8 @@ export const makeVoipClient = async (socket, config = {}) => {
     await client.connect();
     return client;
 };
+<<<<<<< HEAD
 export default VoipClient;
+=======
+export default VoipClient;
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)

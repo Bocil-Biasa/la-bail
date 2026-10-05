@@ -837,6 +837,7 @@ export const a2uiCard = (id, child) => {
     return a2uiNode('Card')(id, { child })
 }
 
+<<<<<<< HEAD
 const a2uiElement = (type) => (element = {}) => {
     if (element === null || typeof element !== 'object' || Array.isArray(element)) {
         throw new TypeError('a2ui ' + type + ' element must be a plain object')
@@ -890,6 +891,33 @@ export const a2uiWidget = (components, { uuid, surfaceId, root, catalogId, sendD
         uuid: id,
         fallback: fallback === undefined ? a2uiFallback(Array.isArray(components) && components.length ? components : payload) : fallback,
         data: payload
+=======
+export const a2uiSurface = (components, { surfaceId, catalogId = A2UI_BASIC_CATALOG, sendDataModel = false, version = A2UI_VERSION } = {}) => {
+    if (!Array.isArray(components) || components.length === 0) {
+        throw new TypeError('a2uiSurface requires at least one component')
+    }
+    if (!components.some(component => component?.id === A2UI_ROOT_ID)) {
+        throw new TypeError('a2ui components must include one with id "' + A2UI_ROOT_ID + '"')
+    }
+    return {
+        version,
+        createSurface: {
+            surfaceId: surfaceId ?? 'card-' + randomUUID(),
+            catalogId,
+            sendDataModel: !!sendDataModel,
+            components
+        }
+    }
+}
+
+export const a2uiWidget = (components, { uuid, surfaceId, catalogId, sendDataModel, version, fallback = '' } = {}) => {
+    const id = uuid ?? randomUUID()
+    return bloksWidget({
+        type: BLOKS_A2UI_TYPE,
+        uuid: id,
+        fallback,
+        data: a2uiSurface(components, { surfaceId: surfaceId ?? 'card-' + id, catalogId, sendDataModel, version })
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
     })
 }
 
@@ -905,7 +933,10 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
     }
 
     const widget = a2uiWidget(components, options)
+<<<<<<< HEAD
     const text = widget.fallback
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
     const msg = generateWAMessageFromContent(
         jid,
@@ -913,7 +944,10 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
             interactiveMessage: trimEmpty({
                 nativeFlowMessage: { buttons, messageParamsJson: JSON.stringify({}), messageVersion: 1 },
                 bloksWidget: widget,
+<<<<<<< HEAD
                 ...(text ? { body: { text } } : {}),
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
                 contextInfo
             })
         },
@@ -936,6 +970,7 @@ export const sendA2UI = async (sock, jid, components, { buttons = [], contextInf
     return msg
 }
 
+<<<<<<< HEAD
 export const buildA2UISection = (components, { uuid, surfaceId, root, catalogId, sendDataModel, version, type, title, data, initialResponse, versioningId } = {}) =>
     bloksSection(
         BLOKS_A2UI_TYPE,
@@ -1085,6 +1120,8 @@ export const sendAIRichMessage = async (
     return rich.send(jid, { ...(forwardWrapper === undefined ? {} : { forwardWrapper }), ...options })
 }
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 export const sendBloksWidget = async (sock, jid, { type, data, uuid, fallback = '', body, contextInfo, messageId, additionalNodes = [], ...options } = {}) => {
     if (!sock) {
         throw new TypeError('sendBloksWidget requires a socket as the first argument')
@@ -1254,6 +1291,7 @@ const readA2UIText = (components) => components
     .map(component => A2UI_TEXT_KEYS.map(key => component[key]).find(value => typeof value === 'string') ?? '')
     .filter(Boolean)
 
+<<<<<<< HEAD
 const parseBloksParams = (data) => {
     if (!data || typeof data !== 'string') {
         return null
@@ -1266,6 +1304,8 @@ const parseBloksParams = (data) => {
     }
 }
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 export const readRichMessage = (msg) => {
     const raw = msg?.message ?? msg
     if (!raw || typeof raw !== 'object') {
@@ -1296,7 +1336,13 @@ export const readRichMessage = (msg) => {
         return { name: button?.name ?? '', params }
     })
 
+<<<<<<< HEAD
     const isA2UIWidget = widget?.type === BLOKS_A2UI_TYPE
+=======
+    const a2uiComponents = widget?.type === BLOKS_A2UI_TYPE && Array.isArray(widget.params?.createSurface?.components)
+        ? widget.params.createSurface.components
+        : []
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
     const sectionPrimitives = sections => sections.flatMap(section => {
         const view = section?.view_model
@@ -1307,6 +1353,7 @@ export const readRichMessage = (msg) => {
     const primitives = sectionPrimitives(rich?.sections ?? [])
     const embeddedPrimitives = sectionPrimitives(rich?.embeddedSections ?? [])
 
+<<<<<<< HEAD
     const richBloks = primitives.find(primitive => primitive?.__typename === 'FOABloksPrimitive' && primitive?.type === BLOKS_A2UI_TYPE)
     const a2uiParams = isA2UIWidget ? widget.params : parseBloksParams(richBloks?.data)
     const surface = a2uiParams?.createSurface
@@ -1327,6 +1374,16 @@ export const readRichMessage = (msg) => {
     ].filter(Boolean)
 
     const kind = isA2UI ? 'a2ui' : widget ? 'bloks' : rich ? 'airich' : 'interactive'
+=======
+    const lines = [
+        ...primitives.map(readPrimitiveText),
+        ...readA2UIText(a2uiComponents),
+        interactive?.body?.text ?? '',
+        interactive?.footer?.text ?? ''
+    ].filter(Boolean)
+
+    const kind = a2uiComponents.length ? 'a2ui' : widget ? 'bloks' : rich ? 'airich' : 'interactive'
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
     return trimEmpty({
         kind,
@@ -1341,6 +1398,7 @@ export const readRichMessage = (msg) => {
         embeddedTabs: rich?.embeddedTabs ?? [],
         submessages: rich?.submessages ?? [],
         responseId: rich?.responseId,
+<<<<<<< HEAD
         a2ui: isA2UI
             ? trimEmpty({
                 surfaceId: surface?.surfaceId,
@@ -1351,6 +1409,15 @@ export const readRichMessage = (msg) => {
                 components: a2uiComponents.length ? a2uiComponents : undefined,
                 element: a2uiElement
             })
+=======
+        a2ui: a2uiComponents.length
+            ? {
+                surfaceId: widget.params.createSurface.surfaceId,
+                catalogId: widget.params.createSurface.catalogId,
+                version: widget.params.version,
+                components: a2uiComponents
+            }
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
             : undefined,
         bloks: widget ? { type: widget.type, uuid: widget.uuid, fallback: widget.fallback, params: widget.params } : undefined
     })

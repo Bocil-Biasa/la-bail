@@ -1400,7 +1400,11 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-bai
 
 ### Satu impor, seluruh builder
 
+<<<<<<< HEAD
 Permukaan builder-nya terdiri dari 212 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+=======
+Permukaan builder-nya terdiri dari 195 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2159,12 +2163,17 @@ await rich.send(jid)
 | `thinkingSection` | `GenAIBotThinkingStatusPrimitive` | `title`, `icon`, `is_in_progress`, `meta_search_apps`, `thought_duration_sec` |
 | `progressSection` | `GenAIBotProgressStatusPrimitive` | field-nya sama dengan thinking |
 
+<<<<<<< HEAD
 `FOABloksPrimitive` justru punya pabrik: `bloksSection`. Primitifnya membawa satu layar Bloks (`type: "im_a2ui"`) yang komponennya ikut di dalam `data`, bukan diambil klien dari server Meta — dan inilah pembungkus yang dipakai fixture A2UI resmi WhatsApp Web. Lihat [Kartu A2UI](#kartu-a2ui). `GenAIMetaSubsQuotaUpsellPrimitive` dulu ikut dikecualikan dengan alasan yang sama, dan itu juga salah: parser-nya membaca seluruh kartunya dari wire — pabriknya ada sekarang, lihat [Kartu Penawaran Langganan](#kartu-penawaran-langganan).
+=======
+Satu primitif di tabel renderer Web tidak punya pabrik di sini: `FOABloksPrimitive` menyebut satu layar Bloks yang diambil klien dari server Meta, bukan dibaca dari pesannya, jadi tidak ada field yang bisa diisi bot. `GenAIMetaSubsQuotaUpsellPrimitive` dulu juga ikut dikecualikan dengan alasan yang sama, dan itu salah: parser-nya membaca seluruh kartunya dari wire. Pabriknya ada sekarang — lihat [Kartu Penawaran Langganan](#kartu-penawaran-langganan).
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 ### Sisa Katalog Meta AI
 
 `AIRichMessage` adalah bentuk yang dikirim Meta AI sendiri, dan bot mencapainya dengan meneruskan salah satunya. Jadi katalognya jauh lebih besar daripada yang dicakup section di atas: klien WhatsApp mem-parse sekitar empat puluh primitif, dan `AI_RICH_PRIMITIVES` sekarang mendaftar semuanya, dengan `AI_RICH_ITEMS` untuk node item yang dibawa sebuah layout.
 
+<<<<<<< HEAD
 Permukaan `AIRichMessage` merakit bentuk itu secara utuh, termasuk submessage dan konteks penerusan yang dicap generator resmi (`WAWebGenerateRichResponseMessageProto`). `sendAIRichMessage(sock, jid, options)` menerima `sections`, `text`, `nativeFlow`, dan `submessages` sekaligus:
 
 ```js
@@ -2181,6 +2190,8 @@ await MB.sendAIRichMessage(sock, jid, {
 
 Peringatan render A2UI tetap berlaku untuk bentuk apa pun: lihat [Kartu A2UI](#kartu-a2ui).
 
+=======
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 Satu catatan yang perlu diketahui sebelum kamu membangun kartu di sekitar salah satunya: katalog penuhnya tergambar di aplikasi WhatsApp, dan di situlah penerimamu berada. WA Web desktop yang tertinggal — ia membawa renderer untuk delapan belas nama dan memetakan sisanya ke node kosong. Pesannya tetap sampai bagaimanapun dan section lainnya tetap tergambar, jadi penonton di desktop melihat bolong, bukan kegagalan.
 
 #### Bagian yang juga tergambar di desktop
@@ -2513,6 +2524,7 @@ Ia membuka view-once dan pembungkus lainnya dulu, jadi kartu di dalam `viewOnceM
 
 ### Kartu A2UI
 
+<<<<<<< HEAD
 `interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` dimaksudkan menghasilkan kartu yang digambar klien dari spesifikasi deklaratif yang dibawa pesannya. Komponennya memang ikut di dalam `data` — tapi lihat peringatan di bawah: yang menggambarnya tetap Bloks app `im_a2ui` dari Meta, dan ada gerbang klien yang tidak bisa dilewati pengirim biasa.
 
 > [!WARNING]
@@ -2574,6 +2586,12 @@ await MB.sendA2UI(sock, jid, [], {
 })
 ```
 
+=======
+`interactiveMessage.bloksWidget` dengan `type: "im_a2ui"` menghasilkan kartu yang digambar klien **dari spesifikasi deklaratif yang dibawa pesannya**. Tanpa HTML, tanpa hosting, dan berbeda dari Bloks lainnya, tidak ada yang diambil dari Meta — komponennya berjalan di dalam `data` dan klien yang menata letaknya.
+
+> [!WARNING]
+> Bentuk payload di bawah sudah terkonfirmasi: `bloksWidget` bentuk ini yang ditulis tangan tergambar di Android, dan klien menjawab yang cacat dengan `A2UIValidationException` bernama. Helper `sendA2UI` **belum** terkonfirmasi — kartu yang dikirim lewatnya belum pernah terlihat tergambar, dan penyebabnya masih terbuka. Sampai itu selesai, bangun `bloksWidget`-nya dengan tangan kalau kamu butuh ini bekerja.
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 ```js
 import { MB } from '@rexxhayanasi/elaina-baileys'
@@ -2591,7 +2609,11 @@ await MB.sendA2UI(sock, jid, [
 })
 ```
 
+<<<<<<< HEAD
 Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus bernama `root`, dan kontainer menyebut anaknya lewat id ketimbang menyarangkannya. `sendA2UI` melempar error kalau komponen `root` tidak ada. Nama `root` itu bisa diganti lewat opsi `root`, dan `createSurface.root` ikut menyesuaikan.
+=======
+Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus bernama `root`, dan kontainer menyebut anaknya lewat id ketimbang menyarangkannya. `sendA2UI` melempar error kalau `root` tidak ada.
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 | Builder | Memancarkan |
 |---|---|
@@ -2600,23 +2622,37 @@ Layout-nya daftar datar yang dialamati lewat id: tepat satu komponen harus berna
 | `a2uiText(id, text, { variant })` | `Text` — `variant` bisa `h1`, `body`, dan seterusnya |
 | `a2uiImage(id, url, { variant, fit })` | `Image` — bawaannya `header` dan `cover` |
 | `a2uiCard(id, child)` | `Card` — menerima satu id anak, bukan array |
+<<<<<<< HEAD
 | `a2uiInfoCard({ title, body, … })` | `{"type":"info_card", …}` — elemen siap pakai, bukan pohon `createSurface` |
 | `a2uiListCard({ title, body, … })` | `{"type":"list_card", …}` |
 
 Pembungkus `a2uiSurface` membangun payload-nya sendiri kalau kamu mau menulis tangan komponen yang belum dicakup helper-nya. `root` selalu ikut; `catalogId`, `sendDataModel`, dan `version` hanya dikirim kalau kamu mengisinya:
+=======
+
+Pembungkus `a2uiSurface` membangun payload-nya sendiri kalau kamu mau menulis tangan komponen yang belum dicakup helper-nya:
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 ```js
 {
   version: 'v0.9',
   createSurface: {
     surfaceId: 'card-<uuid>',
+<<<<<<< HEAD
     root: 'root',
+=======
+    catalogId: 'https://a2ui.org/specification/v0_9/catalogs/basic/catalog.json',
+    sendDataModel: false,
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
     components: [ … ]
   }
 }
 ```
 
+<<<<<<< HEAD
 Isi `catalogId` untuk menyebut kosakata komponennya. Fixture debug WhatsApp tidak mengirim `catalogId` sama sekali dan tetap tergambar, jadi biarkan kosong kalau komponennya dari katalog dasar. `Column`, `Row`, `Text`, `Image`, dan `Card` sudah terkonfirmasi di perangkat — `Card` membungkus tepat satu anak dan memakai field tunggal `child`, itu sebabnya `a2uiCard` menolak array; katalognya mendaftar lebih banyak, dan `a2uiSurface` akan membawa objek apa pun yang kamu beri, tapi anggap sisanya belum teruji.
+=======
+`catalogId` menyebut kosakata komponennya, jadi komponen di luar katalog dasar tidak akan tergambar. `Column`, `Row`, `Text`, `Image`, dan `Card` sudah terkonfirmasi di perangkat — `Card` membungkus tepat satu anak dan memakai field tunggal `child`, itu sebabnya `a2uiCard` menolak array; katalognya mendaftar lebih banyak, dan `a2uiSurface` akan membawa objek apa pun yang kamu beri, tapi anggap sisanya belum teruji.
+>>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 
 Kartu A2UI dan button native-flow hidup di `interactiveMessage` yang sama, dan begitulah kartunya mendapat baris button di bawahnya. `decodeBloksWidget(msg)` membacanya kembali, dengan `params` yang sudah di-parse.
 
