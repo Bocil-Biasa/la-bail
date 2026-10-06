@@ -30802,6 +30802,8 @@ export const proto = $root.proto = (() => {
         DeviceCapabilities.prototype.aiFbidMigration = null;
         DeviceCapabilities.prototype.bizAiSettingsSync = null;
         DeviceCapabilities.prototype.contactRefresh = null;
+        DeviceCapabilities.prototype.reverseHistorySync = null;
+        DeviceCapabilities.prototype.newsletterChatsMigration = null;
         let $oneOfFields;
 
         // Virtual OneOf for proto3 optional field
@@ -30855,6 +30857,16 @@ export const proto = $root.proto = (() => {
             set: $util.oneOfSetter($oneOfFields)
         });
 
+        Object.defineProperty(DeviceCapabilities.prototype, "_reverseHistorySync", {
+            get: $util.oneOfGetter($oneOfFields = ["reverseHistorySync"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
+        Object.defineProperty(DeviceCapabilities.prototype, "_newsletterChatsMigration", {
+            get: $util.oneOfGetter($oneOfFields = ["newsletterChatsMigration"]),
+            set: $util.oneOfSetter($oneOfFields)
+        });
+
         DeviceCapabilities.create = function create(properties) {
             return new DeviceCapabilities(properties);
         };
@@ -30880,6 +30892,10 @@ export const proto = $root.proto = (() => {
                 $root.proto.DeviceCapabilities.BizAiSettingsSync.encode(m.bizAiSettingsSync, w.uint32(66).fork()).ldelim();
             if (m.contactRefresh != null && Object.hasOwnProperty.call(m, "contactRefresh"))
                 $root.proto.DeviceCapabilities.ContactRefresh.encode(m.contactRefresh, w.uint32(74).fork()).ldelim();
+            if (m.reverseHistorySync != null && Object.hasOwnProperty.call(m, "reverseHistorySync"))
+                $root.proto.DeviceCapabilities.ReverseHistorySync.encode(m.reverseHistorySync, w.uint32(82).fork()).ldelim();
+            if (m.newsletterChatsMigration != null && Object.hasOwnProperty.call(m, "newsletterChatsMigration"))
+                $root.proto.DeviceCapabilities.NewsletterChatsMigration.encode(m.newsletterChatsMigration, w.uint32(90).fork()).ldelim();
             return w;
         };
 
@@ -30930,6 +30946,14 @@ export const proto = $root.proto = (() => {
                     }
                 case 9: {
                         m.contactRefresh = $root.proto.DeviceCapabilities.ContactRefresh.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 10: {
+                        m.reverseHistorySync = $root.proto.DeviceCapabilities.ReverseHistorySync.decode(r, r.uint32(), undefined, n + 1);
+                        break;
+                    }
+                case 11: {
+                        m.newsletterChatsMigration = $root.proto.DeviceCapabilities.NewsletterChatsMigration.decode(r, r.uint32(), undefined, n + 1);
                         break;
                     }
                 default:
@@ -31023,6 +31047,16 @@ export const proto = $root.proto = (() => {
                     throw TypeError(".proto.contactRefresh: object expected");
                 m.contactRefresh = $root.proto.DeviceCapabilities.ContactRefresh.fromObject(d.contactRefresh, n + 1);
             }
+            if (d.reverseHistorySync != null) {
+                if (typeof d.reverseHistorySync !== "object")
+                    throw TypeError(".proto.reverseHistorySync: object expected");
+                m.reverseHistorySync = $root.proto.DeviceCapabilities.ReverseHistorySync.fromObject(d.reverseHistorySync, n + 1);
+            }
+            if (d.newsletterChatsMigration != null) {
+                if (typeof d.newsletterChatsMigration !== "object")
+                    throw TypeError(".proto.newsletterChatsMigration: object expected");
+                m.newsletterChatsMigration = $root.proto.DeviceCapabilities.NewsletterChatsMigration.fromObject(d.newsletterChatsMigration, n + 1);
+            }
             return m;
         };
 
@@ -31074,6 +31108,16 @@ export const proto = $root.proto = (() => {
                 d.contactRefresh = $root.proto.DeviceCapabilities.ContactRefresh.toObject(m.contactRefresh, o);
                 if (o.oneofs)
                     d._contactRefresh = "contactRefresh";
+            }
+            if (m.reverseHistorySync != null && m.hasOwnProperty("reverseHistorySync")) {
+                d.reverseHistorySync = $root.proto.DeviceCapabilities.ReverseHistorySync.toObject(m.reverseHistorySync, o);
+                if (o.oneofs)
+                    d._reverseHistorySync = "reverseHistorySync";
+            }
+            if (m.newsletterChatsMigration != null && m.hasOwnProperty("newsletterChatsMigration")) {
+                d.newsletterChatsMigration = $root.proto.DeviceCapabilities.NewsletterChatsMigration.toObject(m.newsletterChatsMigration, o);
+                if (o.oneofs)
+                    d._newsletterChatsMigration = "newsletterChatsMigration";
             }
             return d;
         };
@@ -31941,6 +31985,254 @@ export const proto = $root.proto = (() => {
             };
 
             return ContactRefresh;
+        })();
+
+        DeviceCapabilities.ReverseHistorySync = (function() {
+
+            function ReverseHistorySync(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            ReverseHistorySync.prototype.enabledProducts = $util.emptyArray;
+
+            let $oneOfFields;
+
+            ReverseHistorySync.create = function create(properties) {
+                return new ReverseHistorySync(properties);
+            };
+
+            ReverseHistorySync.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.enabledProducts != null && m.enabledProducts.length) {
+                    for (var i = 0; i < m.enabledProducts.length; ++i)
+                        w.uint32(8).int32(m.enabledProducts[i]);
+                }
+                return w;
+            };
+
+            ReverseHistorySync.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.DeviceCapabilities.ReverseHistorySync();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            if (!(m.enabledProducts && m.enabledProducts.length))
+                                m.enabledProducts = [];
+                            m.enabledProducts.push(r.int32());
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            ReverseHistorySync.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.DeviceCapabilities.ReverseHistorySync)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.DeviceCapabilities.ReverseHistorySync();
+                if (d.enabledProducts) {
+                    if (!Array.isArray(d.enabledProducts))
+                        throw TypeError(".proto.enabledProducts: array expected");
+                    m.enabledProducts = [];
+                    for (var i = 0; i < d.enabledProducts.length; ++i) {
+                        m.enabledProducts[i] = d.enabledProducts[i] >>> 0;
+                    }
+                }
+                return m;
+            };
+
+            ReverseHistorySync.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (o.arrays || o.defaults) {
+                    d.enabledProducts = [];
+                }
+                if (m.enabledProducts && m.enabledProducts.length) {
+                    d.enabledProducts = [];
+                    for (var j = 0; j < m.enabledProducts.length; ++j) {
+                        d.enabledProducts[j] = m.enabledProducts[j];
+                    }
+                }
+                return d;
+            };
+
+            ReverseHistorySync.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            ReverseHistorySync.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.DeviceCapabilities.ReverseHistorySync";
+            };
+
+            return ReverseHistorySync;
+        })();
+
+        DeviceCapabilities.NewsletterChatsMigration = (function() {
+
+            function NewsletterChatsMigration(p) {
+                if (p)
+                    for (var ks = Object.keys(p), i = 0; i < ks.length; ++i)
+                        if (p[ks[i]] != null && ks[i] !== "__proto__")
+                            this[ks[i]] = p[ks[i]];
+            }
+
+            NewsletterChatsMigration.prototype.effectiveMigrated = null;
+            NewsletterChatsMigration.prototype.countdownEndsAt = null;
+            NewsletterChatsMigration.prototype.rolledBack = null;
+
+            let $oneOfFields;
+
+            Object.defineProperty(NewsletterChatsMigration.prototype, "_effectiveMigrated", {
+                get: $util.oneOfGetter($oneOfFields = ["effectiveMigrated"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            Object.defineProperty(NewsletterChatsMigration.prototype, "_countdownEndsAt", {
+                get: $util.oneOfGetter($oneOfFields = ["countdownEndsAt"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            Object.defineProperty(NewsletterChatsMigration.prototype, "_rolledBack", {
+                get: $util.oneOfGetter($oneOfFields = ["rolledBack"]),
+                set: $util.oneOfSetter($oneOfFields)
+            });
+
+            NewsletterChatsMigration.create = function create(properties) {
+                return new NewsletterChatsMigration(properties);
+            };
+
+            NewsletterChatsMigration.encode = function encode(m, w) {
+                if (!w)
+                    w = $Writer.create();
+                if (m.effectiveMigrated != null && Object.hasOwnProperty.call(m, "effectiveMigrated"))
+                    w.uint32(8).bool(m.effectiveMigrated);
+                if (m.countdownEndsAt != null && Object.hasOwnProperty.call(m, "countdownEndsAt"))
+                    w.uint32(16).int64(m.countdownEndsAt);
+                if (m.rolledBack != null && Object.hasOwnProperty.call(m, "rolledBack"))
+                    w.uint32(24).bool(m.rolledBack);
+                return w;
+            };
+
+            NewsletterChatsMigration.decode = function decode(r, l, e, n) {
+                if (!(r instanceof $Reader))
+                    r = $Reader.create(r);
+                if (n === undefined)
+                    n = 0;
+                if (n > $Reader.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var c = l === undefined ? r.len : r.pos + l, m = new $root.proto.DeviceCapabilities.NewsletterChatsMigration();
+                while (r.pos < c) {
+                    var t = r.uint32();
+                    if (t === e)
+                        break;
+                    switch (t >>> 3) {
+                    case 1: {
+                            m.effectiveMigrated = r.bool();
+                            break;
+                        }
+                    case 2: {
+                            m.countdownEndsAt = r.int64();
+                            break;
+                        }
+                    case 3: {
+                            m.rolledBack = r.bool();
+                            break;
+                        }
+                    default:
+                        r.skipType(t & 7, n);
+                        break;
+                    }
+                }
+                return m;
+            };
+
+            NewsletterChatsMigration.fromObject = function fromObject(d, n) {
+                if (d instanceof $root.proto.DeviceCapabilities.NewsletterChatsMigration)
+                    return d;
+                if (n === undefined)
+                    n = 0;
+                if (n > $util.recursionLimit)
+                    throw Error("maximum nesting depth exceeded");
+                var m = new $root.proto.DeviceCapabilities.NewsletterChatsMigration();
+                if (d.effectiveMigrated != null) {
+                    m.effectiveMigrated = Boolean(d.effectiveMigrated);
+                }
+                if (d.countdownEndsAt != null) {
+                    if ($util.Long)
+                        (m.countdownEndsAt = $util.Long.fromValue(d.countdownEndsAt)).unsigned = false;
+                    else if (typeof d.countdownEndsAt === "string")
+                        m.countdownEndsAt = parseInt(d.countdownEndsAt, 10);
+                    else if (typeof d.countdownEndsAt === "number")
+                        m.countdownEndsAt = d.countdownEndsAt;
+                    else if (typeof d.countdownEndsAt === "object")
+                        m.countdownEndsAt = new $util.LongBits(d.countdownEndsAt.low >>> 0, d.countdownEndsAt.high >>> 0).toNumber(false);
+                }
+                if (d.rolledBack != null) {
+                    m.rolledBack = Boolean(d.rolledBack);
+                }
+                return m;
+            };
+
+            NewsletterChatsMigration.toObject = function toObject(m, o) {
+                if (!o)
+                    o = {};
+                var d = {};
+                if (m.effectiveMigrated != null && m.hasOwnProperty("effectiveMigrated")) {
+                    d.effectiveMigrated = m.effectiveMigrated;
+                    if (o.oneofs)
+                        d._effectiveMigrated = "effectiveMigrated";
+                }
+                if (m.countdownEndsAt != null && m.hasOwnProperty("countdownEndsAt")) {
+                    if (typeof m.countdownEndsAt === "number")
+                        d.countdownEndsAt = o.longs === String ? String(m.countdownEndsAt) : m.countdownEndsAt;
+                    else
+                        d.countdownEndsAt = o.longs === String ? longToString(m.countdownEndsAt, false) : o.longs === Number ? longToNumber(m.countdownEndsAt, false) : m.countdownEndsAt;
+                    if (o.oneofs)
+                        d._countdownEndsAt = "countdownEndsAt";
+                }
+                if (m.rolledBack != null && m.hasOwnProperty("rolledBack")) {
+                    d.rolledBack = m.rolledBack;
+                    if (o.oneofs)
+                        d._rolledBack = "rolledBack";
+                }
+                return d;
+            };
+
+            NewsletterChatsMigration.prototype.toJSON = function toJSON() {
+                return this.constructor.toObject(this, $protobuf.util.toJSONOptions);
+            };
+
+            NewsletterChatsMigration.getTypeUrl = function getTypeUrl(typeUrlPrefix) {
+                if (typeUrlPrefix === undefined) {
+                    typeUrlPrefix = "type.googleapis.com";
+                }
+                return typeUrlPrefix + "/proto.DeviceCapabilities.NewsletterChatsMigration";
+            };
+
+            return NewsletterChatsMigration;
         })();
 
         return DeviceCapabilities;
