@@ -2,7 +2,11 @@
 import { Boom } from '@hapi/boom';
 import { createHash, randomBytes, randomFillSync } from 'crypto';
 import { proto } from '../../WAProto/index.js';
+<<<<<<< HEAD
 const baileysVersion = [2, 3000, 1049294120];
+=======
+const baileysVersion = [2, 3000, 1049423634];
+>>>>>>> Elaina-Baileys-Original/main
 import { DisconnectReason } from '../Types/index.js';
 import { getAllBinaryNodeChildren } from '../WABinary/index.js';
 import { sha256 } from './crypto.js';

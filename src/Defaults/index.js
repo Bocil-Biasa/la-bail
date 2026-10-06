@@ -4,10 +4,14 @@ import { makeLibSignalRepository } from '../Signal/libsignal.js';
 import { Browsers } from '../Utils/browser-utils.js';
 import logger from '../Utils/logger.js';
 <<<<<<< HEAD
+<<<<<<< HEAD
 const version = [2, 3000, 1049294120];
 =======
 const version = [2, 3000, 1049098065];
 >>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
+=======
+const version = [2, 3000, 1049423634];
+>>>>>>> Elaina-Baileys-Original/main
 export const UNAUTHORIZED_CODES = [401, 403, 419];
 export const BIZ_BOT_SUPPORT_PAYLOAD = '{"version":1,"is_ai_message":true,"should_upload_client_logs":false,"should_show_system_message":false,"ticket_id":"7004947587700716","citation_items":[],"ticket_locale":"us"}';
 export const DEFAULT_ORIGIN = 'https://web.whatsapp.com';

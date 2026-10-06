@@ -4351,6 +4351,8 @@ export namespace proto {
     }
 
     interface IDeviceCapabilities {
+        reverseHistorySync?: (proto.DeviceCapabilities.IReverseHistorySync|null);
+        newsletterChatsMigration?: (proto.DeviceCapabilities.INewsletterChatsMigration|null);
         aiFbidMigration?: (proto.DeviceCapabilities.IAiFbidMigration|null);
         bizAiSettingsSync?: (proto.DeviceCapabilities.IBizAiSettingsSync|null);
         contactRefresh?: (proto.DeviceCapabilities.IContactRefresh|null);
@@ -4363,6 +4365,8 @@ export namespace proto {
     }
 
     class DeviceCapabilities implements IDeviceCapabilities {
+        public reverseHistorySync?: (proto.DeviceCapabilities.IReverseHistorySync|null);
+        public newsletterChatsMigration?: (proto.DeviceCapabilities.INewsletterChatsMigration|null);
         public aiFbidMigration?: (proto.DeviceCapabilities.IAiFbidMigration|null);
         public bizAiSettingsSync?: (proto.DeviceCapabilities.IBizAiSettingsSync|null);
         public contactRefresh?: (proto.DeviceCapabilities.IContactRefresh|null);
@@ -4383,6 +4387,47 @@ export namespace proto {
     }
 
     namespace DeviceCapabilities {
+        interface INewsletterChatsMigration {
+            effectiveMigrated?: (boolean|null);
+            countdownEndsAt?: (number|Long|null);
+            rolledBack?: (boolean|null);
+        }
+
+        class NewsletterChatsMigration implements INewsletterChatsMigration {
+            constructor(p?: proto.DeviceCapabilities.INewsletterChatsMigration);
+            public effectiveMigrated?: (boolean|null);
+            public countdownEndsAt?: (number|Long|null);
+            public rolledBack?: (boolean|null);
+            public _effectiveMigrated?: "effectiveMigrated";
+            public _countdownEndsAt?: "countdownEndsAt";
+            public _rolledBack?: "rolledBack";
+            public static create(properties?: proto.DeviceCapabilities.INewsletterChatsMigration): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static encode(m: proto.DeviceCapabilities.INewsletterChatsMigration, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.NewsletterChatsMigration;
+            public static toObject(m: proto.DeviceCapabilities.NewsletterChatsMigration, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+
+        interface IReverseHistorySync {
+            enabledProducts?: (number[]|null);
+        }
+
+        class ReverseHistorySync implements IReverseHistorySync {
+            constructor(p?: proto.DeviceCapabilities.IReverseHistorySync);
+            public enabledProducts?: (number[]|null);
+            public static create(properties?: proto.DeviceCapabilities.IReverseHistorySync): proto.DeviceCapabilities.ReverseHistorySync;
+            public static encode(m: proto.DeviceCapabilities.IReverseHistorySync, w?: $protobuf.Writer): $protobuf.Writer;
+            public static decode(r: ($protobuf.Reader|Uint8Array), l?: number): proto.DeviceCapabilities.ReverseHistorySync;
+            public static fromObject(d: { [k: string]: any }): proto.DeviceCapabilities.ReverseHistorySync;
+            public static toObject(m: proto.DeviceCapabilities.ReverseHistorySync, o?: $protobuf.IConversionOptions): { [k: string]: any };
+            public toJSON(): { [k: string]: any };
+            public static getTypeUrl(typeUrlPrefix?: string): string;
+        }
+
+
         interface IContactRefresh {
             refreshSupported?: (boolean|null);
         }
