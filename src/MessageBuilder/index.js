@@ -2173,8 +2173,6 @@ class AIRich extends BaseBuilder {
 
 	async build(
 		jid,
-<<<<<<< HEAD
-<<<<<<< HEAD
 		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, forwardingScore = 1, botEntryPointOrigin = AIRich.BOT_ENTRY_POINT_META_AI_FORWARD, messageSharing = true, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
 	) {
 		const forward = forwarded
@@ -2191,32 +2189,7 @@ class AIRich extends BaseBuilder {
 								},
 							}
 						: {}),
-=======
-		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
-=======
-		{ bypassDownload = true, forwarded = true, forwardWrapper = true, notification = false, includesUnifiedResponse = true, includesSubmessages = true, botJid = AIRich.DEFAULT_BOT_JID, forwardingScore = 1, botEntryPointOrigin = AIRich.BOT_ENTRY_POINT_META_AI_FORWARD, messageSharing = true, disclaimerText = '', verification = 'auto', quoted, quotedParticipant, messageId, ...options } = {}
->>>>>>> Elaina-Baileys-Original/main
-	) {
-		const forward = forwarded
-			? {
-					forwardingScore,
-					isForwarded: true,
-					forwardedAiBotMessageInfo: { botJid },
-<<<<<<< HEAD
-					forwardOrigin: 4,
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-					forwardOrigin: AIRich.FORWARD_ORIGIN_META_AI,
-					...(messageSharing
-						? {
-								botMessageSharingInfo: {
-									botEntryPointOrigin,
-									forwardScore: forwardingScore,
-								},
-							}
-						: {}),
->>>>>>> Elaina-Baileys-Original/main
-				}
+			  }
 			: {};
 
 		const notif = notification
@@ -3186,19 +3159,10 @@ class AIRich extends BaseBuilder {
 
 	static DEFAULT_BOT_JID = '867051314767696@bot';
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 	static FORWARD_ORIGIN_META_AI = 4;
 
 	static BOT_ENTRY_POINT_META_AI_FORWARD = 31;
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 	static wrapRichResponse(richResponseMessage, forwardWrapper = true) {
 		return forwardWrapper ? { botForwardedMessage: { message: { richResponseMessage } } } : { richResponseMessage };
 	}
@@ -3513,25 +3477,13 @@ class AIRich extends BaseBuilder {
 		return this._addContent(section, paired, options);
 	}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
 	addSubmessage(submessage, { id, replace, insertAt } = {}) {
-=======
-	addSubmessage(submessage, options = {}) {
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-	addSubmessage(submessage, { id, replace, insertAt } = {}) {
->>>>>>> Elaina-Baileys-Original/main
 		const items = this._validateSubmessages(submessage);
 
 		if (!items.length) {
 			throw new ContentValidationError('At least one submessage is required');
 		}
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 		const hasReplace = replace !== undefined && replace !== null && replace !== '';
 		const hasInsertAt = insertAt !== undefined && insertAt !== null && insertAt !== '';
 
@@ -3594,12 +3546,6 @@ class AIRich extends BaseBuilder {
 		}
 
 		return this;
-<<<<<<< HEAD
-=======
-		return this._addContent(undefined, items, options);
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 	}
 
 	delete(target) {

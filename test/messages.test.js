@@ -1272,15 +1272,7 @@ test('airich-namespace', async () => {
 
     const members = [...Object.keys(extras), ...Object.keys(metaai)].filter(name => name !== 'default');
     assert.equal(new Set(members).size, members.length, 'extras and metaai must not export the same name twice');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(members.length, 186, 'the README quotes this count, update both together');
-=======
-    assert.equal(members.length, 169, 'the README quotes this count, update both together');
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(members.length, 186, 'the README quotes this count, update both together');
->>>>>>> Elaina-Baileys-Original/main
 
     for (const name of members) {
         assert.equal(AIRich[name], (extras[name] ?? metaai[name]), `AIRich.${name} has to be the same member as the named export`);
@@ -1302,15 +1294,7 @@ test('airich-namespace', async () => {
         assert.equal(typeof MB[name], 'function', `MB.${name} has to be the class`);
     }
     assert.equal(MB.AIRich, AIRich, 'MB holds the same class, not a copy');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(Object.keys(MB).length, 212, 'the README quotes this count, update both together');
-=======
-    assert.equal(Object.keys(MB).length, 195, 'the README quotes this count, update both together');
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(Object.keys(MB).length, 212, 'the README quotes this count, update both together');
->>>>>>> Elaina-Baileys-Original/main
 
     const lib = await import('../src/index.js');
     for (const builder of [Button, ButtonV2, Carousel, AIRich, Toolkit]) {

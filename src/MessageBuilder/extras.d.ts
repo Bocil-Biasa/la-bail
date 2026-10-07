@@ -242,33 +242,19 @@ export interface A2UIComponent {
     [key: string]: any;
 }
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 export interface A2UIElement {
     type: 'info_card' | 'list_card';
     [key: string]: any;
 }
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 export declare function a2uiText(id: string, text: string, options?: { variant?: string }): A2UIComponent;
 export declare function a2uiImage(id: string, url: string, options?: { variant?: string; fit?: string }): A2UIComponent;
 export declare function a2uiColumn(id: string, children?: string[]): A2UIComponent;
 export declare function a2uiRow(id: string, children?: string[]): A2UIComponent;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 export declare function a2uiCard(id: string, child: string): A2UIComponent;
 export declare function a2uiInfoCard(element?: Record<string, any>): A2UIElement;
 export declare function a2uiListCard(element?: Record<string, any>): A2UIElement;
 export declare function a2uiFallback(components: any[]): string;
-<<<<<<< HEAD
 
 export declare function a2uiSurface(components: A2UIComponent[], options?: {
     surfaceId?: string;
@@ -278,9 +264,6 @@ export declare function a2uiSurface(components: A2UIComponent[], options?: {
     version?: string;
     type?: string;
     title?: string;
-=======
-=======
->>>>>>> Elaina-Baileys-Original/main
 
 export declare function a2uiSurface(components: A2UIComponent[], options?: {
     surfaceId?: string;
@@ -288,19 +271,11 @@ export declare function a2uiSurface(components: A2UIComponent[], options?: {
     catalogId?: string;
     sendDataModel?: boolean;
     version?: string;
-<<<<<<< HEAD
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    type?: string;
-    title?: string;
->>>>>>> Elaina-Baileys-Original/main
 }): any;
 
 export declare function a2uiWidget(components: A2UIComponent[], options?: {
     uuid?: string;
     surfaceId?: string;
-<<<<<<< HEAD
-<<<<<<< HEAD
     root?: string;
     catalogId?: string;
     sendDataModel?: boolean;
@@ -309,21 +284,12 @@ export declare function a2uiWidget(components: A2UIComponent[], options?: {
     title?: string;
     fallback?: string;
     data?: any;
-=======
-=======
-    root?: string;
->>>>>>> Elaina-Baileys-Original/main
     catalogId?: string;
     sendDataModel?: boolean;
     version?: string;
     type?: string;
     title?: string;
     fallback?: string;
-<<<<<<< HEAD
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    data?: any;
->>>>>>> Elaina-Baileys-Original/main
 }): BloksWidget;
 
 export declare function sendA2UI(sock: any, jid: string, components: A2UIComponent[], options?: {
@@ -331,32 +297,17 @@ export declare function sendA2UI(sock: any, jid: string, components: A2UICompone
     contextInfo?: any;
     uuid?: string;
     surfaceId?: string;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
     root?: string;
     catalogId?: string;
     sendDataModel?: boolean;
     type?: string;
     title?: string;
-<<<<<<< HEAD
-=======
-    catalogId?: string;
-    sendDataModel?: boolean;
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
     fallback?: string;
     messageId?: string;
     additionalNodes?: any[];
     [key: string]: any;
 }): Promise<any>;
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 export declare function buildA2UISection(components: A2UIComponent[], options?: {
     uuid?: string;
     surfaceId?: string;
@@ -386,19 +337,10 @@ export declare function sendA2UIBloks(sock: any, jid: string, components: A2UICo
     [key: string]: any;
 }): Promise<any>;
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 export declare const BLOKS_A2UI_TYPE: 'im_a2ui';
 export declare const BLOKS_A2UI_REPLY_ACTION: 'a2ui_reply_action';
 export declare const BLOKS_A2UI_SUPPORTED_ELEMENTS: readonly string[];
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 export interface AIRichSubmessage {
     messageType: number;
     messageText?: string;
@@ -452,11 +394,6 @@ export declare function sendAIRichMessage(sock: any, jid: string, options?: {
     [key: string]: any;
 }): Promise<any>;
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 export interface BloksWidget {
     type: string;
     data: string;
@@ -504,15 +441,7 @@ export interface RichMessageRead {
     embeddedTabs: any[];
     submessages: any[];
     responseId?: string;
-<<<<<<< HEAD
-<<<<<<< HEAD
     a2ui?: { surfaceId: string; root?: string; catalogId?: string; version: string; components: A2UIComponent[] };
-=======
-    a2ui?: { surfaceId: string; catalogId: string; version: string; components: A2UIComponent[] };
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    a2ui?: { surfaceId: string; root?: string; catalogId?: string; version: string; components: A2UIComponent[] };
->>>>>>> Elaina-Baileys-Original/main
     bloks?: { type: string; uuid: string; fallback: string; params: any };
 }
 

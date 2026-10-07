@@ -1,9 +1,6 @@
 
-<<<<<<< HEAD
-=======
 import chalk from 'chalk';
 import figlet from 'figlet';
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 import makeWASocket from './Socket/index.js';
 import { AIRich, Button, ButtonV2, Carousel, MessageBuilder, Toolkit } from './MessageBuilder/index.js';
 import * as messageBuilderExtras from './MessageBuilder/extras.js';
@@ -25,13 +22,10 @@ export * from './MessageBuilder/metaai.js';
 export * from './MessageBuilder/bot-signature.js';
 export * from './Voip/index.js';
 
-<<<<<<< HEAD
-=======
 console.log(chalk.cyan(figlet.textSync('La-Bail', { font: 'Standard' })));
 console.log(chalk.magenta(' A WhatsApp multi-device library for NodeJS'));
 console.log(chalk.gray(' Modified by Bocil-Biasa (c) 2026 - la-bail\n'));
 
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
 const builderMembers = [
     ...Object.entries(messageBuilderExtras),
     ...Object.entries(metaAiSections),

@@ -1,15 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { proto } from '../WAProto/index.js';
-<<<<<<< HEAD
-<<<<<<< HEAD
 import { A2UI_BASIC_CATALOG, A2UI_VERSION, AI_RICH_SUBMESSAGE_CONTENT_ITEMS, AI_RICH_SUBMESSAGE_INLINE_IMAGE, AI_RICH_SUBMESSAGE_KINDS, AI_RICH_SUBMESSAGE_TABLE, AI_RICH_SUBMESSAGE_TEXT, AIRichMessage, aiRichInlineImage, aiRichSubmessage, aiRichTable, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, buildA2UISection, decodeBloksWidget, sendA2UI, sendA2UIBloks, sendAIRichMessage, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
-=======
-import { A2UI_BASIC_CATALOG, A2UI_VERSION, BLOKS_A2UI_TYPE, a2uiColumn, a2uiImage, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, decodeBloksWidget, sendA2UI, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-import { A2UI_BASIC_CATALOG, A2UI_VERSION, AI_RICH_SUBMESSAGE_CONTENT_ITEMS, AI_RICH_SUBMESSAGE_INLINE_IMAGE, AI_RICH_SUBMESSAGE_KINDS, AI_RICH_SUBMESSAGE_TABLE, AI_RICH_SUBMESSAGE_TEXT, AIRichMessage, aiRichInlineImage, aiRichSubmessage, aiRichTable, BLOKS_A2UI_TYPE, a2uiCard, a2uiColumn, a2uiFallback, a2uiImage, a2uiInfoCard, a2uiListCard, a2uiRow, a2uiSurface, a2uiText, a2uiWidget, buildA2UISection, decodeBloksWidget, sendA2UI, sendA2UIBloks, sendAIRichMessage, autoHeight, HTML_APP_BRIDGE, AI_RICH_PRIMITIVES, BLOKS_A2UI_REPLY_ACTION, BLOKS_A2UI_SUPPORTED_ELEMENTS, bloksSection, bloksWidget, decodeAIRich, sendBloksWidget, AI_RICH_INLINE_ENTITIES, AI_RICH_SECTION_TYPENAME, EMBEDDED_SCREEN_PRESENTATION, EMBEDDED_SCREEN_TABBED_TYPENAME, SourceProvider, botSourcesMetadata, embeddedScreen, embeddedTab, embeddedTabbedContent, htmlSection, readEmbeddedSections, readEmbeddedTabs, readRichMessage, HTML_MIME_TYPE, fileLinkSection, fileSection, sendHtmlDocument, FooterActionType, footerActionSection, AI_RICH_HTML_PRIMITIVE, AI_RICH_PRIMITIVES_WEB_RENDERED, lockHeight, sendHtmlApp, AI_RICH_ITEMS, AI_RICH_LAYOUTS } from '../src/MessageBuilder/extras.js';
->>>>>>> Elaina-Baileys-Original/main
 import { AIRich, Toolkit, ContentValidationError } from '../src/MessageBuilder/index.js';
 import { checkHtmlApp } from '../src/Utils/html-app.js';
 import { accountLinkingApp, accountLinkingSection, actionListRow, actionListSection, addonActionSection, calendarEvent, calendarWidgetSection, chainOfThoughtSection, chainingSuggestionSection, commentSection, compactEntitySection, contextualSourcesSection, customSection, locationPermissionSection, mapSection, mediaGridSection, mediaItem, multipleResponseSection, placeItem, plannerSnippetSection, plannerStep, productEntityItem, reminderSection, searchAdSection, searchPlannerSection, searchResultV2Section, sideBySideSurveyItem, socialEntityItem, sportsSection, threadSurfingItem, timestampPlaceholderSection, transparencySection, transparencySignal, videoSection, ActionListRowType, CompactEntityType, MapQueryStatus, MultipleResponseLayoutType, SearchPlannerStepStatus, SportsGameStatus, SportsLeague, forwardRichResponse, readSignedRichResponse, verifyRichResponseSignature } from '../src/MessageBuilder/metaai.js';
@@ -50,8 +42,6 @@ test('a2ui', async () => {
     const surface = a2uiSurface(components, { surfaceId: 'card-1' });
     assert.equal(surface.version, 'v0.9');
     assert.equal(surface.createSurface.surfaceId, 'card-1');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(surface.createSurface.root, 'root');
     assert.equal('catalogId' in surface.createSurface, false);
     assert.equal('sendDataModel' in surface.createSurface, false);
@@ -69,31 +59,6 @@ test('a2ui', async () => {
     assert.equal(catalogued.createSurface.sendDataModel, true);
     assert.equal(catalogued.createSurface.root, 'root');
 
-=======
-    assert.equal(surface.createSurface.catalogId, A2UI_BASIC_CATALOG);
-    assert.equal(surface.createSurface.sendDataModel, false);
-    assert.equal(surface.createSurface.components.length, 4);
-
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(surface.createSurface.root, 'root');
-    assert.equal('catalogId' in surface.createSurface, false);
-    assert.equal('sendDataModel' in surface.createSurface, false);
-    assert.equal(surface.createSurface.components.length, 4);
-
-    const infoCard = a2uiInfoCard({ title: '✨ MENU', body: 'Pilih kategori' });
-    assert.deepEqual(infoCard, { type: 'info_card', title: '✨ MENU', body: 'Pilih kategori' });
-    assert.equal(a2uiListCard().type, 'list_card');
-    assert.throws(() => a2uiInfoCard([]), TypeError);
-    assert.equal(a2uiFallback([a2uiText('t', 'Halo'), { type: 'info_card', title: 'Judul' }]), 'Halo\nJudul');
-    assert.equal(a2uiFallback(null), '');
-
-    const catalogued = a2uiSurface(components, { surfaceId: 'card-2', catalogId: A2UI_BASIC_CATALOG, sendDataModel: true });
-    assert.equal(catalogued.createSurface.catalogId, A2UI_BASIC_CATALOG);
-    assert.equal(catalogued.createSurface.sendDataModel, true);
-    assert.equal(catalogued.createSurface.root, 'root');
-
->>>>>>> Elaina-Baileys-Original/main
     assert.throws(() => a2uiSurface([]), TypeError);
     assert.throws(() => a2uiSurface('x'), TypeError);
     assert.throws(() => a2uiSurface([a2uiText('bukan_root', 'x')]), TypeError);
@@ -101,27 +66,12 @@ test('a2ui', async () => {
     const widget = a2uiWidget(components, { uuid: 'u-1' });
     assert.equal(widget.type, BLOKS_A2UI_TYPE);
     assert.equal(widget.uuid, 'u-1');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(widget.fallback, 'Welcome!\nHalo!');
     assert.equal(typeof widget.data, 'string');
     assert.equal(JSON.parse(widget.data).createSurface.surfaceId, 'card-u-1');
     assert.equal(JSON.parse(widget.data).createSurface.root, 'root');
     assert.equal(JSON.parse(widget.data).version, 'v0.9');
     assert.equal('catalogId' in JSON.parse(widget.data).createSurface, false);
-=======
-    assert.equal(widget.fallback, '');
-    assert.equal(typeof widget.data, 'string');
-    assert.equal(JSON.parse(widget.data).createSurface.surfaceId, 'card-u-1');
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(widget.fallback, 'Welcome!\nHalo!');
-    assert.equal(typeof widget.data, 'string');
-    assert.equal(JSON.parse(widget.data).createSurface.surfaceId, 'card-u-1');
-    assert.equal(JSON.parse(widget.data).createSurface.root, 'root');
-    assert.equal(JSON.parse(widget.data).version, 'v0.9');
-    assert.equal('catalogId' in JSON.parse(widget.data).createSurface, false);
->>>>>>> Elaina-Baileys-Original/main
 
     const encoded = proto.Message.encode({ interactiveMessage: { bloksWidget: widget } }).finish();
     const back = proto.Message.decode(encoded).interactiveMessage.bloksWidget;
@@ -152,26 +102,14 @@ test('a2ui', async () => {
     const decoded = decodeBloksWidget(calls[0].message);
     assert.equal(decoded.type, BLOKS_A2UI_TYPE);
     assert.equal(decoded.params.createSurface.components[2].text, 'Welcome!');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(interactive.bloksWidget.fallback, 'Welcome!\nHalo!');
     assert.equal(interactive.body.text, interactive.bloksWidget.fallback);
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(interactive.bloksWidget.fallback, 'Welcome!\nHalo!');
-    assert.equal(interactive.body.text, interactive.bloksWidget.fallback);
->>>>>>> Elaina-Baileys-Original/main
 
     calls.length = 0;
     await sendA2UI(sock, '2@s.whatsapp.net', components);
     assert.deepEqual(calls[0].message.interactiveMessage.nativeFlowMessage.buttons, []);
     assert.equal(calls[0].message.interactiveMessage.contextInfo, undefined);
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
     calls.length = 0;
     await sendA2UI(sock, '2@s.whatsapp.net', [], { uuid: 'u-el', data: a2uiInfoCard({ title: 'Menu', body: 'Pilih' }) });
     const elementWidget = calls[0].message.interactiveMessage.bloksWidget;
@@ -186,11 +124,6 @@ test('a2ui', async () => {
     assert.equal(elementInfo.a2ui.components, undefined);
     assert.equal(elementInfo.text, 'Menu');
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
     await assert.rejects(() => sendA2UI(null, '2@s.whatsapp.net', components), TypeError);
     await assert.rejects(() => sendA2UI(sock, '', components), TypeError);
     await assert.rejects(() => sendA2UI(sock, '2@s.whatsapp.net', components, { buttons: 'x' }), TypeError);
@@ -434,10 +367,6 @@ test('bloks-widget', async () => {
     assert.deepEqual(decodeAIRich({ message: richCalls[0].message }).typenames, ['FOABloksPrimitive']);
 });
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 test('a2ui-bloks-rich', async () => {
     const components = [
         a2uiColumn('root', ['img', 't1']),
@@ -477,11 +406,6 @@ test('a2ui-bloks-rich', async () => {
     await assert.rejects(() => sendA2UIBloks(sock, '', components), TypeError);
 });
 
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
 test('deeplink-item', async () => {
     const entities = text => Toolkit.extractIE(text).inline_entities;
     const typenames = text => entities(text).map(entity => entity.metadata.__typename);
@@ -1148,14 +1072,7 @@ test('read-rich', async () => {
     assert.equal(a2ui.kind, 'a2ui');
     assert.equal(a2ui.text, 'Welcome!\nHalo dunia');
     assert.equal(a2ui.a2ui.surfaceId, 'card-u-1');
-<<<<<<< HEAD
-<<<<<<< HEAD
     assert.equal(a2ui.a2ui.root, 'root');
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
-    assert.equal(a2ui.a2ui.root, 'root');
->>>>>>> Elaina-Baileys-Original/main
     assert.equal(a2ui.a2ui.version, 'v0.9');
     assert.equal(a2ui.a2ui.components.length, 3);
     assert.equal(a2ui.bloks.type, 'im_a2ui');
@@ -1655,10 +1572,6 @@ test('new-airich-sections-2.26.37.6', async () => {
     assert.deepEqual(fused.view_model.primitive.rows[0].cells, ['10', '20']);
     assert.equal(fused.view_model.primitive.pin_label_column, true);
 });
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> Elaina-Baileys-Original/main
 
 test('airich-message-surface', async () => {
     assert.deepEqual(AI_RICH_SUBMESSAGE_KINDS, ['text', 'inline_image', 'table', 'content_items']);
@@ -1743,8 +1656,3 @@ test('airich-submessage-without-section', async () => {
     assert.throws(() => paired.addSubmessage([{ messageType: 2, messageText: 'x' }, { messageType: 2, messageText: 'y' }], { id: 'satu' }), ContentValidationError);
     assert.throws(() => rich.addSubmessage(null), ContentValidationError);
 });
-<<<<<<< HEAD
-=======
->>>>>>> 630bd2b (feat(utils): add calculateReconnectDelay buat exponential backoff & jitter reconnection biar gak kena ratelimit)
-=======
->>>>>>> Elaina-Baileys-Original/main
