@@ -1,6 +1,6 @@
 {
   "name": "@nixzzy/la-bail",
-  "version": "1.4.3",
+  "version": "1.4.4",
   "description": "La-Bail is a WhatsApp multi-device library, forked from most popular and widely used library for NodeJS. It is a fork of Elaina-Baileys, which is a fork of Whiskeysockets-Baileys.",
   "main": "src/index.js",
   "types": "src/index.d.ts",

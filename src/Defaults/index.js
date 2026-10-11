@@ -4,7 +4,7 @@ import { makeLibSignalRepository } from '../Signal/libsignal.js';
 import { Browsers } from '../Utils/browser-utils.js';
 import logger from '../Utils/logger.js';
 
-const version = [2, 3000, 1049423634];
+const version = [2, 3000, 1049981125];
 
 export const UNAUTHORIZED_CODES = [401, 403, 419];
 export const BIZ_BOT_SUPPORT_PAYLOAD = '{"version":1,"is_ai_message":true,"should_upload_client_logs":false,"should_show_system_message":false,"ticket_id":"7004947587700716","citation_items":[],"ticket_locale":"us"}';
