@@ -67,7 +67,7 @@ console.log('participantAlt:', key.participantAlt)
 Normalise with the built-in helpers rather than string surgery:
 
 ```js
-import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina-baileys'
+import { jidDecode, jidEncode, jidNormalizedUser } from '@nixzzy/la-bail'
 
 const normalized = jidNormalizedUser(jid)
 const decoded = jidDecode(jid)
@@ -165,7 +165,7 @@ await sock.sendMessage(jid, {
 String options and image options can be mixed. Plain strings still send a normal text poll.
 
 > [!NOTE]
-> Photo polls are verified **Offline** — the proto is confirmed locally but has not been run against WhatsApp's servers. See [EXPERIMENTAL.md](https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md).
+> Photo polls are verified **Offline** — the proto is confirmed locally but has not been run against WhatsApp's servers. See [EXPERIMENTAL.md](https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md).
 
 ## Replying and quoting
 
@@ -181,14 +181,14 @@ await sock.sendMessage(jid, { text: 'pong' }, { quoted: message })
 
 ```js
 await sock.sendMessage(jid, {
-  text: 'Elaina Baileys',
+  text: 'La-Bail',
   contextInfo: {
     externalAdReply: {
-      title: 'Elaina Baileys',
+      title: 'La-Bail',
       body: 'Modern WhatsApp Multi-Device library',
       mediaType: 1,
       thumbnailUrl: 'https://example.com/elaina.jpg',
-      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+      sourceUrl: 'https://www.npmjs.com/package/@nixzzy/la-bail',
       renderLargerThumbnail: true,
       showAdAttribution: false
     }

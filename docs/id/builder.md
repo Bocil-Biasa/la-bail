@@ -12,7 +12,7 @@ import {
   MessageBuilder,
   MB,
   MESSAGE_BUILDER_VERSION
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 Kelas-kelasnya juga bisa diakses lewat namespace `MessageBuilder` atau alias pendeknya `MB`:
@@ -29,12 +29,12 @@ Semua builder menerima socket di constructor dan diakhiri `.send(jid)`. Pakai `.
 `Button` membangun pesan interaktif native-flow — tipe tombol yang modern.
 
 ```js
-import { Button } from '@rexxhayanasi/elaina-baileys'
+import { Button } from '@nixzzy/la-bail'
 
 const message = new Button(sock)
   .setTitle('Elaina Menu')
   .setBody('Pilih salah satu di bawah.')
-  .setFooter('@rexxhayanasi/elaina-baileys')
+  .setFooter('@nixzzy/la-bail')
   .addReply('Ping', 'ping')
   .addUrl('Buka Website', 'https://example.com')
   .addCopy('Salin Kode', 'ELAINA2026')
@@ -51,7 +51,7 @@ const message = new Button(sock)
   .setImage('https://example.com/elaina.jpg')
   .setTitle('Elaina')
   .setBody('Pesan interaktif dengan header gambar.')
-  .setFooter('Powered by Elaina Baileys')
+  .setFooter('Powered by La-Bail')
   .addReply('Menu', 'menu')
   .addUrl('Website', 'https://example.com')
 
@@ -100,7 +100,7 @@ List pilihan tunggal adalah `Button` dengan `addSelection`, lalu section dan row
 const list = new Button(sock)
   .setTitle('Elaina Menu')
   .setBody('Pilih satu menu.')
-  .setFooter('Elaina Baileys')
+  .setFooter('La-Bail')
   .addSelection('Buka Menu')
   .makeSection('Menu Utama')
   .makeRow('', 'Profil', 'Buka menu profil', 'profile')
@@ -120,13 +120,13 @@ Row menempel ke section yang dideklarasikan di atasnya, jadi panggil `makeSectio
 `ButtonV2` adalah builder tombol klasik yang lebih sederhana. Jenis tombolnya lebih sedikit, pengaturannya lebih ringkas.
 
 ```js
-import { ButtonV2 } from '@rexxhayanasi/elaina-baileys'
+import { ButtonV2 } from '@nixzzy/la-bail'
 
 const message = new ButtonV2(sock)
   .setTitle('Elaina')
   .setSubtitle('WhatsApp Bot')
   .setBody('Pilih tindakan.')
-  .setFooter('Elaina Baileys')
+  .setFooter('La-Bail')
   .setThumbnail('https://example.com/elaina.jpg')
   .addButton('Menu', 'menu')
   .addButton('Ping', 'ping')
@@ -139,7 +139,7 @@ await message.send(jid)
 Carousel adalah beberapa kartu yang bisa digeser. Bangun tiap kartu dengan `Button.toCard()`, lalu serahkan ke `Carousel`.
 
 ```js
-import { Button, Carousel } from '@rexxhayanasi/elaina-baileys'
+import { Button, Carousel } from '@nixzzy/la-bail'
 
 const card1 = await new Button(sock)
   .setImage('https://example.com/card1.jpg')
@@ -171,7 +171,7 @@ await carousel.send(jid)
 `AIRich` membangun respons kaya dengan blok konten campuran — teks, kode, tabel — dalam satu pesan.
 
 ```js
-import { AIRich } from '@rexxhayanasi/elaina-baileys'
+import { AIRich } from '@nixzzy/la-bail'
 
 const rich = new AIRich(sock)
   .setTitle('Elaina AI')

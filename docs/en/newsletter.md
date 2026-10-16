@@ -178,4 +178,4 @@ Derived does not mean broken; it means untested against a server. When one answe
 > [!NOTE]
 > `newsletterSubscribers` uses a query id that in the current bundle belongs to the pending-admin-invites query, and its data path does not exist in that response. Use `newsletterFollowers`, which is what WhatsApp Web itself uses. The old binding was left in place rather than silently repointed.
 
-Full detail is in [EXPERIMENTAL.md](https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md).
+Full detail is in [EXPERIMENTAL.md](https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md).

@@ -13,7 +13,7 @@ sock.ev.on('creds.update', saveCreds)
 Satu folder, satu berkas per kunci. Sederhana, tanpa dependensi, dan pilihan yang tepat untuk satu bot di satu mesin.
 
 ```js
-import { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useMultiFileAuthState('./session')
 ```
@@ -25,7 +25,7 @@ Ia menulis banyak berkas kecil — akun yang sibuk menghasilkan ribuan berkas pr
 Semuanya dalam satu berkas JSON. Lebih mudah dibackup atau dipindah antar host, tapi melambat begitu kumpulan kuncinya membesar karena seluruh berkas ditulis ulang setiap ada perubahan.
 
 ```js
-import { useSingleFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useSingleFileAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useSingleFileAuthState('./session.json')
 ```
@@ -39,7 +39,7 @@ npm i better-sqlite3
 ```
 
 ```js
-import { useSqliteAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useSqliteAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useSqliteAuthState({ dbPath: './session.db' })
 ```
@@ -72,7 +72,7 @@ import {
   useMySQLAuthState,
   useMongoAuthState,
   useRedisAuthState
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 
 const pg = await usePostgresAuthState({
   connectionString: 'postgres://user:pass@localhost:5432/bot'
@@ -119,7 +119,7 @@ Ganti namanya dengan `table`, `collectionName`, atau `prefix`. Backend SQL menul
 Untuk bot yang state-nya sudah ada di NekoDB, supaya sesinya ikut bersama data yang lain.
 
 ```js
-import { useNekoDBAuth } from '@rexxhayanasi/elaina-baileys'
+import { useNekoDBAuth } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useNekoDBAuth(db)
 ```
@@ -135,7 +135,7 @@ const { state, saveCreds } = await useNekoDBAuth(db, 'my_sessions')
 Setiap backend membaca kunci dari disk atau database pada tiap dekripsi. Membungkus penyimpanan kunci dengan cache menghilangkan perjalanan itu:
 
 ```js
-import makeWASocket, { makeCacheableSignalKeyStore, useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { makeCacheableSignalKeyStore, useMultiFileAuthState } from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const logger = pino({ level: 'silent' })
@@ -157,7 +157,7 @@ Layak dipakai di backend apa pun, dan hampir wajib di yang berbasis berkas untuk
 Auth state menyimpan kunci, bukan percakapan. Untuk chat, kontak, dan riwayat pesan, pasang penyimpanan in-memory:
 
 ```js
-import { makeInMemoryStore } from '@rexxhayanasi/elaina-baileys'
+import { makeInMemoryStore } from '@nixzzy/la-bail'
 
 const store = makeInMemoryStore({ logger })
 store.readFromFile('./store.json')

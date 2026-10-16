@@ -67,7 +67,7 @@ console.log('participantAlt:', key.participantAlt)
 Normalkan dengan helper bawaan, bukan dengan potong-potong string:
 
 ```js
-import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina-baileys'
+import { jidDecode, jidEncode, jidNormalizedUser } from '@nixzzy/la-bail'
 
 const normalized = jidNormalizedUser(jid)
 const decoded = jidDecode(jid)
@@ -165,7 +165,7 @@ await sock.sendMessage(jid, {
 Opsi string dan opsi gambar boleh dicampur. String biasa tetap mengirim polling teks normal.
 
 > [!NOTE]
-> Polling foto berstatus **Offline** — proto-nya sudah diverifikasi lokal tapi belum pernah dijalankan ke server WhatsApp. Lihat [EXPERIMENTAL.md](https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md).
+> Polling foto berstatus **Offline** — proto-nya sudah diverifikasi lokal tapi belum pernah dijalankan ke server WhatsApp. Lihat [EXPERIMENTAL.md](https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md).
 
 ## Membalas dan mengutip
 
@@ -181,14 +181,14 @@ await sock.sendMessage(jid, { text: 'pong' }, { quoted: message })
 
 ```js
 await sock.sendMessage(jid, {
-  text: 'Elaina Baileys',
+  text: 'La-Bail',
   contextInfo: {
     externalAdReply: {
-      title: 'Elaina Baileys',
+      title: 'La-Bail',
       body: 'Modern WhatsApp Multi-Device library',
       mediaType: 1,
       thumbnailUrl: 'https://example.com/elaina.jpg',
-      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+      sourceUrl: 'https://www.npmjs.com/package/@nixzzy/la-bail',
       renderLargerThumbnail: true,
       showAdAttribution: false
     }

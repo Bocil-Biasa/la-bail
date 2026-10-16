@@ -1,6 +1,6 @@
 # Contoh
 
-Program lengkap, bukan potongan. Semuanya bisa langsung dijalankan setelah `@rexxhayanasi/elaina-baileys` terpasang dan `"type": "module"` diset.
+Program lengkap, bukan potongan. Semuanya bisa langsung dijalankan setelah `@nixzzy/la-bail` terpasang dan `"type": "module"` diset.
 
 ## Bot perintah
 
@@ -10,7 +10,7 @@ Menyambung ulang saat putus, mengabaikan sinkronisasi riwayat, dan merutekan per
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PREFIX = '.'
@@ -98,7 +98,7 @@ Tiga detail yang layak ditiru:
 Untuk server headless yang merepotkan kalau harus scan QR.
 
 ```js
-import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PHONE = '6281234567890'
@@ -127,16 +127,16 @@ Masukkan kodenya di HP lewat **Perangkat tertaut → Tautkan dengan nomor telepo
 ## Menu interaktif
 
 ```js
-import { Button } from '@rexxhayanasi/elaina-baileys'
+import { Button } from '@nixzzy/la-bail'
 
 async function sendMenu(sock, jid) {
   const menu = new Button(sock)
     .setTitle('Elaina')
     .setBody('Mau melakukan apa?')
-    .setFooter('Elaina Baileys')
+    .setFooter('La-Bail')
     .addReply('Ping', 'menu_ping')
     .addReply('Tentang', 'menu_about')
-    .addUrl('Dokumentasi', 'https://github.com/rexxzyid/elaina-baileys')
+    .addUrl('Dokumentasi', 'https://github.com/Bocil-Biasa/la-bail')
 
   await menu.send(jid)
 }
@@ -163,7 +163,7 @@ sock.ev.on('messages.upsert', async ({ messages, type }) => {
   }
 
   if (selected.includes('menu_about')) {
-    await sock.sendMessage(jid, { text: 'Elaina Baileys 💜' })
+    await sock.sendMessage(jid, { text: 'La-Bail 💜' })
   }
 })
 ```
@@ -173,7 +173,7 @@ Balasan native-flow datang sebagai `paramsJson`, yaitu string JSON, bukan id pol
 ## Memposting ke channel
 
 ```js
-import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const CHANNEL = '123456789@newsletter'
 
@@ -206,7 +206,7 @@ Mengecek capabilities dulu setimpal dengan satu panggilan tambahan. Beberapa fit
 `downloadContentFromMessage` menerima node medianya langsung — bukan seluruh pesan — beserta tipenya, dan mengembalikan stream:
 
 ```js
-import { downloadContentFromMessage } from '@rexxhayanasi/elaina-baileys'
+import { downloadContentFromMessage } from '@nixzzy/la-bail'
 import { writeFile } from 'node:fs/promises'
 
 async function toBuffer(stream) {

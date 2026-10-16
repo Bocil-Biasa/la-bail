@@ -1,8 +1,8 @@
 {
  "site": {
-  "name": "Elaina Baileys",
-  "repository": "https://github.com/rexxzyid/elaina-baileys",
-  "npm": "https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys",
+  "name": "La-Bail",
+  "repository": "https://github.com/Bocil-Biasa/la-bail",
+  "npm": "https://www.npmjs.com/package/@nixzzy/la-bail",
   "domain": ""
  },
  "languages": [
@@ -15,7 +15,7 @@
    "heroTag": "WhatsApp Multi-Device for Node.js",
    "heroStart": "Get started",
    "onThisPage": "On this page",
-   "footer": "Elaina Baileys documentation. Source on {repo}.",
+   "footer": "La-Bail documentation (forked from La-Bail & WhiskeySockets). Source on {repo}.",
    "apiIntro": "{total} socket members, generated from the type declarations of v{version} on {date}. Every entry below is read straight from the code, so it never drifts from what the library actually exposes.",
    "apiSearch": "Filter methods…",
    "returns": "Returns",
@@ -29,7 +29,7 @@
    "heroTag": "WhatsApp Multi-Device untuk Node.js",
    "heroStart": "Mulai",
    "onThisPage": "Di halaman ini",
-   "footer": "Dokumentasi Elaina Baileys. Sumbernya di {repo}.",
+   "footer": "Dokumentasi La-Bail (fork dari La-Bail & WhiskeySockets). Sumbernya di {repo}.",
    "apiIntro": "{total} anggota socket, dibangkitkan dari deklarasi tipe v{version} pada {date}. Semua entri di bawah dibaca langsung dari kode, jadi tidak pernah melenceng dari yang benar-benar disediakan library.",
    "apiSearch": "Saring method…",
    "returns": "Mengembalikan",

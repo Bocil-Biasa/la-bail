@@ -178,4 +178,4 @@ Derived bukan berarti rusak; artinya belum diuji ke server. Kalau salah satunya 
 > [!NOTE]
 > `newsletterSubscribers` memakai query id yang di bundle sekarang justru milik query pending-admin-invites, dan data path-nya tidak ada di respons itu. Pakai `newsletterFollowers`, yang memang dipakai WhatsApp Web sendiri. Binding lama sengaja dibiarkan, bukan diam-diam diarahkan ulang.
 
-Detail lengkapnya ada di [EXPERIMENTAL.md](https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md).
+Detail lengkapnya ada di [EXPERIMENTAL.md](https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md).

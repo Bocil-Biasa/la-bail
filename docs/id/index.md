@@ -1,4 +1,4 @@
-# Elaina Baileys
+# La-Bail
 
 Library WhatsApp Multi-Device untuk Node.js. Bicara langsung ke protokol WhatsApp Web lewat WebSocket — tanpa browser, tanpa Selenium, tanpa headless Chrome.
 
@@ -24,7 +24,7 @@ Fork ini mengikuti bundle WhatsApp Web dari dekat: skema protobuf, revisi klien,
 ## Pemasangan
 
 ```bash
-npm install @rexxhayanasi/elaina-baileys
+npm install @nixzzy/la-bail
 ```
 
 Butuh Node.js 22 atau lebih baru. Paket ini ESM-first, jadi pakai `import`, bukan `require()`.
@@ -32,7 +32,7 @@ Butuh Node.js 22 atau lebih baru. Paket ini ESM-first, jadi pakai `import`, buka
 ## Versi terpendek yang sudah jalan
 
 ```js
-import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useMultiFileAuthState('./session')
 const sock = makeWASocket({ auth: state })
@@ -50,10 +50,10 @@ Itu menyambung, menampilkan QR di terminal, dan membalas semua pesan. [Mulai cep
 
 ## Catatan soal tingkat verifikasi
 
-Sebagian library ini direkonstruksi dengan membaca bundle WhatsApp Web, bukan dari implementasi yang sudah ada. Bagian itu didokumentasikan apa adanya di [EXPERIMENTAL.md](https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md), yang menandai tiap fitur sebagai **Live** (sudah dijalankan ke server WhatsApp), **Offline** (diverifikasi lokal, belum pernah dikirim), atau **Derived** (bentuknya diambil dari bundle, belum pernah dijalankan).
+Sebagian library ini direkonstruksi dengan membaca bundle WhatsApp Web, bukan dari implementasi yang sudah ada. Bagian itu didokumentasikan apa adanya di [EXPERIMENTAL.md](https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md), yang menandai tiap fitur sebagai **Live** (sudah dijalankan ke server WhatsApp), **Offline** (diverifikasi lokal, belum pernah dikirim), atau **Derived** (bentuknya diambil dari bundle, belum pernah dijalankan).
 
 Baca file itu dulu sebelum merilis apa pun yang bergantung pada API channel yang baru.
 
 ## Lisensi dan kredit
 
-Ini fork yang dipelihara aktif. Pemberitahuan upstream disimpan di `LICENSE` dan `NOTICE.md`, dan daftar kreditnya ada di README repositori.
+La-Bail adalah library WhatsApp Multi-Device untuk Node.js, di-fork dari `@rexxhayanasi/elaina-baileys` yang merupakan fork dari `WhiskeySockets/Baileys`. Pemberitahuan upstream dan lisensi MIT disimpan di `LICENSE` dan `NOTICE.md`, dan daftar kredit pengembang ada di README repositori.

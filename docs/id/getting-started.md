@@ -13,7 +13,7 @@ node -v
 ## Pemasangan
 
 ```bash
-npm install @rexxhayanasi/elaina-baileys
+npm install @nixzzy/la-bail
 ```
 
 Paket ini ESM-first, jadi `package.json` kamu butuh `"type": "module"`:
@@ -22,7 +22,7 @@ Paket ini ESM-first, jadi `package.json` kamu butuh `"type": "module"`:
 {
   "type": "module",
   "dependencies": {
-    "@rexxhayanasi/elaina-baileys": "latest"
+    "@nixzzy/la-bail": "latest"
   }
 }
 ```
@@ -30,7 +30,7 @@ Paket ini ESM-first, jadi `package.json` kamu butuh `"type": "module"`:
 ## Import
 
 ```js
-import makeWASocket from '@rexxhayanasi/elaina-baileys'
+import makeWASocket from '@nixzzy/la-bail'
 ```
 
 Sisanya datang dari entry point yang sama:
@@ -45,7 +45,7 @@ import makeWASocket, {
   AIRich,
   MessageBuilder,
   MB
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 > [!NOTE]
@@ -59,7 +59,7 @@ Bagian pentingnya bukan socket-nya — tapi menyambung ulang saat WhatsApp memut
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 async function startSock() {

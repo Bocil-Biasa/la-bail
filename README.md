@@ -1,18 +1,18 @@
 
 
 <div align="center">
-  <h1>💫 @rexxhayanasi/elaina-baileys</h1>
+  <h1>💫 @nixzzy/la-bail</h1>
   <p><em>Library WhatsApp custom di atas Baileys — diperbaiki, dimodernkan, dan dilengkapi message builder bawaan.</em></p>
 
   <img src="https://files.catbox.moe/z913tc.jpg" width="400" alt="Elaina Baileys Banner" />
   <br><br>
 
   <p>
-    <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys">
-      <img src="https://img.shields.io/npm/v/@rexxhayanasi/elaina-baileys?color=blueviolet&label=version&logo=npm" alt="npm version" />
+    <a href="https://www.npmjs.com/package/@nixzzy/la-bail">
+      <img src="https://img.shields.io/npm/v/@nixzzy/la-bail?color=blueviolet&label=version&logo=npm" alt="npm version" />
     </a>
-    <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys">
-      <img src="https://img.shields.io/npm/dt/@rexxhayanasi/elaina-baileys?color=blueviolet&label=downloads&logo=npm" alt="npm downloads" />
+    <a href="https://www.npmjs.com/package/@nixzzy/la-bail">
+      <img src="https://img.shields.io/npm/dt/@nixzzy/la-bail?color=blueviolet&label=downloads&logo=npm" alt="npm downloads" />
     </a>
     <a href="LICENSE">
       <img src="https://img.shields.io/badge/license-MIT-success" alt="license" />
@@ -34,7 +34,7 @@
 </div>
 
 > [!IMPORTANT]
-> `@rexxhayanasi/elaina-baileys` adalah library API WhatsApp Web tidak resmi. Tidak berafiliasi, tidak diizinkan, tidak dipelihara, tidak disponsori, dan tidak didukung oleh WhatsApp maupun Meta.
+> `@nixzzy/la-bail` adalah library API WhatsApp Web tidak resmi. Tidak berafiliasi, tidak diizinkan, tidak dipelihara, tidak disponsori, dan tidak didukung oleh WhatsApp maupun Meta.
 >
 > Pakai proyek ini dengan bertanggung jawab, dan patuhi Ketentuan Layanan WhatsApp serta hukum yang berlaku.
 
@@ -51,7 +51,7 @@
 
 ## 📌 Ringkasan
 
-`@rexxhayanasi/elaina-baileys` adalah fork Baileys modern yang berorientasi ESM, untuk pengembangan WhatsApp Multi-Device.
+`@nixzzy/la-bail` adalah fork Baileys modern yang berorientasi ESM, untuk pengembangan WhatsApp Multi-Device.
 
 Paket ini menggabungkan lapisan socket, utilitas protokol, dukungan pengalamatan yang sadar LID, dan MessageBuilder bawaan dalam satu dependensi. Button, pesan native-flow, carousel, dan layout AIRich bisa dipakai langsung dari paket ini tanpa memasang dependensi builder terpisah.
 
@@ -331,7 +331,7 @@ node -v
 Pasang langsung dari npm:
 
 ```bash
-npm install @rexxhayanasi/elaina-baileys
+npm install @nixzzy/la-bail
 ```
 
 ### Paket yang disarankan
@@ -342,7 +342,7 @@ Pakai paketnya langsung dengan namanya sendiri:
 {
   "type": "module",
   "dependencies": {
-    "@rexxhayanasi/elaina-baileys": "latest"
+    "@nixzzy/la-bail": "latest"
   }
 }
 ```
@@ -371,7 +371,7 @@ Mengirim teks biasa, button, polling, channel, dan pesan AI Rich tidak butuh sat
 Periksa saat runtime sebelum mengandalkan salah satunya:
 
 ```js
-import { hasOptionalMedia } from '@rexxhayanasi/elaina-baileys'
+import { hasOptionalMedia } from '@nixzzy/la-bail'
 
 await hasOptionalMedia('sharp')          // false kalau belum terpasang
 await hasOptionalMedia('fluent-ffmpeg')
@@ -382,7 +382,7 @@ await hasOptionalMedia('fluent-ffmpeg')
 ## 📥 Impor
 
 ```js
-import makeWASocket from '@rexxhayanasi/elaina-baileys'
+import makeWASocket from '@nixzzy/la-bail'
 ```
 
 Mengimpor utilitas tambahan:
@@ -398,7 +398,7 @@ import makeWASocket, {
   Toolkit,
   MessageBuilder,
   MB
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 > [!NOTE]
@@ -412,7 +412,7 @@ import makeWASocket, {
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 async function startSock() {
@@ -546,7 +546,7 @@ sock.ev.on('creds.update', saveCreds)
 Satu folder, satu berkas per kunci. Sederhana, tanpa dependensi, dan pilihan yang tepat untuk satu bot di satu mesin.
 
 ```js
-import { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useMultiFileAuthState('./session')
 ```
@@ -558,7 +558,7 @@ Ia menulis banyak berkas kecil — akun yang sibuk menghasilkan ribuan berkas pr
 Semuanya dalam satu berkas JSON. Lebih mudah dibackup atau dipindah antar host, tapi melambat begitu kumpulan kuncinya membesar karena seluruh berkas ditulis ulang setiap ada perubahan.
 
 ```js
-import { useSingleFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useSingleFileAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useSingleFileAuthState('./session.json')
 ```
@@ -572,7 +572,7 @@ npm i better-sqlite3
 ```
 
 ```js
-import { useSqliteAuthState } from '@rexxhayanasi/elaina-baileys'
+import { useSqliteAuthState } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useSqliteAuthState({ dbPath: './session.db' })
 ```
@@ -605,7 +605,7 @@ import {
     useMySQLAuthState,
     useMongoAuthState,
     useRedisAuthState
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await usePostgresAuthState({
     connectionString: 'postgres://user:pass@localhost:5432/bot'
@@ -652,7 +652,7 @@ Ganti namanya dengan `table`, `collectionName`, atau `prefix`. Backend SQL menul
 Untuk bot yang state-nya sudah ada di NekoDB, supaya sesinya ikut bersama data yang lain.
 
 ```js
-import { useNekoDBAuth } from '@rexxhayanasi/elaina-baileys'
+import { useNekoDBAuth } from '@nixzzy/la-bail'
 
 const { state, saveCreds } = await useNekoDBAuth(db)
 ```
@@ -668,7 +668,7 @@ const { state, saveCreds } = await useNekoDBAuth(db, 'my_sessions')
 Setiap penyimpanan membaca kunci dari disk atau database pada tiap dekripsi. Membungkus penyimpanan kunci dengan cache menghilangkan perjalanan itu:
 
 ```js
-import makeWASocket, { makeCacheableSignalKeyStore, useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { makeCacheableSignalKeyStore, useMultiFileAuthState } from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const logger = pino({ level: 'silent' })
@@ -690,7 +690,7 @@ Layak dipakai di penyimpanan apa pun, dan hampir wajib di yang berbasis berkas u
 Auth state menyimpan kunci, bukan percakapan. Untuk chat, kontak, dan riwayat pesan, pasang penyimpanan in-memory:
 
 ```js
-import { makeInMemoryStore } from '@rexxhayanasi/elaina-baileys'
+import { makeInMemoryStore } from '@nixzzy/la-bail'
 
 const store = makeInMemoryStore({ logger })
 store.readFromFile('./store.json')
@@ -942,7 +942,7 @@ Kalau WhatsApp menyediakan PN/JID alternatif, `remoteJidAlt` atau `participantAl
 Pakai helper JID bawaan saat menormalkan penanda:
 
 ```js
-import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina-baileys'
+import { jidDecode, jidEncode, jidNormalizedUser } from '@nixzzy/la-bail'
 
 const normalized = jidNormalizedUser(jid)
 const decoded = jidDecode(jid)
@@ -1157,7 +1157,7 @@ await sock.sendMessage(jid, {
       body: 'Library WhatsApp Multi-Device modern',
       mediaType: 1,
       thumbnailUrl: 'https://example.com/elaina.jpg',
-      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+      sourceUrl: 'https://www.npmjs.com/package/@nixzzy/la-bail',
       renderLargerThumbnail: true,
       showAdAttribution: false
     }
@@ -1176,7 +1176,7 @@ await sock.sendMessage(jid, {
     title: 'Elaina Baileys',
     body: 'Library WhatsApp Multi-Device modern',
     thumbnail: await fs.promises.readFile('./cover.jpg'),
-    url: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+    url: 'https://www.npmjs.com/package/@nixzzy/la-bail',
     largeThumbnail: true
   }
 })
@@ -1211,7 +1211,7 @@ Bawaan prop ini di tabel klien `false`, jadi ini tidak aktif di mana-mana — di
 Contoh di atas memakai `externalAdReply` sebagai hiasan. Click-to-WhatsApp adalah tujuan asli field ini dibangun: seseorang mengetuk iklan di Facebook atau Instagram, WhatsApp terbuka di thread pengiklan, dan pesan pertama yang dikirim orang itu membawa iklan asalnya. Kunci-kunci tambahan itulah yang dibiarkan kosong oleh kartu hiasan.
 
 ```js
-import { proto } from '@rexxhayanasi/elaina-baileys'
+import { proto } from '@nixzzy/la-bail'
 
 await sock.sendMessage(jid, {
   text: 'Halo, saya mau tanya soal promonya',
@@ -1396,14 +1396,14 @@ Fungsi `upload` harus tersedia untuk kartu besar, karena thumbnail-nya memang be
 
 # 🧱 MessageBuilder Terintegrasi
 
-MessageBuilder v4.7 sudah disertakan langsung di dalam `@rexxhayanasi/elaina-baileys`.
+MessageBuilder v4.7 sudah disertakan langsung di dalam `@nixzzy/la-bail`.
 
 ### Satu impor, seluruh builder
 
 Permukaan builder-nya terdiri dari 212 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 await new MB.Button(sock)
   .setTitle('Elaina Menu')
@@ -1438,7 +1438,7 @@ import {
   DuplicateIdError,
   InvalidTargetError,
   ContentValidationError
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 ---
@@ -1448,7 +1448,7 @@ import {
 Dua-duanya tergambar di Android sebagai bubble-nya sendiri. Nominalnya angka manusia — nilai di wire diskalakan dengan `offset` (bawaan 1000), dan menyerahkan angka yang sudah diskalakan dengan tangan membuat tagihannya seribu kali lipat.
 
 ```js
-import { SplitPaymentStatus, ReminderFrequency } from '@rexxhayanasi/elaina-baileys'
+import { SplitPaymentStatus, ReminderFrequency } from '@nixzzy/la-bail'
 
 await sock.sendMessage(jid, {
   splitPayment: {
@@ -1503,7 +1503,7 @@ Klien tidak menerbitkan nama apa pun untuk nilai-nilai ini, jadi di sini angkany
 Kalau klien Meta sendiri mengirim link preview untuk reel atau postingan, mereka menempelkan node tambahan di sebelah judul dan thumbnail yang biasa: `linkPreviewMetadata` berisi jenis postingan, video inline, dan durasinya, plus `endCardTiles` dan `videoContentUrl`. `readSocialPreview(msg)` menarik semua itu kembali keluar, dan mengembalikan `null` untuk pesan yang tidak membawa satu pun di antaranya.
 
 ```js
-import { readSocialPreview } from '@rexxhayanasi/elaina-baileys'
+import { readSocialPreview } from '@nixzzy/la-bail'
 
 sock.ev.on('messages.upsert', ({ messages }) => {
   for (const msg of messages) {
@@ -1526,12 +1526,12 @@ Builder `Button` dipakai untuk pesan interaktif native-flow.
 ### Quick Reply + URL + Copy
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const message = new MB.Button(sock)
   .setTitle('Elaina Menu')
   .setBody('Pilih salah satu di bawah.')
-  .setFooter('@rexxhayanasi/elaina-baileys')
+  .setFooter('@nixzzy/la-bail')
   .addReply('Ping', 'ping')
   .addUrl('Buka Website', 'https://example.com')
   .addCopy('Salin Kode', 'ELAINA2026')
@@ -1616,7 +1616,7 @@ await list.send(jid)
 WhatsApp Web memegang daftar nama button native-flow yang tetap. Apa pun di luar daftar itu dibuang dan pesannya diturunkan jadi `phone_only_feature` — teksnya tetap sampai, button-nya tidak.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 MB.checkNativeFlowButtons([{ name: 'single_select' }])
 // { ok: false, unsupported: ['single_select'], problems: ['"single_select" is not a native flow WhatsApp Web or iOS can render, only Android shows it'] }
@@ -1646,7 +1646,7 @@ Kalau kamu butuh satu menu yang jalan di semua platform, pakai sampai 10 button 
 `ButtonV2` menyediakan builder button klasik yang lebih sederhana.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const message = new MB.ButtonV2(sock)
   .setTitle('Elaina')
@@ -1667,7 +1667,7 @@ await message.send(jid)
 Kartu carousel bisa dibuat dari `Button.toCard()` lalu diserahkan ke `Carousel`.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const card1 = await new MB.Button(sock)
   .setImage('https://example.com/card1.jpg')
@@ -1703,7 +1703,7 @@ Ia tidak lewat `sock.sendMessage`, dan memang tidak bisa. `send` merelay pesanny
 **`import { MB }` adalah satu-satunya impor di bagian ini**, termasuk halaman mini app HTML, A2UI, dan semua pembacanya — `MB.htmlSection(…)`, `MB.sendHtmlApp(…)`, `MB.a2uiText(…)`, `MB.decodeAIRich(…)`, `MB.TaskStatus.RUNNING`. Lihat [Satu impor, seluruh builder](#satu-impor-seluruh-builder). Named export-nya tetap jalan tanpa perubahan kalau kamu lebih suka itu; keduanya fungsi yang sama, bukan salinan.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock)
 rich.addText('Halo')
@@ -1717,7 +1717,7 @@ Satu panggilan `send` mengirim dua stanza: pesannya, lalu suntingan `protocolMes
 ### Teks + Kode + Tabel
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock)
   .setTitle('Elaina AI')
@@ -2006,7 +2006,7 @@ Di sinilah respons rich benar-benar bisa disusun. Empat daftar berjalan bersama 
 Widget Bloks juga bisa hidup **di dalam** respons rich, bukan di sebelahnya, sebagai section ketimbang field `interactiveMessage`:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2031,7 +2031,7 @@ Itu memancarkan `FOABloksPrimitive`, salah satu dari delapan belas nama yang jug
 | `[x^2]<https://img.test>` | rumus yang digambar | `GenAILatexItem` |
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2058,7 +2058,7 @@ Tiga baris itu opsi pada satu panggilan, bukan urutan untuk dijalankan apa adany
 `AI_RICH_INLINE_ENTITIES` mendaftar keempatnya. Daftarnya sengaja tertutup — parser Web memilih jalur berdasarkan `__typename` dan **melempar** `inline entity <name>` untuk apa pun di luarnya, jadi nama kelima yang dikarang merusak seluruh pesannya, bukan menurunkannya pelan-pelan.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const info = MB.decodeAIRich(m.message)
 const inline = info.sections.flatMap(s => s.view_model?.primitive?.inline_entities ?? [])
@@ -2070,7 +2070,7 @@ console.log(inline.map(e => e.metadata.__typename))
 Setiap panggilan `add*` menerima `id`, `insertAt`, dan `replace`, jadi pesan yang sudah terkirim bisa terus berubah ketimbang dikirim ulang.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock)
   .setTitle('Elaina AI')
@@ -2131,7 +2131,7 @@ const buttonV2 = new MB.ButtonV2(sock).loadFrom(m.message)
 MessageBuilder mencakup 11 dari primitif yang digambar langsung WA Web. Sisanya dibuka di sini sebagai pembangun section biasa yang kamu jatuhkan ke `addSection`; katalog Meta AI yang lebih luas ada di [Sisa Katalog Meta AI](#sisa-katalog-meta-ai).
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock)
   .setTitle('Elaina AI')
@@ -2242,7 +2242,7 @@ info.allTypenames   // setiap __typename di seluruh pohon, sedalam apa pun
 Lubang kedua ada di `readEmbeddedSections`: ia hanya mengambil entri `content` yang punya `view_model` atau `tabs`, jadi layar tertanam tanpa tab — yang menaruh `sections` langsung di entri itu — menghasilkan nol section, dan HTML di dalamnya tidak terlihat oleh `readRichMessage(m).html`. Sekarang entri yang membawa `sections` ikut diambil, dipilih berdasarkan bentuk field-nya dan bukan berdasarkan `__typename`, persis cara Pando menafsirkan pohonnya.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2318,7 +2318,7 @@ await rich.send(jid)
 `rich.addMap` memancarkan kedua paruhnya sekaligus, sama seperti `addTable` dan `addCode` memasangkan section dengan metadata-nya:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2336,7 +2336,7 @@ Setiap tempat butuh `latitude` dan `longitude` berupa angka — selain itu dilem
 Item itu node yang dibawa sebuah layout, bukan section yang berdiri sendiri, jadi bangun dulu lalu serahkan ke sebuah layout:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2369,7 +2369,7 @@ Dua layout bergabung dengan delapan yang sudah didukung: `multipleResponseSectio
 `quotaUpsellSection` membangun `GenAIMetaSubsQuotaUpsellPrimitive`, kartu yang dipakai Meta untuk menawarkan langganan waktu kuota habis. Nama field-nya dibaca langsung dari `cometComposedTextV2GenAiMetaSubsQuotaUpsellPrimitiveParser` di bundle WA Web, jadi ini salah satu dari sedikit primitif yang bentuknya terverifikasi sampai ke tombolnya:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2409,7 +2409,7 @@ Karena itu tidak ada pabrik untuk keduanya: menebak nama field sama dengan menga
 Untuk apa pun yang belum dimodelkan di sini, `customSection` mengirim node-nya langsung — klien memilih jalur berdasarkan `__typename` dan tidak ada yang lain:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Elaina AI')
 
@@ -2440,7 +2440,7 @@ Tidak ada apa pun tentang pengirim, id pesan, timestamp, atau penerima di dalamn
 `forwardRichResponse` merelay tanpa menyentuh satu pun di antaranya:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 sock.ev.on('messages.upsert', async ({ messages }) => {
   for (const msg of messages) {
@@ -2485,7 +2485,7 @@ Keempatnya disetel per akun oleh server. Sebuah respons bisa sempurna secara str
 Pesan AI Rich, A2UI, atau Bloks tiba dengan keadaan kosong di tempat yang biasa dilihat bot — `conversation` kosong, `extendedTextMessage` tidak ada, dan `getContentType` hanya melaporkan pembungkusnya (`botForwardedMessage` atau `interactiveMessage`). `readRichMessage` menormalkan semuanya menjadi satu bentuk.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 sock.ev.on('messages.upsert', ({ messages }) => {
     for (const msg of messages) {
@@ -2576,7 +2576,7 @@ await MB.sendA2UI(sock, jid, [], {
 
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 await MB.sendA2UI(sock, jid, [
     MB.a2uiColumn('root', ['card_image', 'card_title', 'card_body']),
@@ -2629,7 +2629,7 @@ Kartu A2UI dan button native-flow hidup di `interactiveMessage` yang sama, dan b
 Beri `typename` untuk mengirim section-nya dengan nama lain:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock).setTitle('Dashboard')
 
@@ -2653,7 +2653,7 @@ WebView tempatnya digambar itu offline dan tidak punya penyimpanan — baca [apa
 Satu panggilan, tanpa menyusun pembungkusnya sendiri.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 import { readFileSync } from 'node:fs'
 
 await MB.sendHtmlApp(sock, m.chat, readFileSync('./dino.html', 'utf8'), {
@@ -2713,7 +2713,7 @@ ditambah `messageType: 1`, satu `botResponseId` baru, dan blok `verificationMeta
 Pakai pembangun section-nya kalau HTML-nya duduk bersama section lain di builder yang kamu kendalikan.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const rich = new MB.AIRich(sock)
 rich.setTitle('Dashboard')
@@ -2878,7 +2878,7 @@ Jangan mengambil `sections[0]` — HTML-nya mendarat di tempat kamu menambahkann
 Nilai enum-nya, dibaca dari klien ketimbang dikira-kira:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 ```
 
 `AI_RICH_LAYOUTS` mendaftar kedelapan nama layout yang diterima `MB.newLayout` — `Single`, `HScroll`, dan `ActionRow` yang dipakai MessageBuilder; `VStack`, `Grid`, `FlexibleCountGrid`, `RichListItem`, dan `AddonAction` juga ada.
@@ -2895,7 +2895,7 @@ Dua hal yang perlu diketahui sebelum membangunnya:
 #### Contoh lengkap
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const gameHtml = `
 <body style="margin:0;background:transparent;color:#eee;font-family:Arial">
@@ -2991,7 +2991,7 @@ Baca penyarangannya dari luar ke dalam: **layar → `content[]` → `tabs[]` →
 Kalau kamu lebih suka menyusun payload-nya dengan tangan — atau sedang memindahkan yang kamu terima dari bot lain — ini panggilan `relayMessage` yang setara. Tidak ada sihir di sini; ini persis yang dihasilkan `AIRich`:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 await sock.relayMessage(m.chat, {
   messageContextInfo: {
@@ -3083,7 +3083,7 @@ Asal-usulnya, supaya kamu bisa memeriksanya sendiri:
 Section selalu mendapat typename-nya. Layar dan tab-nya tetap tanpa tipe kecuali kamu memintanya:
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 MB.embeddedScreen({ typename: MB.EMBEDDED_SCREEN_TYPENAME, tabs: [tab] })
 MB.embeddedTab({ typename: MB.EMBEDDED_SCREEN_TAB_TYPENAME, sections: [...] })
@@ -3130,7 +3130,7 @@ Apa pun yang dibiarkan `undefined` dibuang, tidak pernah dikirim sebagai `null`.
 #### Membaca balik layar tertanam
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const info = MB.decodeAIRich(m.message)
 
@@ -3164,7 +3164,7 @@ const html = MB.readEmbeddedSections(info.embeddedScreens[0])
 `decodeAIRich` membongkar `unifiedResponse` yang base64 supaya kamu bisa melihat persis primitif apa yang dipakai sebuah pesan — berguna untuk menirukan sesuatu yang dikirim bot lain.
 
 ```js
-import { MB } from '@rexxhayanasi/elaina-baileys'
+import { MB } from '@nixzzy/la-bail'
 
 const info = MB.decodeAIRich(m.message)
 console.log(info.layouts)     // [ 'Single', 'HScroll' ]
@@ -3246,7 +3246,7 @@ await sock.sendMessage('status@broadcast', {
 Status **teks** itu `extendedTextMessage` dengan tiga field penggayaan, dan ketiganya opsi di argumen ketiga, bukan bagian dari kontennya:
 
 ```js
-import { StatusFont } from '@rexxhayanasi/elaina-baileys'
+import { StatusFont } from '@nixzzy/la-bail'
 
 await sock.sendMessage('status@broadcast', { text: 'Halo semua' }, {
   statusJidList,
@@ -3303,7 +3303,7 @@ Dua hal yang perlu diketahui sebelum kamu mantap memilih satu muka:
 - **Lubang di penomorannya nyata.** Nilainya melompat 2 → 6, jadi 3, 4, dan 5 pensiun atau tidak dipakai. Jangan mengirimnya; mereka tidak ada di daftar yang diterima dan akan dibuang seperti nilai tak dikenal lainnya.
 
 ```js
-import { StatusFont } from '@rexxhayanasi/elaina-baileys'
+import { StatusFont } from '@nixzzy/la-bail'
 
 await sock.sendMessage('status@broadcast', {
   text: 'PENGUMUMAN'
@@ -3355,7 +3355,7 @@ import {
   linkSticker,
   musicSticker,
   StatusLinkType
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 
 await sock.sendMessage('status@broadcast', {
   image: { url: './liburan.jpg' },
@@ -3394,7 +3394,7 @@ Opsinya `statusStickers`, bukan `stickers` — kunci itu sudah dipakai untuk mem
 Membacanya kembali:
 
 ```js
-import { readStickers } from '@rexxhayanasi/elaina-baileys'
+import { readStickers } from '@nixzzy/la-bail'
 
 for (const sticker of readStickers(msg.message)) {
   if (sticker.kind === 'location') console.log(sticker.location.degreesLatitude)
@@ -3458,7 +3458,7 @@ await sock.sendMessage(groupJid, {
 **Penggayaannya jalan di sini juga, dan tidak ada tambahan yang perlu diserahkan.** Pembungkusannya terjadi setelah pesannya dibangun, jadi `backgroundColor`, `textColor`, dan `font` mendarat di `extendedTextMessage` di dalam pembungkusnya persis seperti di status biasa:
 
 ```js
-import { StatusFont } from '@rexxhayanasi/elaina-baileys'
+import { StatusFont } from '@nixzzy/la-bail'
 
 await sock.sendMessage(groupJid, {
   text: 'halo grup',
@@ -4167,7 +4167,7 @@ PIN-nya tepat empat digit.
 Validasi tanpa memanggil server:
 
 ```js
-import { validateUsername, isUsernamePin, displayUsername } from '@rexxhayanasi/elaina-baileys'
+import { validateUsername, isUsernamePin, displayUsername } from '@nixzzy/la-bail'
 
 validateUsername('rexx.hayanasi')  // { isValid: true }
 validateUsername('rexx.com')       // { isValid: false, errorType: 'INVALID_DOMAIN_SUFFIX' }
@@ -4309,7 +4309,7 @@ await sock.groupJoinApprovalMode(groupJid, 'on')
 WA Web revisi terbaru menambah app-state action `groupHistoryToggleAction` (apakah riwayat pesan lama dibagikan ke anggota baru). Di revisi ini WhatsApp Web baru punya sisi **terima**-nya — belum ada flow kirim — jadi fork mendecode-nya dan meneruskan lewat event `groups.update`:
 
 ```js
-import { GroupHistoryToggleMode } from '@rexxhayanasi/elaina-baileys'
+import { GroupHistoryToggleMode } from '@nixzzy/la-bail'
 // GroupHistoryToggleMode = { DEFAULT: 0, ON: 1, OFF: 2 }
 
 sock.ev.on('groups.update', ([update]) => {
@@ -4459,7 +4459,7 @@ const blocked = await sock.fetchBlocklist()
 ### Melaporkan Spam
 
 ```js
-import { SPAM_FLOWS } from '@rexxhayanasi/elaina-baileys'
+import { SPAM_FLOWS } from '@nixzzy/la-bail'
 
 const laporan = await sock.reportSpam(jid)
 // { jid: '628xxxx@s.whatsapp.net', flow: 'overflow_menu_report', reported: true, node }
@@ -4501,7 +4501,7 @@ pembungkusnya bersarang — foto view-once yang disunting di dalam chat sementar
 itu tiga pembungkus bertumpuk:
 
 ```js
-import { normalizeMessageContent, getContentType } from '@rexxhayanasi/elaina-baileys'
+import { normalizeMessageContent, getContentType } from '@nixzzy/la-bail'
 
 const content = normalizeMessageContent(m.message)
 const type = getContentType(content)        // 'imageMessage'
@@ -4763,7 +4763,7 @@ sock.ev.on('group.member-tag.update', ({ groupId, participant, label }) => {
 ## 📞 Panggilan
 
 ```js
-import { CALL_AUDIO_PREFIX, CALL_VIDEO_PREFIX } from '@rexxhayanasi/elaina-baileys'
+import { CALL_AUDIO_PREFIX, CALL_VIDEO_PREFIX } from '@nixzzy/la-bail'
 
 const token = await sock.createCallLink('video')
 console.log(CALL_VIDEO_PREFIX + token)
@@ -4781,7 +4781,7 @@ await sock.rejectCall(callId, callFrom)
 Tumpukan VoIP-nya menjalankan mesin panggilan WhatsApp Web di dalam proses yang sama dan menumpang **socket yang sudah kamu pakai login**. Tidak ada pairing kedua dan tidak ada QR kedua: pairing sekali, dan sesi yang sama yang melakukan panggilan.
 
 ```js
-import { makeVoipClient } from '@rexxhayanasi/elaina-baileys'
+import { makeVoipClient } from '@nixzzy/la-bail'
 
 sock.ev.on('connection.update', async ({ connection }) => {
     if (connection !== 'open') {
@@ -5008,7 +5008,7 @@ import {
   MB,
   MESSAGE_BUILDER_VERSION,
   TTLCache
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 Cek versi builder-nya:
@@ -5038,7 +5038,7 @@ Jadi `makeWASocket({ auth })` biasa sudah lengkap. Yang berubah cuma isi kotakny
 Cuma kalau kamu memang mau menyerahkan cache buatanmu sendiri — dan itu bukan hal baru, dari dulu memang bisa:
 
 ```js
-import makeWASocket, { TTLCache } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { TTLCache } from '@nixzzy/la-bail'
 
 const sock = makeWASocket({
   auth,
@@ -5197,7 +5197,7 @@ import {
   buildUnscheduleProtocolMessage,
   isScheduledTimeValid,
   SCHEDULED_MSG_WINDOW
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 
 const at = Math.floor(Date.now() / 1000) + 3600
 if (!isScheduledTimeValid(at)) throw new Error('di luar jendela yang diizinkan')
@@ -5252,7 +5252,7 @@ import {
   makeNewsletterStatusAttribution,
   LOCATION_BROADCAST_JID,
   isJidLocationBroadcast
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 ### Message Key
@@ -5625,7 +5625,7 @@ Perhatikan `message.conversation` bernilai `undefined` di situ — teksnya dua l
 `audienceType` menerima nama enum-nya atau angkanya:
 
 ```js
-import { makeStatusAudienceMetadata, proto } from '@rexxhayanasi/elaina-baileys'
+import { makeStatusAudienceMetadata, proto } from '@nixzzy/la-bail'
 
 makeStatusAudienceMetadata({ listName: 'Kerja', listEmoji: '💼', audienceType: 'CLOSE_FRIENDS' })
 makeStatusAudienceMetadata({ listName: 'Kerja', audienceType: proto.ContextInfo.StatusAudienceMetadata.AudienceType.CLOSE_FRIENDS })
@@ -5645,7 +5645,7 @@ await sock.sendMessage('status@broadcast', {
 #### Membaca yang kamu terima
 
 ```js
-import { normalizeMessageContent, getContentType } from '@rexxhayanasi/elaina-baileys'
+import { normalizeMessageContent, getContentType } from '@nixzzy/la-bail'
 
 const content = normalizeMessageContent(m.message)
 const audience = content?.[getContentType(content)]?.contextInfo?.statusAudienceMetadata
@@ -5742,7 +5742,7 @@ await sock.sendMessage('status@broadcast', {
 `addYours` itu bentuk singkat di atas mekanisme umumnya, dan itu layak diketahui karena field yang sama merangkai polling status, pertanyaan, reaksi, dan item album:
 
 ```js
-import { AssociationType } from '@rexxhayanasi/elaina-baileys'
+import { AssociationType } from '@nixzzy/la-bail'
 
 await sock.sendMessage('status@broadcast', {
   text: 'jawaban',
@@ -5803,7 +5803,7 @@ await sock.sendMessage(groupJid, { statusMention: { key: myStatus.key, group: tr
 Atau bangun tanpa mengirim, untuk relay buatan sendiri:
 
 ```js
-import { makeStatusMentionMessage } from '@rexxhayanasi/elaina-baileys'
+import { makeStatusMentionMessage } from '@nixzzy/la-bail'
 
 const content = makeStatusMentionMessage({ key: myStatus.key, group: false })
 // { statusMentionMessage: { message: { protocolMessage: { key, type: 25 } } } }
@@ -5921,7 +5921,7 @@ import {
   makeNewsletterStatusAttribution,
   makeGroupStatusAttribution,
   makeStatusAudienceMetadata
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 ```
 
 Helper ini mengembalikan konten pesan yang kompatibel dengan protobuf dan bisa diserahkan ke `generateWAMessageFromContent` atau logika relay buatanmu sendiri.
@@ -6042,7 +6042,7 @@ Itu lebih penting daripada kedengarannya. Bot yang mengutip pesan yang dibalasny
 Kalau kamu lebih memilih tidak mengirim sama sekali daripada mengirim tanpa kutipan, periksa dulu sebelum memanggil:
 
 ```js
-import { normalizeMessageContent, getContentType } from '@rexxhayanasi/elaina-baileys'
+import { normalizeMessageContent, getContentType } from '@nixzzy/la-bail'
 
 const quotable = !!getContentType(normalizeMessageContent(m.message))
 await sock.sendMessage(m.key.remoteJid, { text: 'halo' }, quotable ? { quoted: m } : {})
@@ -6287,14 +6287,14 @@ Terima kasih kepada semua pihak yang telah memberikan dukungan, inspirasi, dan k
 
 Proyek ini didistribusikan di bawah lisensi yang disertakan bersama repo/paketnya.
 
-Modifikasi khusus Elaina dipelihara oleh **RexxHayanasi**. Sebagian kode diturunkan dari Baileys dan kerja open source lainnya, karena itu tetap membawa pemberitahuan hak cipta, lisensi, dan atribusi upstream yang berlaku.
+**La-Bail** dipelihara oleh **nixzzy / Bocil-Biasa**, di-fork dari **@rexxhayanasi/elaina-baileys** (dipelihara oleh **RexxHayanasi**) yang diturunkan dari **WhiskeySockets/Baileys**. Proyek ini membawa pemberitahuan hak cipta, lisensi, dan atribusi upstream yang berlaku.
 
 Jangan menghapus pemberitahuan hak cipta atau atribusi pihak ketiga yang diwajibkan lisensinya masing-masing.
 
 ---
 
 <div align="center">
-  <b>💫 @rexxhayanasi/elaina-baileys</b>
+  <b>💫 @nixzzy/la-bail</b>
   <br>
   <sub>Dibangun dengan hormat kepada ekosistem open source Baileys.</sub>
 </div>

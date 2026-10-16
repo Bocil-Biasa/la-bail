@@ -1,6 +1,6 @@
 # Examples
 
-Complete programs, not fragments. Each one runs as written once you have `@rexxhayanasi/elaina-baileys` installed and `"type": "module"` set.
+Complete programs, not fragments. Each one runs as written once you have `@nixzzy/la-bail` installed and `"type": "module"` set.
 
 ## A command bot
 
@@ -10,7 +10,7 @@ Reconnects on drop, ignores history sync, and routes text commands.
 import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PREFIX = '.'
@@ -98,7 +98,7 @@ Three details worth copying:
 For a headless server where scanning a QR is awkward.
 
 ```js
-import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PHONE = '6281234567890'
@@ -127,16 +127,16 @@ Enter the code on the phone under **Linked devices → Link with phone number**.
 ## An interactive menu
 
 ```js
-import { Button } from '@rexxhayanasi/elaina-baileys'
+import { Button } from '@nixzzy/la-bail'
 
 async function sendMenu(sock, jid) {
   const menu = new Button(sock)
     .setTitle('Elaina')
     .setBody('What would you like to do?')
-    .setFooter('Elaina Baileys')
+    .setFooter('La-Bail')
     .addReply('Ping', 'menu_ping')
     .addReply('About', 'menu_about')
-    .addUrl('Docs', 'https://github.com/rexxzyid/elaina-baileys')
+    .addUrl('Docs', 'https://github.com/Bocil-Biasa/la-bail')
 
   await menu.send(jid)
 }
@@ -163,7 +163,7 @@ sock.ev.on('messages.upsert', async ({ messages, type }) => {
   }
 
   if (selected.includes('menu_about')) {
-    await sock.sendMessage(jid, { text: 'Elaina Baileys 💜' })
+    await sock.sendMessage(jid, { text: 'La-Bail 💜' })
   }
 })
 ```
@@ -173,7 +173,7 @@ Native-flow replies arrive as `paramsJson`, a JSON string rather than a bare id 
 ## Posting to a channel
 
 ```js
-import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const CHANNEL = '123456789@newsletter'
 
@@ -206,7 +206,7 @@ Checking capabilities first is worth the extra call. Several channel features ar
 `downloadContentFromMessage` takes the media node itself — not the whole message — plus its type, and returns a stream:
 
 ```js
-import { downloadContentFromMessage } from '@rexxhayanasi/elaina-baileys'
+import { downloadContentFromMessage } from '@nixzzy/la-bail'
 import { writeFile } from 'node:fs/promises'
 
 async function toBuffer(stream) {
