@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mulai cepat — Elaina Baileys</title>
+<title>Mulai cepat — La-Bail</title>
 <meta name="description" content="Pasang paket, buka koneksi, dan pasangkan perangkat dengan pairing code.">
-<meta property="og:title" content="Mulai cepat — Elaina Baileys">
+<meta property="og:title" content="Mulai cepat — La-Bail">
 <meta property="og:description" content="Pasang paket, buka koneksi, dan pasangkan perangkat dengan pairing code.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E">
@@ -18,20 +18,20 @@
 <a class="skip" href="#content">Lompat ke konten</a>
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
-  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
+  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>La-Bail</span></a>
   <span class="version">v1.4.5</span>
   <div class="topbar-actions">
     <a class="lang" href="../en/getting-started.html">EN</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
-    <a class="ghlink" href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>
+    <a class="ghlink" href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>
   </div>
 </header>
 <div class="shell">
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Ringkasan</a><a href="./getting-started.html" class="active">Mulai cepat</a><a href="./sessions.html">Penyimpanan sesi</a><a href="./pairing.html">Kode pairing</a><a href="./messages.html">Pesan</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Grup</a><a href="./examples.html">Contoh</a><a href="./api.html">Referensi API</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
-      <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
+      <a href="https://www.npmjs.com/package/@nixzzy/la-bail" rel="noreferrer">npm</a>
+      <a href="https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
   <main id="content">
@@ -42,16 +42,16 @@
 <ul><li>Node.js <strong>22 atau lebih baru</strong> (disarankan 24)</li><li>npm</li><li>Akun WhatsApp untuk dipasangkan</li></ul>
 <div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>node -v</code></pre></div>
 <h2 id="pemasangan">Pemasangan<a class="anchor" href="#pemasangan" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @rexxhayanasi/elaina-baileys</code></pre></div>
+<div class="code-block"><span class="code-lang">bash</span><button class="copy" type="button" data-copy>copy</button><pre><code>npm install @nixzzy/la-bail</code></pre></div>
 <p>Paket ini ESM-first, jadi <code>package.json</code> kamu butuh <code>&quot;type&quot;: &quot;module&quot;</code>:</p>
 <div class="code-block"><span class="code-lang">json</span><button class="copy" type="button" data-copy>copy</button><pre><code>{
   &quot;type&quot;: &quot;module&quot;,
   &quot;dependencies&quot;: {
-    &quot;@rexxhayanasi/elaina-baileys&quot;: &quot;latest&quot;
+    &quot;@nixzzy/la-bail&quot;: &quot;latest&quot;
   }
 }</code></pre></div>
 <h2 id="import">Import<a class="anchor" href="#import" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket from '@rexxhayanasi/elaina-baileys'</code></pre></div>
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket from '@nixzzy/la-bail'</code></pre></div>
 <p>Sisanya datang dari entry point yang sama:</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, {
   useMultiFileAuthState,
@@ -62,14 +62,14 @@
   AIRich,
   MessageBuilder,
   MB
-} from '@rexxhayanasi/elaina-baileys'</code></pre></div>
+} from '@nixzzy/la-bail'</code></pre></div>
 <div class="alert alert-note"><span class="alert-label">note</span><p>MessageBuilder sudah terintegrasi. Kamu tidak perlu memasang <code>baileys-mbuilder</code> terpisah.</p></div>
 <h2 id="koneksi-yang-tahan-restart">Koneksi yang tahan restart<a class="anchor" href="#koneksi-yang-tahan-restart" aria-label="link">#</a></h2>
 <p>Bagian pentingnya bukan socket-nya — tapi menyambung ulang saat WhatsApp memutus, dan tahu kapan <em>tidak</em> boleh menyambung ulang.</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 async function startSock() {
@@ -131,7 +131,7 @@ console.log(code)</code></pre></div>
 <h2 id="selanjutnya">Selanjutnya<a class="anchor" href="#selanjutnya" aria-label="link">#</a></h2>
 <p>Setelah koneksi stabil, lanjut ke <a href="./messages.html">Pesan</a> untuk membaca yang masuk dan membalasnya.</p></article>
     <footer class="page-foot">
-      <p>Dokumentasi Elaina Baileys. Sumbernya di <a href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>.</p>
+      <p>Dokumentasi La-Bail (fork dari La-Bail & WhiskeySockets). Sumbernya di <a href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>.</p>
     </footer>
   </main>
 </div>

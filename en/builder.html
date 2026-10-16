@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MessageBuilder — Elaina Baileys</title>
+<title>MessageBuilder — La-Bail</title>
 <meta name="description" content="Interactive messages: buttons, lists, carousels and AIRich rich responses.">
-<meta property="og:title" content="MessageBuilder — Elaina Baileys">
+<meta property="og:title" content="MessageBuilder — La-Bail">
 <meta property="og:description" content="Interactive messages: buttons, lists, carousels and AIRich rich responses.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E">
@@ -18,20 +18,20 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
-  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
+  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>La-Bail</span></a>
   <span class="version">v1.4.5</span>
   <div class="topbar-actions">
     <a class="lang" href="../id/builder.html">ID</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
-    <a class="ghlink" href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>
+    <a class="ghlink" href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>
   </div>
 </header>
 <div class="shell">
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Overview</a><a href="./getting-started.html">Getting started</a><a href="./sessions.html">Session storage</a><a href="./pairing.html">Pairing code</a><a href="./messages.html">Messages</a><a href="./builder.html" class="active">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Groups</a><a href="./examples.html">Examples</a><a href="./api.html">API reference</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
-      <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
+      <a href="https://www.npmjs.com/package/@nixzzy/la-bail" rel="noreferrer">npm</a>
+      <a href="https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
   <main id="content">
@@ -48,19 +48,19 @@
   MessageBuilder,
   MB,
   MESSAGE_BUILDER_VERSION
-} from '@rexxhayanasi/elaina-baileys'</code></pre></div>
+} from '@nixzzy/la-bail'</code></pre></div>
 <p>The classes are also reachable through the <code>MessageBuilder</code> namespace or its short alias <code>MB</code>:</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>const button = new MessageBuilder.Button(sock)
 const carousel = new MB.Carousel(sock)</code></pre></div>
 <p>Every builder takes the socket in its constructor and ends with <code>.send(jid)</code>. Use <code>.build(jid)</code> instead when you want the message object without sending it.</p>
 <h2 id="button">Button<a class="anchor" href="#button" aria-label="link">#</a></h2>
 <p><code>Button</code> builds native-flow interactive messages — the modern button type.</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button } from '@nixzzy/la-bail'
 
 const message = new Button(sock)
   .setTitle('Elaina Menu')
   .setBody('Choose an option below.')
-  .setFooter('@rexxhayanasi/elaina-baileys')
+  .setFooter('@nixzzy/la-bail')
   .addReply('Ping', 'ping')
   .addUrl('Open Website', 'https://example.com')
   .addCopy('Copy Code', 'ELAINA2026')
@@ -72,7 +72,7 @@ await message.send(jid)</code></pre></div>
   .setImage('https://example.com/elaina.jpg')
   .setTitle('Elaina')
   .setBody('Interactive message with image header.')
-  .setFooter('Powered by Elaina Baileys')
+  .setFooter('Powered by La-Bail')
   .addReply('Menu', 'menu')
   .addUrl('Website', 'https://example.com')
 
@@ -108,7 +108,7 @@ await message.send(jid)</code></pre></div>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>const list = new Button(sock)
   .setTitle('Elaina Menu')
   .setBody('Select one menu.')
-  .setFooter('Elaina Baileys')
+  .setFooter('La-Bail')
   .addSelection('Open Menu')
   .makeSection('Main Menu')
   .makeRow('', 'Profile', 'Open profile menu', 'profile')
@@ -121,13 +121,13 @@ await list.send(jid)</code></pre></div>
 <p>Rows attach to the section declared above them, so call <code>makeSection</code> before the rows that belong to it.</p>
 <h2 id="buttonv2">ButtonV2<a class="anchor" href="#buttonv2" aria-label="link">#</a></h2>
 <p><code>ButtonV2</code> is the simpler classic button builder. Fewer button types, less to configure.</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { ButtonV2 } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { ButtonV2 } from '@nixzzy/la-bail'
 
 const message = new ButtonV2(sock)
   .setTitle('Elaina')
   .setSubtitle('WhatsApp Bot')
   .setBody('Choose an action.')
-  .setFooter('Elaina Baileys')
+  .setFooter('La-Bail')
   .setThumbnail('https://example.com/elaina.jpg')
   .addButton('Menu', 'menu')
   .addButton('Ping', 'ping')
@@ -135,7 +135,7 @@ const message = new ButtonV2(sock)
 await message.send(jid)</code></pre></div>
 <h2 id="carousel">Carousel<a class="anchor" href="#carousel" aria-label="link">#</a></h2>
 <p>A carousel is several cards you can swipe. Build each card with <code>Button.toCard()</code>, then hand them to <code>Carousel</code>.</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button, Carousel } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button, Carousel } from '@nixzzy/la-bail'
 
 const card1 = await new Button(sock)
   .setImage('https://example.com/card1.jpg')
@@ -159,7 +159,7 @@ await carousel.send(jid)</code></pre></div>
 <div class="alert alert-important"><span class="alert-label">important</span><p>Every carousel card needs an image or video in its header. A card without media will not render.</p></div>
 <h2 id="airich">AIRich<a class="anchor" href="#airich" aria-label="link">#</a></h2>
 <p><code>AIRich</code> builds rich responses with mixed content blocks — text, code, tables — in one message.</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { AIRich } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { AIRich } from '@nixzzy/la-bail'
 
 const rich = new AIRich(sock)
   .setTitle('Elaina AI')
@@ -174,7 +174,7 @@ await rich.send(jid)</code></pre></div>
 <h2 id="rendering-differences">Rendering differences<a class="anchor" href="#rendering-differences" aria-label="link">#</a></h2>
 <p>Interactive messages depend on the recipient's WhatsApp version and platform. A button that renders on Android may fall back to plain text on an older desktop client. Test on the platforms you actually support, and keep the message readable if the interactive part does not render.</p></article>
     <footer class="page-foot">
-      <p>Elaina Baileys documentation. Source on <a href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>.</p>
+      <p>La-Bail documentation (forked from La-Bail & WhiskeySockets). Source on <a href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>.</p>
     </footer>
   </main>
 </div>

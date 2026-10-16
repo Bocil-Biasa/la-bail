@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Contoh — Elaina Baileys</title>
+<title>Contoh — La-Bail</title>
 <meta name="description" content="Bot lengkap yang bisa langsung dijalankan, dirakit dari potongan di dokumentasi ini.">
-<meta property="og:title" content="Contoh — Elaina Baileys">
+<meta property="og:title" content="Contoh — La-Bail">
 <meta property="og:description" content="Bot lengkap yang bisa langsung dijalankan, dirakit dari potongan di dokumentasi ini.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E">
@@ -18,33 +18,33 @@
 <a class="skip" href="#content">Lompat ke konten</a>
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
-  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
+  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>La-Bail</span></a>
   <span class="version">v1.4.5</span>
   <div class="topbar-actions">
     <a class="lang" href="../en/examples.html">EN</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
-    <a class="ghlink" href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>
+    <a class="ghlink" href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>
   </div>
 </header>
 <div class="shell">
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Ringkasan</a><a href="./getting-started.html">Mulai cepat</a><a href="./sessions.html">Penyimpanan sesi</a><a href="./pairing.html">Kode pairing</a><a href="./messages.html">Pesan</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Grup</a><a href="./examples.html" class="active">Contoh</a><a href="./api.html">Referensi API</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
-      <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
+      <a href="https://www.npmjs.com/package/@nixzzy/la-bail" rel="noreferrer">npm</a>
+      <a href="https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
   <main id="content">
     <nav class="toc"><span class="toc-title">Di halaman ini</span><a href="#bot-perintah">Bot perintah</a><a href="#pairing-dengan-kode">Pairing dengan kode</a><a href="#menu-interaktif">Menu interaktif</a><a href="#memposting-ke-channel">Memposting ke channel</a><a href="#mengunduh-media-masuk">Mengunduh media masuk</a><a href="#menjaga-sesi-tetap-aman">Menjaga sesi tetap aman</a></nav>
     
     <article class="prose"><h1 id="contoh">Contoh<a class="anchor" href="#contoh" aria-label="link">#</a></h1>
-<p>Program lengkap, bukan potongan. Semuanya bisa langsung dijalankan setelah <code>@rexxhayanasi/elaina-baileys</code> terpasang dan <code>&quot;type&quot;: &quot;module&quot;</code> diset.</p>
+<p>Program lengkap, bukan potongan. Semuanya bisa langsung dijalankan setelah <code>@nixzzy/la-bail</code> terpasang dan <code>&quot;type&quot;: &quot;module&quot;</code> diset.</p>
 <h2 id="bot-perintah">Bot perintah<a class="anchor" href="#bot-perintah" aria-label="link">#</a></h2>
 <p>Menyambung ulang saat putus, mengabaikan sinkronisasi riwayat, dan merutekan perintah teks.</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, {
   useMultiFileAuthState,
   DisconnectReason
-} from '@rexxhayanasi/elaina-baileys'
+} from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PREFIX = '.'
@@ -123,7 +123,7 @@ start()</code></pre></div>
 <p><strong><code>{ quoted: message }</code></strong> — balasan jadi rapi di grup, tempat banyak orang bicara bersamaan.</p>
 <h2 id="pairing-dengan-kode">Pairing dengan kode<a class="anchor" href="#pairing-dengan-kode" aria-label="link">#</a></h2>
 <p>Untuk server headless yang merepotkan kalau harus scan QR.</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 import pino from 'pino'
 
 const PHONE = '6281234567890'
@@ -147,16 +147,16 @@ sock.ev.on('connection.update', ({ connection }) =&gt; {
 })</code></pre></div>
 <p>Masukkan kodenya di HP lewat <strong>Perangkat tertaut → Tautkan dengan nomor telepon</strong>.</p>
 <h2 id="menu-interaktif">Menu interaktif<a class="anchor" href="#menu-interaktif" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { Button } from '@nixzzy/la-bail'
 
 async function sendMenu(sock, jid) {
   const menu = new Button(sock)
     .setTitle('Elaina')
     .setBody('Mau melakukan apa?')
-    .setFooter('Elaina Baileys')
+    .setFooter('La-Bail')
     .addReply('Ping', 'menu_ping')
     .addReply('Tentang', 'menu_about')
-    .addUrl('Dokumentasi', 'https://github.com/rexxzyid/elaina-baileys')
+    .addUrl('Dokumentasi', 'https://github.com/Bocil-Biasa/la-bail')
 
   await menu.send(jid)
 }</code></pre></div>
@@ -179,12 +179,12 @@ async function sendMenu(sock, jid) {
   }
 
   if (selected.includes('menu_about')) {
-    await sock.sendMessage(jid, { text: 'Elaina Baileys 💜' })
+    await sock.sendMessage(jid, { text: 'La-Bail 💜' })
   }
 })</code></pre></div>
 <p>Balasan native-flow datang sebagai <code>paramsJson</code>, yaitu string JSON, bukan id polos — itulah sebabnya pengecekan di atas memakai <code>includes</code>, bukan perbandingan sama dengan. Parse isinya kalau kamu butuh payload terstruktur.</p>
 <h2 id="memposting-ke-channel">Memposting ke channel<a class="anchor" href="#memposting-ke-channel" aria-label="link">#</a></h2>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import makeWASocket, { useMultiFileAuthState } from '@nixzzy/la-bail'
 
 const CHANNEL = '123456789@newsletter'
 
@@ -211,7 +211,7 @@ sock.ev.on('connection.update', async ({ connection }) =&gt; {
 <p>Mengecek capabilities dulu setimpal dengan satu panggilan tambahan. Beberapa fitur channel dibatasi per akun, dan ketika salah satunya tidak ada, server menerima request lalu membuangnya tanpa error — jadi kegagalan diam-diam terlihat persis seperti keberhasilan.</p>
 <h2 id="mengunduh-media-masuk">Mengunduh media masuk<a class="anchor" href="#mengunduh-media-masuk" aria-label="link">#</a></h2>
 <p><code>downloadContentFromMessage</code> menerima node medianya langsung — bukan seluruh pesan — beserta tipenya, dan mengembalikan stream:</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { downloadContentFromMessage } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { downloadContentFromMessage } from '@nixzzy/la-bail'
 import { writeFile } from 'node:fs/promises'
 
 async function toBuffer(stream) {
@@ -239,7 +239,7 @@ sock.ev.on('messages.upsert', async ({ messages, type }) =&gt; {
 node_modules/</code></pre></div>
 <p>Siapa pun yang memegang folder itu sedang login sebagai kamu. Menyalinnya ke mesin lain memberi mesin itu sesimu; menghapusnya memaksa pairing ulang.</p></article>
     <footer class="page-foot">
-      <p>Dokumentasi Elaina Baileys. Sumbernya di <a href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>.</p>
+      <p>Dokumentasi La-Bail (fork dari La-Bail & WhiskeySockets). Sumbernya di <a href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>.</p>
     </footer>
   </main>
 </div>

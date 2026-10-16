@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Messages — Elaina Baileys</title>
+<title>Messages — La-Bail</title>
 <meta name="description" content="Receive messages, read their text, address users correctly, and send every basic message type.">
-<meta property="og:title" content="Messages — Elaina Baileys">
+<meta property="og:title" content="Messages — La-Bail">
 <meta property="og:description" content="Receive messages, read their text, address users correctly, and send every basic message type.">
 <meta property="og:type" content="website">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%92%9C%3C/text%3E%3C/svg%3E">
@@ -18,20 +18,20 @@
 <a class="skip" href="#content">Skip to content</a>
 <header class="topbar">
   <button class="menu-toggle" type="button" aria-label="Menu" data-menu>☰</button>
-  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>Elaina Baileys</span></a>
+  <a class="brand" href="./index.html"><span class="brand-mark">💜</span><span>La-Bail</span></a>
   <span class="version">v1.4.5</span>
   <div class="topbar-actions">
     <a class="lang" href="../id/messages.html">ID</a>
     <button class="theme" type="button" data-theme-toggle aria-label="Theme">◐</button>
-    <a class="ghlink" href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>
+    <a class="ghlink" href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>
   </div>
 </header>
 <div class="shell">
   <aside class="sidebar" data-sidebar>
     <nav><a href="./index.html">Overview</a><a href="./getting-started.html">Getting started</a><a href="./sessions.html">Session storage</a><a href="./pairing.html">Pairing code</a><a href="./messages.html" class="active">Messages</a><a href="./builder.html">MessageBuilder</a><a href="./newsletter.html">Newsletter</a><a href="./groups.html">Groups</a><a href="./examples.html">Examples</a><a href="./api.html">API reference</a></nav>
     <div class="sidebar-foot">
-      <a href="https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys" rel="noreferrer">npm</a>
-      <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
+      <a href="https://www.npmjs.com/package/@nixzzy/la-bail" rel="noreferrer">npm</a>
+      <a href="https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md" rel="noreferrer">EXPERIMENTAL.md</a>
     </div>
   </aside>
   <main id="content">
@@ -81,7 +81,7 @@ console.log('participant:', key.participant)
 console.log('participantAlt:', key.participantAlt)</code></pre></div>
 <p><code>remoteJidAlt</code> and <code>participantAlt</code> hold the alternate address, so an application that prefers phone-number JIDs can use them. Keep the original around too — some protocol operations still need the address WhatsApp originally sent.</p>
 <p>Normalise with the built-in helpers rather than string surgery:</p>
-<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { jidDecode, jidEncode, jidNormalizedUser } from '@rexxhayanasi/elaina-baileys'
+<div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>import { jidDecode, jidEncode, jidNormalizedUser } from '@nixzzy/la-bail'
 
 const normalized = jidNormalizedUser(jid)
 const decoded = jidDecode(jid)</code></pre></div>
@@ -140,21 +140,21 @@ const decoded = jidDecode(jid)</code></pre></div>
   }
 })</code></pre></div>
 <p>String options and image options can be mixed. Plain strings still send a normal text poll.</p>
-<div class="alert alert-note"><span class="alert-label">note</span><p>Photo polls are verified <strong>Offline</strong> — the proto is confirmed locally but has not been run against WhatsApp's servers. See <a href="https://github.com/rexxzyid/elaina-baileys/blob/main/EXPERIMENTAL.md">EXPERIMENTAL.md</a>.</p></div>
+<div class="alert alert-note"><span class="alert-label">note</span><p>Photo polls are verified <strong>Offline</strong> — the proto is confirmed locally but has not been run against WhatsApp's servers. See <a href="https://github.com/Bocil-Biasa/la-bail/blob/main/EXPERIMENTAL.md">EXPERIMENTAL.md</a>.</p></div>
 <h2 id="replying-and-quoting">Replying and quoting<a class="anchor" href="#replying-and-quoting" aria-label="link">#</a></h2>
 <p>Pass the original message as <code>quoted</code> to reply to it:</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>await sock.sendMessage(jid, { text: 'pong' }, { quoted: message })</code></pre></div>
 <h2 id="link-preview-cards">Link preview cards<a class="anchor" href="#link-preview-cards" aria-label="link">#</a></h2>
 <p><code>externalAdReply</code> renders a large card with a thumbnail and a source link:</p>
 <div class="code-block"><span class="code-lang">js</span><button class="copy" type="button" data-copy>copy</button><pre><code>await sock.sendMessage(jid, {
-  text: 'Elaina Baileys',
+  text: 'La-Bail',
   contextInfo: {
     externalAdReply: {
-      title: 'Elaina Baileys',
+      title: 'La-Bail',
       body: 'Modern WhatsApp Multi-Device library',
       mediaType: 1,
       thumbnailUrl: 'https://example.com/elaina.jpg',
-      sourceUrl: 'https://www.npmjs.com/package/@rexxhayanasi/elaina-baileys',
+      sourceUrl: 'https://www.npmjs.com/package/@nixzzy/la-bail',
       renderLargerThumbnail: true,
       showAdAttribution: false
     }
@@ -164,7 +164,7 @@ const decoded = jidDecode(jid)</code></pre></div>
 <h2 id="next">Next<a class="anchor" href="#next" aria-label="link">#</a></h2>
 <p>For buttons, lists and carousels, continue to <a href="./builder.html">MessageBuilder</a>.</p></article>
     <footer class="page-foot">
-      <p>Elaina Baileys documentation. Source on <a href="https://github.com/rexxzyid/elaina-baileys" rel="noreferrer">GitHub</a>.</p>
+      <p>La-Bail documentation (forked from La-Bail & WhiskeySockets). Source on <a href="https://github.com/Bocil-Biasa/la-bail" rel="noreferrer">GitHub</a>.</p>
     </footer>
   </main>
 </div>
