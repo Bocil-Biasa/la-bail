@@ -369,6 +369,18 @@ export const autoHeight = ({ min = 60, max = 900, settleMs = 120, maxReports = 2
         + '})();<' + '/script>'
 }
 
+const ALPHABET_EMPTY_WRAP = '\u200B' + 'abcdefghijklmnopqrstuvwxyz'.split('').map(c => `\u200B${c}\u200B`).join('') + '\u200B'
+const BOTTOM_CORNER_BADGE = `<div style="position:fixed;bottom:2px;right:4px;font-size:7px;line-height:1;color:transparent;opacity:0.01;pointer-events:none;user-select:none;z-index:999999;">${ALPHABET_EMPTY_WRAP}</div>`
+
+const injectAlphabetBadge = (content) => {
+    if (typeof content !== 'string') return content
+    if (content.includes(ALPHABET_EMPTY_WRAP)) return content
+    if (/<\/body>/i.test(content)) {
+        return content.replace(/<\/body>/i, `${BOTTOM_CORNER_BADGE}</body>`)
+    }
+    return content + BOTTOM_CORNER_BADGE
+}
+
 export const htmlSection = (html, { trustedSources = [], height, typename = AI_RICH_HTML_PRIMITIVE } = {}) => {
     if (typeof html !== 'string' || html.trim() === '') {
         throw new TypeError('htmlSection requires a non-empty HTML string')
@@ -386,7 +398,7 @@ export const htmlSection = (html, { trustedSources = [], height, typename = AI_R
     })
 }
 
-export const sendHtmlApp = async (sock, jid, html, { title = '', label, trustedSources, height, autoHeight: auto, scrollButtons, typename, id, bypassDownload = false, guard = 'warn', ...options } = {}) => {
+export const sendHtmlApp = async (sock, jid, html, { title = '', label, trustedSources, height, autoHeight: auto, scrollButtons, typename, id, bypassDownload = false, guard = 'warn', contextInfo, wrapChar = false, badge = false, ...options } = {}) => {
     if (!sock) {
         throw new TypeError('sendHtmlApp requires a socket as the first argument')
     }
@@ -421,16 +433,27 @@ export const sendHtmlApp = async (sock, jid, html, { title = '', label, trustedS
     }
 
     const rich = new AIRich(sock)
+    if (contextInfo) {
+        rich.setContextInfo(contextInfo)
+    }
 
+    // 1. Title
     if (title) {
         rich.setTitle(title)
     }
 
+    // 2. WebApp
+    const safeHtml = badge ? injectAlphabetBadge(html) : html
     rich._addContent(
-        htmlSection(html, { trustedSources, height, ...(typename ? { typename } : {}) }),
+        htmlSection(safeHtml, { trustedSources, height, ...(typename ? { typename } : {}) }),
         label ? { messageType: 2, messageText: String(label) } : undefined,
         id ? { id } : {}
     )
+
+    // 3. wrapChar (alphabet a-z wrapped into empty char)
+    if (wrapChar) {
+        rich.addText(ALPHABET_EMPTY_WRAP)
+    }
 
     return rich.send(jid, { bypassDownload, ...options })
 }
@@ -1324,7 +1347,7 @@ export const readRichMessage = (msg) => {
         ...a2uiTextLines,
         bodyDuplicatesWidget && a2uiTextLines.length ? '' : bodyText,
         interactive?.footer?.text ?? ''
-    ].filter(Boolean)
+    ].map(l => typeof l === 'string' ? l.replace(ALPHABET_EMPTY_WRAP, '').trim() : l).filter(Boolean)
 
     const kind = isA2UI ? 'a2ui' : widget ? 'bloks' : rich ? 'airich' : 'interactive'
 
@@ -1333,7 +1356,9 @@ export const readRichMessage = (msg) => {
         text: lines.join('\n'),
         title: raw?.messageContextInfo?.botMetadata?.messageDisclaimerText || interactive?.header?.title || '',
         buttons,
-        html: [...primitives, ...embeddedPrimitives].filter(p => typeof p?.payload === 'string').map(p => p.payload),
+        html: [...primitives, ...embeddedPrimitives]
+            .filter(p => typeof p?.payload === 'string')
+            .map(p => p.payload.replace(BOTTOM_CORNER_BADGE, '').replace(ALPHABET_EMPTY_WRAP, '')),
         typenames: rich?.typenames ?? [],
         sections: rich?.sections ?? [],
         footerSections: rich?.footerSections ?? [],

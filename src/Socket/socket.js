@@ -870,19 +870,23 @@ export const makeSocket = (config) => {
             const myLID = node.attrs.lid;
             process.nextTick(async () => {
                 try {
-                    const myPN = authState.creds.me.id;
+                    const myPN = authState.creds.me?.id;
+                    if (myPN) {
+                        await signalRepository.lidMapping.storeLIDPNMappings([{ lid: myLID, pn: myPN }]);
 
-                    await signalRepository.lidMapping.storeLIDPNMappings([{ lid: myLID, pn: myPN }]);
+                        const decoded = jidDecode(myPN);
+                        if (decoded) {
+                            const { user, device } = decoded;
+                            await authState.keys.set({
+                                'device-list': {
+                                    [user]: [device?.toString() || '0']
+                                }
+                            });
 
-                    const { user, device } = jidDecode(myPN);
-                    await authState.keys.set({
-                        'device-list': {
-                            [user]: [device?.toString() || '0']
+                            await signalRepository.migrateSession(myPN, myLID);
+                            logger.info({ myPN, myLID }, 'Own LID session created successfully');
                         }
-                    });
-
-                    await signalRepository.migrateSession(myPN, myLID);
-                    logger.info({ myPN, myLID }, 'Own LID session created successfully');
+                    }
                 }
                 catch (error) {
                     logger.error({ error, lid: myLID }, 'Failed to create own LID session');
