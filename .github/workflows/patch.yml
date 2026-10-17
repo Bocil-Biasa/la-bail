@@ -48,6 +48,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '24'
+          cache: npm
 
       - name: Identify as the repository owner
         run: |
@@ -60,6 +61,10 @@ jobs:
         run: |
           printf '%s' "$PATCH_B64" | base64 -d > "$RUNNER_TEMP/change.patch"
           test -s "$RUNNER_TEMP/change.patch"
+          git apply --check --reverse "$RUNNER_TEMP/change.patch" && {
+            echo "Patch tampaknya sudah diterapkan."
+            exit 1
+          } || true
           echo "BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
           git am --3way "$RUNNER_TEMP/change.patch"
           git log --format='%h %an <%ae> %s' "$BASE_SHA"..HEAD
@@ -67,12 +72,16 @@ jobs:
       - name: Install dependencies
         run: |
           npm install --package-lock=false --ignore-scripts
-          npm install --no-save --package-lock=false --ignore-scripts sharp fluent-ffmpeg
+          npm install --no-save --package-lock=false sharp fluent-ffmpeg
+
+      - name: Verify sharp installation
+        run: |
+          node --input-type=module -e "import sharp from 'sharp'; console.log('sharp loaded:', sharp.versions.sharp)"
 
       - name: Syntax check changed files
         run: |
-          git diff --name-only --diff-filter=AM "$BASE_SHA" HEAD -- '*.js' '*.mjs' | while read -r file; do
-            node --check "$file"
+          git diff --name-only --diff-filter=AM "$BASE_SHA" HEAD -- '*.js' '*.mjs' | while IFS= read -r file; do
+            node --check "$file" || exit 1
           done
 
       - name: Verify protobuf round trip
