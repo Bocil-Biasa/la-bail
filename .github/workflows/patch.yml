@@ -1,0 +1,99 @@
+name: Apply Patch
+
+on:
+  workflow_dispatch:
+    inputs:
+      patch:
+        description: 'Isi patch git format-patch dalam base64 satu baris'
+        required: true
+        type: string
+      push:
+        description: 'Push hasilnya ke main setelah semua pemeriksaan lulus'
+        required: true
+        default: 'true'
+        type: choice
+        options:
+          - 'true'
+          - 'false'
+
+permissions:
+  contents: write
+
+concurrency:
+  group: elaina-baileys-apply-patch
+  cancel-in-progress: false
+
+jobs:
+  apply:
+    name: Apply, verify and push
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+          token: ${{ secrets.GH_PAT || secrets.GITHUB_TOKEN }}
+
+      - name: Protect generated files
+        run: |
+          printf '%s\n' \
+            'node_modules/' \
+            'package-lock.json' \
+            '.wa-bundle/' \
+            'proto-sync.txt' >> .git/info/exclude
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+
+      - name: Identify as the repository owner
+        run: |
+          git config user.name "RexxHayanasi Pengen S.Kom"
+          git config user.email "150516773+rexxzyid@users.noreply.github.com"
+
+      - name: Apply the patch
+        env:
+          PATCH_B64: ${{ inputs.patch }}
+        run: |
+          printf '%s' "$PATCH_B64" | base64 -d > "$RUNNER_TEMP/change.patch"
+          test -s "$RUNNER_TEMP/change.patch"
+          echo "BASE_SHA=$(git rev-parse HEAD)" >> "$GITHUB_ENV"
+          git am --3way "$RUNNER_TEMP/change.patch"
+          git log --format='%h %an <%ae> %s' "$BASE_SHA"..HEAD
+
+      - name: Install dependencies
+        run: |
+          npm install --package-lock=false --ignore-scripts
+          npm install --no-save --package-lock=false --ignore-scripts sharp fluent-ffmpeg
+
+      - name: Syntax check changed files
+        run: |
+          git diff --name-only --diff-filter=AM "$BASE_SHA" HEAD -- '*.js' '*.mjs' | while read -r file; do
+            node --check "$file"
+          done
+
+      - name: Verify protobuf round trip
+        run: npm run verify:proto
+
+      - name: Verify MEX surface
+        run: |
+          if git diff --name-only "$BASE_SHA" HEAD | grep -qE '^(lib|src)/(Socket|Types/Mex)'; then
+            npm run verify:mex
+          fi
+
+      - name: Run tests
+        run: node --test "test/*.test.js"
+
+      - name: Make sure no bundle files are committed
+        run: |
+          if git diff --name-only "$BASE_SHA" HEAD | grep -q '^\.wa-bundle/'; then
+            echo "File di .wa-bundle ikut ter-commit"
+            exit 1
+          fi
+
+      - name: Push to main
+        if: ${{ inputs.push == 'true' }}
+        run: git push origin HEAD:main
