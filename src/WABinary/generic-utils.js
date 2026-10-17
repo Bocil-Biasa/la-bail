@@ -186,7 +186,8 @@ export const getBizBinaryNode = (message) => {
             ]
         };
     }
-    if (flowMsg || message.buttonsMessage || message.templateMessage) {
+    const carouselFlow = message.interactiveMessage?.carouselMessage?.cards?.some(card => card?.nativeFlowMessage);
+    if (flowMsg || carouselFlow || message.buttonsMessage || message.templateMessage) {
         return {
             tag: 'biz',
             attrs: bizAttributes,

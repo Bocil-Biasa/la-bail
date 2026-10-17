@@ -907,8 +907,8 @@ class Button extends BaseBuilder {
 				text: this._footer,
 			},
 			header: {
-				title: this._title,
-				subtitle: this._subtitle,
+				...(this._title ? { title: this._title } : {}),
+				...(this._subtitle ? { subtitle: this._subtitle } : {}),
 				hasMediaAttachment: !!this._data,
 				...(this._data
 					? await prepareWAMessageMedia(this._data, { upload: this.#client.waUploadToServer }).catch((e) => {

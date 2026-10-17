@@ -7,6 +7,9 @@ import { promises as fs, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { proto } from '../WAProto/index.js';
+import { getBizBinaryNode } from '../src/WABinary/generic-utils.js';
+import { shouldIncludeBizBinaryNode } from '../src/Utils/messages.js';
+import { Button } from '../src/MessageBuilder/index.js';
 import { SocialMediaPostType, buildSocialPreview, readSocialPreview, videoEndCard } from '../src/Utils/link-preview-metadata.js';
 import { MONEY_OFFSET, ReminderFrequency, ReminderStatus, SplitPaymentStatus, buildPaymentReminder, buildSplitPayment, buildSplitPaymentUpdate, money, readMoney, readPaymentReminder, readSplitPayment } from '../src/Utils/payment-messages.js';
 import { aesEncryptGCM, hmacSign } from '../src/Utils/crypto.js';
@@ -1454,4 +1457,84 @@ test('airich-deep-decode', async () => {
     const deep = { __typename: 'Root' };
     deep.self = deep;
     assert.equal(MB.collectTypenames(deep).includes('Root'), true, 'a cycle must not hang the walk');
+});
+
+const decodeHeader = (content) => {
+    const decoded = proto.Message.decode(proto.Message.encode(content).finish());
+    return decoded.interactiveMessage.header;
+};
+
+const stubUpload = async () => ({ mediaUrl: 'https://mmg.example/x', directPath: '/v/x', handle: 'h' });
+
+test('interactive-header-empty-text', async () => {
+    const bare = await generateWAMessageContent({
+        location: { degreesLatitude: 1, degreesLongitude: 2 },
+        caption: 'Halo',
+        nativeFlow: [{ text: 'Menu', id: '.menu' }]
+    }, { upload: stubUpload });
+    const bareHeader = decodeHeader(bare);
+    assert.equal(Object.hasOwn(bareHeader, 'title'), false, 'an unset title must not be serialised as an empty string');
+    assert.equal(Object.hasOwn(bareHeader, 'subtitle'), false, 'an unset subtitle must not be serialised as an empty string');
+    assert.equal(bareHeader.hasMediaAttachment, true);
+
+    const titled = await generateWAMessageContent({
+        location: { degreesLatitude: 1, degreesLongitude: 2 },
+        caption: 'Halo',
+        title: 'Judul',
+        nativeFlow: [{ text: 'Menu', id: '.menu' }]
+    }, { upload: stubUpload });
+    const titledHeader = decodeHeader(titled);
+    assert.equal(titledHeader.title, 'Judul');
+    assert.equal(Object.hasOwn(titledHeader, 'subtitle'), false);
+});
+
+test('carousel-card-header-empty-text', async () => {
+    const sharp = await loadSharp();
+    const image = await sharp({
+        create: { width: 64, height: 64, channels: 3, background: { r: 51, g: 102, b: 153 } }
+    }).png().toBuffer();
+
+    const content = await generateWAMessageContent({
+        text: 'Isi',
+        cards: [
+            { image, caption: 'Kartu', nativeFlow: [{ text: 'Buka', id: '.a' }] },
+            { image, caption: 'Kartu dua', title: 'Judul', subtitle: 'Sub', nativeFlow: [{ text: 'Buka', id: '.b' }] }
+        ]
+    }, { upload: stubUpload });
+
+    const decoded = proto.Message.decode(proto.Message.encode(content).finish());
+    const [plain, full] = decoded.interactiveMessage.carouselMessage.cards.map((card) => card.header);
+    assert.equal(Object.hasOwn(plain, 'title'), false);
+    assert.equal(Object.hasOwn(plain, 'subtitle'), false);
+    assert.equal(full.title, 'Judul');
+    assert.equal(full.subtitle, 'Sub');
+});
+
+test('builder-card-header-empty-text', async () => {
+    const card = await new Button({ waUploadToServer: stubUpload }).setBody('Isi').addReply('Ya', '.ya').toCard();
+    assert.equal(Object.hasOwn(card.header, 'title'), false);
+    assert.equal(Object.hasOwn(card.header, 'subtitle'), false);
+    assert.equal(card.header.hasMediaAttachment, false);
+
+    const titled = await new Button({ waUploadToServer: stubUpload }).setTitle('T').setSubtitle('S').setBody('Isi').addReply('Ya', '.ya').toCard();
+    assert.equal(titled.header.title, 'T');
+    assert.equal(titled.header.subtitle, 'S');
+});
+
+test('carousel-biz-node', () => {
+    const carousel = {
+        interactiveMessage: {
+            carouselMessage: { cards: [{ nativeFlowMessage: { buttons: [{ name: 'quick_reply', buttonParamsJson: '{}' }] } }] }
+        }
+    };
+    assert.equal(shouldIncludeBizBinaryNode(carousel), true, 'a carousel whose cards hold native flow buttons needs the biz node');
+    assert.equal(shouldIncludeBizBinaryNode({ interactiveMessage: { carouselMessage: { cards: [{ body: { text: 'x' } }] } } }), false);
+    assert.equal(shouldIncludeBizBinaryNode({ interactiveMessage: { carouselMessage: { cards: [] } } }), false);
+    assert.equal(shouldIncludeBizBinaryNode({ conversation: 'halo' }), false);
+
+    const biz = getBizBinaryNode(carousel);
+    assert.equal(biz.tag, 'biz');
+    const interactive = biz.content.find((node) => node.tag === 'interactive');
+    assert.deepEqual(interactive.attrs, { type: 'native_flow', v: '1' });
+    assert.deepEqual(interactive.content[0].attrs, { v: '9', name: 'mixed' });
 });

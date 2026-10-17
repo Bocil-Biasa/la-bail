@@ -721,6 +721,11 @@ export const hasValidInteractiveHeader = (message) => {
         message.locationMessage);
 };
 
+const headerText = ({ title, subtitle }) => ({
+    ...(title ? { title } : {}),
+    ...(subtitle ? { subtitle } : {})
+});
+
 export const hasValidCarouselHeader = (message) => {
     return !!(message.imageMessage ||
         message.videoMessage ||
@@ -1366,8 +1371,7 @@ export const generateWAMessageContent = async (message, options) => {
                     throw new Boom('Invalid media type for interactive message header', { statusCode: 400 });
                 }
                 interactiveMessage.header = {
-                    title: message.title || '',
-                    subtitle: message.subtitle || '',
+                    ...headerText(message),
                     hasMediaAttachment: isValidHeader
                 };
                 interactiveMessage.body = { text: message.caption };
@@ -1415,8 +1419,7 @@ export const generateWAMessageContent = async (message, options) => {
                     else {
                         if (hasOptionalProperty(card, 'caption')) {
                             carouselCard.header = {
-                                title: card.title || '',
-                                subtitle: card.subtitle || '',
+                                ...headerText(card),
                                 hasMediaAttachment: isValidHeader
                             };
                             carouselCard.body = { text: card.caption };
@@ -2146,4 +2149,5 @@ export const shouldIncludeBizBinaryNode = (message) => !!(message.buttonsMessage
     message.listMessage ||
     message.templateMessage ||
     (message.interactiveMessage &&
-        message.interactiveMessage.nativeFlowMessage));
+        (message.interactiveMessage.nativeFlowMessage ||
+            message.interactiveMessage.carouselMessage?.cards?.some(card => card?.nativeFlowMessage))));
