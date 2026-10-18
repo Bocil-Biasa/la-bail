@@ -36,6 +36,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: elaina-baileys-auto-release
@@ -76,8 +77,88 @@ jobs:
 
       - name: Verify proto
         id: verify_proto
+        continue-on-error: true
+        env:
+          VERIFYPROTO_RESULT_PATH: verifyproto-result.json
         run: |
           node ./script/verifyproto.js
+
+      - name: Report proto verification failures and close resolved issue
+        if: always()
+        uses: actions/github-script@v7
+        env:
+          VERIFYPROTO_RESULT_PATH: verifyproto-result.json
+        with:
+          script: |
+            const fs = require('fs')
+            const resultPath = process.env.VERIFYPROTO_RESULT_PATH || 'verifyproto-result.json'
+            if (!fs.existsSync(resultPath)) {
+              core.info('No verification result found')
+              return
+            }
+            const data = JSON.parse(fs.readFileSync(resultPath, 'utf8'))
+            const failures = data.failures || []
+            const owner = context.repo.owner
+            const repo = context.repo.repo
+            const labels = ['verifyproto-failure']
+            const title = 'verifyproto failure'
+            const { data: issues } = await github.rest.issues.listForRepo({
+              owner,
+              repo,
+              state: 'open',
+              labels: labels.join(','),
+              per_page: 100
+            })
+            const existing = issues.find(issue => issue.title === title)
+            if (!failures.length) {
+              if (existing) {
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  body: `Verification passed on ${new Date().toISOString().slice(0,10)}. Closing issue.`
+                })
+                await github.rest.issues.update({
+                  owner,
+                  repo,
+                  issue_number: existing.number,
+                  state: 'closed'
+                })
+                core.info(`Closed issue #${existing.number}`)
+              } else {
+                core.info('No failures and no existing issue to close')
+              }
+              return
+            }
+            const body = [
+              `Checked: ${data.checked ?? 'n/a'} fields`,
+              `Wrappers checked: ${(data.wrappers || []).length}`,
+              '',
+              ...failures.map(f => `- ${f}`)
+            ].join('\n')
+            if (existing) {
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: existing.number,
+                body
+              })
+              await github.rest.issues.update({
+                owner,
+                repo,
+                issue_number: existing.number,
+                state: 'open'
+              }).catch(() => {})
+              core.info(`Updated issue #${existing.number} with new failures`)
+              return
+            }
+            await github.rest.issues.create({
+              owner,
+              repo,
+              title,
+              body,
+              labels
+            })
 
       - name: Update WhatsApp version (update files that track WA revision)
         run: npm run update:version
@@ -273,7 +354,6 @@ jobs:
             echo "- NPM tag: \`latest\`" >> "$GITHUB_STEP_SUMMARY"
           fi
 
-          # Indicate whether publish step ran:
           if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.publish }}" = "true" ]; then
             echo "- Publish allowed (manual): \`true\`" >> "$GITHUB_STEP_SUMMARY"
           elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
