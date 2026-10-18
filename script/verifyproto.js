@@ -1,4 +1,3 @@
-import { writeFileSync } from 'node:fs'
 import { loadBundle } from './protobundle.js'
 import waproto from '../WAProto/index.js'
 import { FUTURE_PROOF_MESSAGE_KEYS } from '../src/Utils/messages.js'
@@ -136,14 +135,6 @@ else {
     }
     console.log(`Checked ${wrappers.length} FutureProofMessage wrappers against normalizeMessageContent.`)
 }
-
-const resultPath = process.env.VERIFYPROTO_RESULT_PATH || 'verifyproto-result.json'
-const result = {
-    checked,
-    wrappers,
-    failures
-}
-writeFileSync(resultPath, JSON.stringify(result, null, 2))
 
 if (failures.length) {
     console.error(`${failures.length} fields failed:`)
