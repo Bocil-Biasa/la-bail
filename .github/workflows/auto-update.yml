@@ -25,6 +25,15 @@ on:
           - 'false'
           - 'true'
 
+      publish:
+        description: 'Publish to NPM? (only used for manual runs)'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - 'false'
+          - 'true'
+
 permissions:
   contents: write
 
@@ -58,14 +67,26 @@ jobs:
       - name: Install dependencies
         run: npm install --package-lock=false
 
-      - name: Update WhatsApp version
+      - name: Update WhatsApp artifacts (waupdate / updatewa / syncproto)
+        id: wa_update
+        run: |
+          node ./script/waupdate.js --apply --keep 2 || true
+          node ./script/updatewa.js
+          node ./script/syncproto.js
+
+      - name: Verify proto
+        id: verify_proto
+        run: |
+          node ./script/verifyproto.js
+
+      - name: Update WhatsApp version (update files that track WA revision)
         run: npm run update:version
 
       - name: Detect changes
         id: changes
         shell: bash
         run: |
-          git add src/Defaults/index.js src/Utils/generics.js
+          git add -A
 
           if git diff --staged --quiet; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
@@ -183,11 +204,11 @@ jobs:
 
           VERSION=$(node -p 'require("./package.json").version')
 
-          git add package.json src/Defaults/index.js src/Utils/generics.js
+          git add -A
 
-          git commit -m "chore: release v${VERSION} — WA update $(date -u +%Y-%m-%d)"
+          git commit -m "chore: release v${VERSION} — WA update $(date -u +%Y-%m-%d)" || echo "No changes to commit"
 
-          git pull --rebase origin main
+          git pull --rebase origin main || true
 
           if git rev-parse "v${VERSION}" >/dev/null 2>&1; then
             echo "Tag v${VERSION} sudah ada."
@@ -195,11 +216,11 @@ jobs:
             git tag "v${VERSION}"
           fi
 
-          git push origin main
-          git push origin "v${VERSION}"
+          git push origin main || true
+          git push origin "v${VERSION}" || true
 
       - name: Publish to NPM
-        if: steps.changes.outputs.changed == 'true' || github.event.inputs.force == 'true'
+        if: (steps.changes.outputs.changed == 'true' || github.event.inputs.force == 'true') && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish == 'true')
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         shell: bash
@@ -250,4 +271,13 @@ jobs:
             echo "- NPM tag: \`${TAG}\`" >> "$GITHUB_STEP_SUMMARY"
           else
             echo "- NPM tag: \`latest\`" >> "$GITHUB_STEP_SUMMARY"
+          fi
+
+          # Indicate whether publish step ran:
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ github.event.inputs.publish }}" = "true" ]; then
+            echo "- Publish allowed (manual): \`true\`" >> "$GITHUB_STEP_SUMMARY"
+          elif [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "- Publish allowed (manual): \`false\`" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Publish allowed (auto run): \`true\`" >> "$GITHUB_STEP_SUMMARY"
           fi
