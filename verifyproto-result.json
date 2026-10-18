@@ -1,0 +1,40 @@
+{
+  "checked": 2984,
+  "wrappers": [
+    "viewOnceMessage",
+    "ephemeralMessage",
+    "documentWithCaptionMessage",
+    "viewOnceMessageV2",
+    "editedMessage",
+    "viewOnceMessageV2Extension",
+    "groupMentionedMessage",
+    "botInvokeMessage",
+    "lottieStickerMessage",
+    "eventCoverImage",
+    "statusMentionMessage",
+    "pollCreationOptionImageMessage",
+    "associatedChildMessage",
+    "groupStatusMentionMessage",
+    "pollCreationMessageV4",
+    "statusAddYours",
+    "groupStatusMessage",
+    "limitSharingMessage",
+    "botTaskMessage",
+    "questionMessage",
+    "groupStatusMessageV2",
+    "botForwardedMessage",
+    "questionReplyMessage",
+    "newsletterAdminProfileMessage",
+    "spoilerMessage",
+    "newsletterAdminProfileStatusMessage",
+    "botPlatformRegistrationSuccessMessage",
+    "newsletterScheduledMessage",
+    "acp2SettingMessage",
+    "audioStickerMessage",
+    "botGroupParticipantMessage"
+  ],
+  "failures": [
+    "Message.ChatSolidColorWallpaper.backgroundLightArgb: lost on round trip",
+    "Message.ChatSolidColorWallpaper.backgroundDarkArgb: lost on round trip"
+  ]
+}
