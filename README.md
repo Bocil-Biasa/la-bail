@@ -33,6 +33,25 @@
   <img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b636-4676-a213-39d67b2d5d67.gif" width="100%">
 </div>
 
+
+## 🐞 Menemukan Bug?
+
+Untuk pertanyaan, kolaborasi, laporan bug, atau hal-hal lainnya, silakan hubungi saya melalui saluran berikut.
+
+<p align="left">
+  <a href="mailto:rexxhayanasidev@gmail.com">
+    <img src="https://img.shields.io/badge/Email-Contact%20Me-D14836?style=for-the-badge&logo=gmail&logoColor=white" alt="Email" />
+  </a>
+  <a href="https://t.me/rexxhayanasi">
+    <img src="https://img.shields.io/badge/Telegram-Contact%20Me-26A5E4?style=for-the-badge&logo=telegram&logoColor=white" alt="Telegram" />
+  </a>
+  <a href="https://portofoliorexx.vercel.app">
+    <img src="https://img.shields.io/badge/Website-Maintainer-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Website Maintainer" />
+  </a>
+</p>
+
+---
+
 > [!IMPORTANT]
 > `@rexxhayanasi/elaina-baileys` adalah library API WhatsApp Web tidak resmi. Tidak berafiliasi, tidak diizinkan, tidak dipelihara, tidak disponsori, dan tidak didukung oleh WhatsApp maupun Meta.
 >
@@ -6142,21 +6161,6 @@ Ini wajar di alur pengalamatan WhatsApp yang lebih baru. Periksa `participantAlt
 ### Sesi ter-logout
 
 Kalau WhatsApp mengembalikan `DisconnectReason.loggedOut`, hapus sesi lokal yang tidak valid lalu pairing akunnya lagi.
-
----
-
-## 🐞 Menemukan Bug?
-
-Kalau kamu menemukan bug atau masalah kompatibilitas, kamu bisa menghubungi pemeliharanya atau mengikuti WhatsApp Channel untuk update proyeknya.
-
-<p align="center">
-  <a href="https://wa.me/6285924647929">
-    <img src="https://img.shields.io/badge/Chat%20on%20WhatsApp-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="Chat on WhatsApp" />
-  </a>
-  <a href="https://whatsapp.com/channel/0029Vb8RvQKEFeXmGnJr621s">
-    <img src="https://img.shields.io/badge/WhatsApp%20Channel-25D366?style=for-the-badge&logo=whatsapp&logoColor=white" alt="WhatsApp Channel" />
-  </a>
-</p>
 
 ---
 
