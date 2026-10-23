@@ -187,35 +187,55 @@ jobs:
           const fs = require('fs')
           const pkgPath = './package.json'
           const pkg = JSON.parse(fs.readFileSync(pkgPath, 'utf8'))
-          const current = pkg.version
-          const bump = process.env.BUMP || 'patch'
+          const currentRaw = String(pkg.version ?? '').trim()
+          const bump = (process.env.BUMP || 'patch').trim().toLowerCase()
+
+          if (!currentRaw) {
+            throw new Error('package.json version is empty')
+          }
+
+          function normalize(version) {
+            let v = String(version ?? '').trim()
+            if (!v) throw new Error('Version is empty')
+            if (v.startsWith('v')) v = v.slice(1)
+            return v
+          }
+
           function parse(version) {
-            const match = version.match(/^(\\d+)\\.(\\d+)\\.(\\d+)(?:-([0-9A-Za-z-]+)\\.(\\d+))?$/)
+            const v = normalize(version)
+            const match = v.match(/^(\d+)\.(\d+)\.(\d+)(?:-([0-9A-Za-z.-]+))?(?:\+([0-9A-Za-z.-]+))?$/)
             if (!match) throw new Error(`Unsupported version format: ${version}`)
-            return { major: Number(match[1]), minor: Number(match[2]), patch: Number(match[3]), tag: match[4] || null, prerelease: match[5] ? Number(match[5]) : null }
+            return {
+              major: Number(match[1]),
+              minor: Number(match[2]),
+              patch: Number(match[3]),
+              pre: match[4] ?? null,
+              build: match[5] ?? null
+            }
           }
-          function carry(major, minor, patch) {
-            if (patch > 9) { patch = 0; minor += 1 }
-            if (minor > 9) { minor = 0; major += 1 }
-            return { major, minor, patch }
-          }
-          function bumpStable(version, type) {
-            const v = parse(version)
-            if (type === 'major') return `${v.major + 1}.0.0`
-            if (type === 'minor') { const c = carry(v.major, v.minor + 1, 0); return `${c.major}.${c.minor}.0` }
-            const c = carry(v.major, v.minor, v.patch + 1); return `${c.major}.${c.minor}.${c.patch}`
-          }
+
           function bumpVersion(version, type) {
             const v = parse(version)
-            if (!v.tag) return bumpStable(version, type)
-            if (type === 'major') return `${v.major + 1}.0.0-${v.tag}.1`
-            if (type === 'minor') { const c = carry(v.major, v.minor + 1, 0); return `${c.major}.${c.minor}.0-${v.tag}.1` }
-            return `${v.major}.${v.minor}.${v.patch}-${v.tag}.${v.prerelease + 1}`
+            const t = ['major', 'minor', 'patch'].includes(type) ? type : 'patch'
+
+            if (t === 'major') return `${v.major + 1}.0.0`
+            if (t === 'minor') return `${v.major}.${v.minor + 1}.0`
+
+            if (v.pre) {
+              const parts = v.pre.split('.')
+              const last = parts[parts.length - 1]
+              const nextPre = /^\d+$/.test(last) ? Number(last) + 1 : 1
+              parts[parts.length - 1] = String(nextPre)
+              return `${v.major}.${v.minor}.${v.patch}-${parts.join('.')}`
+            }
+
+            return `${v.major}.${v.minor}.${v.patch + 1}`
           }
-          const next = bumpVersion(current, bump)
+
+          const next = bumpVersion(currentRaw, bump)
           pkg.version = next
           fs.writeFileSync(pkgPath, JSON.stringify(pkg, null, 2) + '\n')
-          console.log(`Version: ${current} -> ${next}`)
+          console.log(`Version: ${currentRaw} -> ${next}`)
           NODE
 
       - name: Commit and push
@@ -237,19 +257,31 @@ jobs:
           git push origin "v${VERSION}" || true
 
       - name: Publish to NPM
-        if: (steps.changes.outputs.changed == 'true' || github.event.inputs.force == 'true') && (github.event_name != 'workflow_dispatch' || github.event.inputs.publish == 'true')
+        if: >
+          (steps.changes.outputs.changed == 'true' || github.event.inputs.force == 'true')
+          && github.event_name == 'workflow_dispatch'
+          && github.event.inputs.publish == 'true'
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         shell: bash
         run: |
           VERSION=$(node -p 'require("./package.json").version')
           PACKAGE_NAME="@rexxhayanasi/elaina-baileys"
+
           echo "Preparing ${PACKAGE_NAME}@${VERSION}"
+
+          if [ -z "${NODE_AUTH_TOKEN}" ]; then
+            echo "NPM_TOKEN is missing. Skipping publish."
+            exit 0
+          fi
+
           if npm view "${PACKAGE_NAME}@${VERSION}" version >/dev/null 2>&1; then
             echo "${PACKAGE_NAME}@${VERSION} sudah tersedia di NPM."
             exit 0
           fi
+
           npm config set //registry.npmjs.org/:_authToken "${NODE_AUTH_TOKEN}"
+
           if [[ "$VERSION" == *"-"* ]]; then
             TAG=$(echo "$VERSION" | cut -d'-' -f2 | cut -d'.' -f1)
             echo "Publishing prerelease dengan npm tag: ${TAG}"
@@ -258,6 +290,7 @@ jobs:
             echo "Publishing stable release dengan npm tag: latest"
             npm publish --access public
           fi
+
           echo "Published ${PACKAGE_NAME}@${VERSION}"
 
       - name: Summary
