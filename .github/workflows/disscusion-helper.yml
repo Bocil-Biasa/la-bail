@@ -1,0 +1,400 @@
+
+name: Discussion Commands and Queue
+
+on:
+  discussion_comment:
+    types: [created]
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  discussions: write
+
+concurrency:
+  group: discussion-command-queue-${{ github.repository }}
+  queue: max
+
+jobs:
+  commands:
+    if: github.event_name == 'discussion_comment' && github.event.comment.user.type != 'Bot'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Process discussion command
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+          COMMENT_BODY: ${{ github.event.comment.body }}
+          COMMENT_AUTHOR: ${{ github.event.comment.user.login }}
+          DISCUSSION_NODE_ID: ${{ github.event.discussion.node_id }}
+          DISCUSSION_URL: ${{ github.event.discussion.html_url }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          USER_NAME="$COMMENT_AUTHOR"
+          REQUESTER_LABEL="requester-${USER_NAME,,}"
+          BODY="$(printf '%s' "$COMMENT_BODY" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+
+          reply() {
+            gh api graphql \
+              -f query='mutation($id: ID!, $body: String!) { addDiscussionComment(input: {discussionId: $id, body: $body}) { comment { id } } }' \
+              -F id="$DISCUSSION_NODE_ID" \
+              -F body="$1" >/dev/null
+          }
+
+          ensure_label() {
+            gh label create "$1" \
+              --color "${2:-2973B2}" \
+              --description "${3:-Created by Discussion Commands}" \
+              --force >/dev/null
+          }
+
+          get_pending() {
+            gh issue list \
+              --repo "$GH_REPO" \
+              --state open \
+              --label queue-pending \
+              --limit 100 \
+              --json number,title,body,createdAt \
+              --jq 'sort_by(.createdAt)'
+          }
+
+          show_help() {
+            reply "DISCUSSION COMMANDS
+
+/start
+Menampilkan panduan penggunaan.
+
+/help
+Menampilkan semua command.
+
+/cissue <judul>, <keterangan>, <label>
+Membuat issue dengan judul, keterangan, dan label.
+
+/cissue <keterangan>
+Membuat issue dengan judul otomatis.
+
+/bug <keterangan>
+Melaporkan bug.
+
+/feature <keterangan>
+Mengusulkan fitur.
+
+/test <keterangan>
+Mengirim permintaan pengujian.
+
+/queue
+Melihat antrean.
+
+/queue rv <nomor>
+Membatalkan antrean milik kamu berdasarkan posisi, misalnya /queue rv 1.
+
+/queue rv all
+Membatalkan semua antrean milik kamu yang masih menunggu.
+
+Command digunakan sebagai komentar di GitHub Discussion."
+          }
+
+          create_queue_item() {
+            local TYPE="$1"
+            local TITLE="$2"
+            local DESCRIPTION="$3"
+            local REQUESTED_LABEL="$4"
+            local QUEUE_BODY
+
+            ensure_label "queue-pending" "D97706" "Waiting to be processed"
+            ensure_label "queue-request" "6F42C1" "Request submitted through a Discussion"
+            ensure_label "$REQUESTER_LABEL" "2973B2" "Requester: $USER_NAME"
+
+            QUEUE_BODY="$(printf '%s\n' \
+              "Queue owner: @$USER_NAME" \
+              "Queue type: $TYPE" \
+              "Requested label: $REQUESTED_LABEL" \
+              "Source discussion: $DISCUSSION_URL" \
+              "" \
+              "Description:" \
+              "$DESCRIPTION")"
+
+            gh issue create \
+              --repo "$GH_REPO" \
+              --title "[QUEUE] $TITLE" \
+              --body "$QUEUE_BODY" \
+              --label queue-pending \
+              --label queue-request \
+              --label "$REQUESTER_LABEL" >/dev/null
+
+            reply "Request berhasil dimasukkan ke antrean.
+
+Jenis: $TYPE
+Judul: $TITLE
+Label: ${REQUESTED_LABEL:-otomatis}
+
+Gunakan /queue untuk melihat antrean."
+          }
+
+          if [[ "$BODY" == "/start" || "$BODY" == "/help" ]]; then
+            show_help
+            exit 0
+          fi
+
+          if [[ "$BODY" == "/queue" ]]; then
+            PENDING="$(get_pending)"
+
+            if [[ "$(jq 'length' <<< "$PENDING")" -eq 0 ]]; then
+              reply "Antrean sedang kosong."
+              exit 0
+            fi
+
+            LIST="$(jq -r 'to_entries[] | "\(.key + 1). #\(.value.number) \(.value.title)"' <<< "$PENDING")"
+            reply "DAFTAR ANTREAN
+
+$LIST
+
+Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
+            exit 0
+          fi
+
+          if [[ "$BODY" =~ ^/queue[[:space:]]+rv[[:space:]]+all$ ]]; then
+            PENDING="$(get_pending)"
+            NUMBERS="$(jq -r --arg owner "Queue owner: @$USER_NAME" '.[] | select(.body | split("\n") | index($owner)) | .number' <<< "$PENDING")"
+
+            if [[ -z "$NUMBERS" ]]; then
+              reply "Tidak ada antrean milik kamu yang menunggu."
+              exit 0
+            fi
+
+            ensure_label "queue-cancelled" "B60205" "Cancelled queue request"
+            CANCELLED=0
+
+            while IFS= read -r NUMBER; do
+              [[ -z "$NUMBER" ]] && continue
+              gh issue edit "$NUMBER" --repo "$GH_REPO" \
+                --remove-label queue-pending \
+                --add-label queue-cancelled
+              gh issue close "$NUMBER" --repo "$GH_REPO" >/dev/null
+              CANCELLED=$((CANCELLED + 1))
+            done <<< "$NUMBERS"
+
+            reply "Berhasil membatalkan $CANCELLED antrean milik kamu."
+            exit 0
+          fi
+
+          if [[ "$BODY" =~ ^/queue[[:space:]]+rv[[:space:]]+([0-9]+)$ ]]; then
+            POSITION="${BASH_REMATCH[1]}"
+
+            if (( POSITION < 1 )); then
+              reply "Nomor antrean harus dimulai dari 1."
+              exit 0
+            fi
+
+            PENDING="$(get_pending)"
+            NUMBER="$(jq -r --argjson pos "$POSITION" 'if $pos <= length then .[$pos - 1].number else empty end' <<< "$PENDING")"
+
+            if [[ -z "$NUMBER" ]]; then
+              reply "Antrean nomor $POSITION tidak ditemukan."
+              exit 0
+            fi
+
+            QUEUE_BODY="$(gh issue view "$NUMBER" --repo "$GH_REPO" --json body --jq '.body')"
+
+            if ! grep -Fqx "Queue owner: @$USER_NAME" <<< "$QUEUE_BODY"; then
+              reply "Kamu hanya bisa membatalkan antrean milik kamu sendiri."
+              exit 0
+            fi
+
+            ensure_label "queue-cancelled" "B60205" "Cancelled queue request"
+
+            gh issue edit "$NUMBER" --repo "$GH_REPO" \
+              --remove-label queue-pending \
+              --add-label queue-cancelled
+            gh issue close "$NUMBER" --repo "$GH_REPO" >/dev/null
+
+            reply "Antrean nomor $POSITION berhasil dibatalkan."
+            exit 0
+          fi
+
+          if [[ "$BODY" =~ ^/cissue([[:space:]]|$) ]]; then
+            ARGS="$(printf '%s' "$BODY" | sed -E 's#^/cissue[[:space:]]*##')"
+
+            if [[ -z "$ARGS" ]]; then
+              reply "Format:
+              
+/cissue <judul>, <keterangan>, <label>
+/cissue <keterangan>
+
+Contoh:
+/cissue Perbaiki README, Tambahkan petunjuk instalasi, documentation
+/cissue Tambahkan petunjuk instalasi pada README"
+              exit 0
+            fi
+
+            COMMA_COUNT="$(grep -o ',' <<< "$ARGS" | wc -l | tr -d ' ')"
+
+            if (( COMMA_COUNT >= 2 )); then
+              TITLE="${ARGS%%,*}"
+              REMAINDER="${ARGS#*,}"
+              REQUESTED_LABEL="${REMAINDER##*,}"
+              DESCRIPTION="${REMAINDER%,*}"
+
+              TITLE="$(sed 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$TITLE")"
+              DESCRIPTION="$(sed 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$DESCRIPTION")"
+              REQUESTED_LABEL="$(sed 's/^[[:space:]]*//;s/[[:space:]]*$//' <<< "$REQUESTED_LABEL")"
+            else
+              DESCRIPTION="$ARGS"
+              TITLE="$(printf '%s\n' "$DESCRIPTION" | head -n 1 | cut -c 1-80)"
+              REQUESTED_LABEL="task"
+            fi
+
+            if [[ -z "$TITLE" || -z "$DESCRIPTION" || -z "$REQUESTED_LABEL" ]]; then
+              reply "Format tidak lengkap. Gunakan /help."
+              exit 0
+            fi
+
+            create_queue_item "issue" "$TITLE" "$DESCRIPTION" "$REQUESTED_LABEL"
+            exit 0
+          fi
+
+          for TYPE in bug feature test; do
+            if [[ "$BODY" =~ ^/${TYPE}([[:space:]]|$) ]]; then
+              DESCRIPTION="$(printf '%s' "$BODY" | sed -E "s#^/${TYPE}[[:space:]]*##")"
+
+              if [[ -z "$DESCRIPTION" ]]; then
+                reply "Format: /$TYPE <keterangan>"
+                exit 0
+              fi
+
+              TITLE="$(printf '%s\n' "$DESCRIPTION" | head -n 1 | cut -c 1-80)"
+              create_queue_item "$TYPE" "$TITLE" "$DESCRIPTION" "$TYPE"
+              exit 0
+            fi
+          done
+
+          if [[ "$BODY" =~ ^/ ]]; then
+            reply "Command tidak dikenal. Gunakan /start atau /help."
+          fi
+
+  worker:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Process next queue item
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_REPO: ${{ github.repository }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          ensure_label() {
+            gh label create "$1" \
+              --color "${2:-2973B2}" \
+              --description "${3:-Created by Discussion Commands}" \
+              --force >/dev/null
+          }
+
+          QUEUE_NUMBER="$(gh issue list \
+            --repo "$GH_REPO" \
+            --state open \
+            --label queue-pending \
+            --limit 100 \
+            --json number,createdAt \
+            --jq 'sort_by(.createdAt) | .[0].number // empty')"
+
+          if [[ -z "$QUEUE_NUMBER" ]]; then
+            echo "No pending queue items."
+            exit 0
+          fi
+
+          QUEUE_BODY="$(gh issue view "$QUEUE_NUMBER" --repo "$GH_REPO" --json body --jq '.body')"
+          QUEUE_TITLE="$(gh issue view "$QUEUE_NUMBER" --repo "$GH_REPO" --json title --jq '.title')"
+
+          get_field() {
+            sed -n "s/^$1: //p" <<< "$QUEUE_BODY" | head -n 1
+          }
+
+          OWNER="$(get_field "Queue owner")"
+          TYPE="$(get_field "Queue type")"
+          REQUESTED_LABEL="$(get_field "Requested label")"
+          DESCRIPTION="$(awk 'found {print} /^Description:$/ {found=1}' <<< "$QUEUE_BODY")"
+          TITLE="${QUEUE_TITLE#\[QUEUE\] }"
+
+          if [[ -z "$OWNER" || -z "$TYPE" || -z "$DESCRIPTION" ]]; then
+            ensure_label "queue-failed" "B60205" "Queue item could not be processed"
+            gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
+              --remove-label queue-pending \
+              --add-label queue-failed
+            gh issue close "$QUEUE_NUMBER" --repo "$GH_REPO" >/dev/null
+            echo "Queue metadata is incomplete."
+            exit 1
+          fi
+
+          USER_NAME="${OWNER#@}"
+          REQUESTER_LABEL="requester-${USER_NAME,,}"
+
+          SINCE="$(date -u -d '1 hour ago' '+%Y-%m-%dT%H:%M:%SZ')"
+          RECENT_COUNT="$(gh issue list \
+            --repo "$GH_REPO" \
+            --state all \
+            --search "label:from-discussion label:$REQUESTER_LABEL" \
+            --limit 100 \
+            --json number,createdAt \
+            --jq --arg since "$SINCE" '[.[] | select(.createdAt >= $since)] | length')"
+
+          if (( RECENT_COUNT >= 3 )); then
+            ensure_label "queue-rate-limited" "B60205" "Request exceeded the hourly limit"
+            gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
+              --remove-label queue-pending \
+              --add-label queue-rate-limited
+            gh issue close "$QUEUE_NUMBER" \
+              --repo "$GH_REPO" \
+              --comment "Permintaan dibatalkan karena batas 3 issue per pengguna per jam telah tercapai."
+            exit 0
+          fi
+
+          ensure_label "queue-processing" "1D76DB" "Currently processing"
+          gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
+            --remove-label queue-pending \
+            --add-label queue-processing
+
+          ensure_label "from-discussion" "2973B2" "Created from a GitHub Discussion"
+          ensure_label "$REQUESTER_LABEL" "2973B2" "Requester: $USER_NAME"
+          ensure_label "$TYPE" "6F42C1" "Category: $TYPE"
+
+          if [[ -n "$REQUESTED_LABEL" && "$TYPE" == "issue" ]]; then
+            ensure_label "$REQUESTED_LABEL"
+          fi
+
+          ISSUE_BODY="$(printf '%s\n\n' \
+            "$DESCRIPTION" \
+            "---" \
+            "Requested by: @$USER_NAME" \
+            "Source: GitHub Discussion queue item #$QUEUE_NUMBER")"
+
+          LABEL_ARGS=(--label from-discussion --label "$REQUESTER_LABEL" --label "$TYPE")
+
+          if [[ -n "$REQUESTED_LABEL" && "$TYPE" == "issue" ]]; then
+            LABEL_ARGS+=(--label "$REQUESTED_LABEL")
+          fi
+
+          NEW_ISSUE_URL="$(gh issue create \
+            --repo "$GH_REPO" \
+            --title "$TITLE" \
+            --body "$ISSUE_BODY" \
+            "${LABEL_ARGS[@]}")"
+
+          ensure_label "queue-completed" "0E8A16" "Queue item completed"
+
+          gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
+            --remove-label queue-processing \
+            --add-label queue-completed
+
+          gh issue close "$QUEUE_NUMBER" \
+            --repo "$GH_REPO" \
+            --comment "Request berhasil diproses: $NEW_ISSUE_URL"
+
+          echo "Created issue: $NEW_ISSUE_URL"
