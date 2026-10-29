@@ -17,10 +17,6 @@ permissions:
   issues: write
   discussions: write
 
-concurrency:
-  group: discussion-command-queue-${{ github.repository }}
-  queue: max
-
 jobs:
   commands:
     if: ${{ github.event_name == 'discussion_comment' && github.event.comment.user.type != 'Bot' }}
@@ -46,8 +42,8 @@ jobs:
           reply() {
             gh api graphql \
               -f query='mutation($id: ID!, $body: String!) { addDiscussionComment(input: {discussionId: $id, body: $body}) { comment { id } } }' \
-              -F id="$DISCUSSION_NODE_ID" \
-              -F body="$1" >/dev/null
+              -f id="$DISCUSSION_NODE_ID" \
+              -f body="$1" >/dev/null
           }
 
           ensure_label() {
@@ -70,37 +66,37 @@ jobs:
           show_help() {
             reply "DISCUSSION COMMANDS
 
-/start
-Menampilkan panduan penggunaan.
+          /start
+          Menampilkan panduan penggunaan.
 
-/help
-Menampilkan semua command.
+          /help
+          Menampilkan semua command.
 
-/cissue <judul>, <keterangan>, <label>
-Membuat issue dengan judul, keterangan, dan label.
+          /cissue <judul>, <keterangan>, <label>
+          Membuat issue dengan judul, keterangan, dan label.
 
-/cissue <keterangan>
-Membuat issue dengan judul otomatis.
+          /cissue <keterangan>
+          Membuat issue dengan judul otomatis.
 
-/bug <keterangan>
-Melaporkan bug.
+          /bug <keterangan>
+          Melaporkan bug.
 
-/feature <keterangan>
-Mengusulkan fitur.
+          /feature <keterangan>
+          Mengusulkan fitur.
 
-/test <keterangan>
-Mengirim permintaan pengujian.
+          /test <keterangan>
+          Mengirim permintaan pengujian.
 
-/queue
-Melihat antrean.
+          /queue
+          Melihat antrean.
 
-/queue rv <nomor>
-Membatalkan antrean milik kamu berdasarkan posisi, misalnya /queue rv 1.
+          /queue rv <nomor>
+          Membatalkan antrean milik kamu berdasarkan posisi, misalnya /queue rv 1.
 
-/queue rv all
-Membatalkan semua antrean milik kamu yang masih menunggu.
+          /queue rv all
+          Membatalkan semua antrean milik kamu yang masih menunggu.
 
-Command digunakan sebagai komentar di GitHub Discussion."
+          Command digunakan sebagai komentar di GitHub Discussion."
           }
 
           create_queue_item() {
@@ -113,6 +109,7 @@ Command digunakan sebagai komentar di GitHub Discussion."
             ensure_label "queue-request" "6F42C1" "Request submitted through a Discussion"
             ensure_label "$REQUESTER_LABEL" "2973B2" "Requester: $USER_NAME"
 
+            local QUEUE_BODY
             QUEUE_BODY="$(printf '%s\n' \
               "Queue owner: @$USER_NAME" \
               "Queue type: $TYPE" \
@@ -132,11 +129,11 @@ Command digunakan sebagai komentar di GitHub Discussion."
 
             reply "Request berhasil dimasukkan ke antrean.
 
-Jenis: $TYPE
-Judul: $TITLE
-Label: ${REQUESTED_LABEL:-otomatis}
+          Jenis: $TYPE
+          Judul: $TITLE
+          Label: ${REQUESTED_LABEL:-otomatis}
 
-Gunakan /queue untuk melihat antrean."
+          Gunakan /queue untuk melihat antrean."
           }
 
           if [[ "$BODY" == "/start" || "$BODY" == "/help" ]]; then
@@ -156,15 +153,15 @@ Gunakan /queue untuk melihat antrean."
 
             reply "DAFTAR ANTREAN
 
-$LIST
+          $LIST
 
-Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
+          Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
             exit 0
           fi
 
           if [[ "$BODY" =~ ^/queue[[:space:]]+rv[[:space:]]+all$ ]]; then
             PENDING="$(get_pending)"
-            NUMBERS="$(jq -r --arg owner "Queue owner: @$USER_NAME" '.[] | select(.body | split("\n") | index($owner)) | .number' <<< "$PENDING")"
+            NUMBERS="$(jq -r --arg owner "Queue owner: @$USER_NAME" '.[] | select((.body | split("\n") | map(rtrimstr("\r"))) | index($owner)) | .number' <<< "$PENDING")"
 
             if [[ -z "$NUMBERS" ]]; then
               reply "Tidak ada antrean milik kamu yang menunggu."
@@ -178,8 +175,8 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
               [[ -z "$NUMBER" ]] && continue
               gh issue edit "$NUMBER" --repo "$GH_REPO" \
                 --remove-label queue-pending \
-                --add-label queue-cancelled
-              gh issue close "$NUMBER" --repo "$GH_REPO" >/dev/null
+                --add-label queue-cancelled </dev/null >/dev/null
+              gh issue close "$NUMBER" --repo "$GH_REPO" </dev/null >/dev/null
               CANCELLED=$((CANCELLED + 1))
             done <<< "$NUMBERS"
 
@@ -188,7 +185,7 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
           fi
 
           if [[ "$BODY" =~ ^/queue[[:space:]]+rv[[:space:]]+([0-9]+)$ ]]; then
-            POSITION="${BASH_REMATCH[1]}"
+            POSITION="$((10#${BASH_REMATCH[1]}))"
 
             if (( POSITION < 1 )); then
               reply "Nomor antrean harus dimulai dari 1."
@@ -203,9 +200,9 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
               exit 0
             fi
 
-            QUEUE_BODY="$(gh issue view "$NUMBER" --repo "$GH_REPO" --json body --jq '.body')"
+            QUEUE_BODY="$(gh issue view "$NUMBER" --repo "$GH_REPO" --json body --jq '.body' | tr -d '\r')"
 
-            if ! grep -Fqx "Queue owner: @$USER_NAME" <<< "$QUEUE_BODY"; then
+            if ! grep -Fqx -- "Queue owner: @$USER_NAME" <<< "$QUEUE_BODY"; then
               reply "Kamu hanya bisa membatalkan antrean milik kamu sendiri."
               exit 0
             fi
@@ -214,7 +211,7 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
 
             gh issue edit "$NUMBER" --repo "$GH_REPO" \
               --remove-label queue-pending \
-              --add-label queue-cancelled
+              --add-label queue-cancelled >/dev/null
             gh issue close "$NUMBER" --repo "$GH_REPO" >/dev/null
 
             reply "Antrean nomor $POSITION berhasil dibatalkan."
@@ -227,16 +224,17 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
             if [[ -z "$ARGS" ]]; then
               reply "Format:
 
-/cissue <judul>, <keterangan>, <label>
-/cissue <keterangan>
+          /cissue <judul>, <keterangan>, <label>
+          /cissue <keterangan>
 
-Contoh:
-/cissue Perbaiki README, Tambahkan petunjuk instalasi, documentation
-/cissue Tambahkan petunjuk instalasi pada README"
+          Contoh:
+          /cissue Perbaiki README, Tambahkan petunjuk instalasi, documentation
+          /cissue Tambahkan petunjuk instalasi pada README"
               exit 0
             fi
 
-            COMMA_COUNT="$(grep -o ',' <<< "$ARGS" | wc -l | tr -d ' ')"
+            COMMAS="${ARGS//[^,]/}"
+            COMMA_COUNT="${#COMMAS}"
 
             if (( COMMA_COUNT >= 2 )); then
               TITLE="${ARGS%%,*}"
@@ -284,6 +282,9 @@ Contoh:
   worker:
     if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
+    concurrency:
+      group: discussion-queue-worker-${{ github.repository }}
+      cancel-in-progress: false
 
     steps:
       - name: Process next queue item
@@ -314,7 +315,7 @@ Contoh:
             exit 0
           fi
 
-          QUEUE_BODY="$(gh issue view "$QUEUE_NUMBER" --repo "$GH_REPO" --json body --jq '.body')"
+          QUEUE_BODY="$(gh issue view "$QUEUE_NUMBER" --repo "$GH_REPO" --json body --jq '.body' | tr -d '\r')"
           QUEUE_TITLE="$(gh issue view "$QUEUE_NUMBER" --repo "$GH_REPO" --json title --jq '.title')"
 
           get_field() {
@@ -331,7 +332,7 @@ Contoh:
             ensure_label "queue-failed" "B60205" "Queue item could not be processed"
             gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
               --remove-label queue-pending \
-              --add-label queue-failed
+              --add-label queue-failed >/dev/null
             gh issue close "$QUEUE_NUMBER" --repo "$GH_REPO" >/dev/null
             echo "Queue metadata is incomplete."
             exit 1
@@ -344,26 +345,27 @@ Contoh:
           RECENT_COUNT="$(gh issue list \
             --repo "$GH_REPO" \
             --state all \
-            --search "label:from-discussion label:$REQUESTER_LABEL" \
+            --label from-discussion \
+            --label "$REQUESTER_LABEL" \
             --limit 100 \
             --json number,createdAt \
-            --jq --arg since "$SINCE" '[.[] | select(.createdAt >= $since)] | length')"
+            | jq --arg since "$SINCE" '[.[] | select(.createdAt >= $since)] | length')"
 
           if (( RECENT_COUNT >= 3 )); then
             ensure_label "queue-rate-limited" "B60205" "Request exceeded the hourly limit"
             gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
               --remove-label queue-pending \
-              --add-label queue-rate-limited
+              --add-label queue-rate-limited >/dev/null
             gh issue close "$QUEUE_NUMBER" \
               --repo "$GH_REPO" \
-              --comment "Permintaan dibatalkan karena batas 3 issue per pengguna per jam telah tercapai."
+              --comment "Permintaan dibatalkan karena batas 3 issue per pengguna per jam telah tercapai." >/dev/null
             exit 0
           fi
 
           ensure_label "queue-processing" "1D76DB" "Currently processing"
           gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
             --remove-label queue-pending \
-            --add-label queue-processing
+            --add-label queue-processing >/dev/null
 
           ensure_label "from-discussion" "2973B2" "Created from a GitHub Discussion"
           ensure_label "$REQUESTER_LABEL" "2973B2" "Requester: $USER_NAME"
@@ -373,8 +375,9 @@ Contoh:
             ensure_label "$REQUESTED_LABEL"
           fi
 
-          ISSUE_BODY="$(printf '%s\n\n' \
+          ISSUE_BODY="$(printf '%s\n' \
             "$DESCRIPTION" \
+            "" \
             "---" \
             "Requested by: @$USER_NAME" \
             "Source: GitHub Discussion queue item #$QUEUE_NUMBER")"
@@ -395,10 +398,10 @@ Contoh:
 
           gh issue edit "$QUEUE_NUMBER" --repo "$GH_REPO" \
             --remove-label queue-processing \
-            --add-label queue-completed
+            --add-label queue-completed >/dev/null
 
           gh issue close "$QUEUE_NUMBER" \
             --repo "$GH_REPO" \
-            --comment "Request berhasil diproses: $NEW_ISSUE_URL"
+            --comment "Request berhasil diproses: $NEW_ISSUE_URL" >/dev/null
 
           echo "Created issue: $NEW_ISSUE_URL"
