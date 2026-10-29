@@ -1,7 +1,11 @@
-
 name: Discussion Commands and Queue
 
 on:
+  push:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/disscusion-helper.yml'
   discussion_comment:
     types: [created]
   schedule:
@@ -19,7 +23,7 @@ concurrency:
 
 jobs:
   commands:
-    if: github.event_name == 'discussion_comment' && github.event.comment.user.type != 'Bot'
+    if: ${{ github.event_name == 'discussion_comment' && github.event.comment.user.type != 'Bot' }}
     runs-on: ubuntu-latest
 
     steps:
@@ -35,9 +39,9 @@ jobs:
         run: |
           set -euo pipefail
 
-          USER_NAME="$COMMENT_AUTHOR"
+          USER_NAME="${COMMENT_AUTHOR}"
           REQUESTER_LABEL="requester-${USER_NAME,,}"
-          BODY="$(printf '%s' "$COMMENT_BODY" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
+          BODY="$(printf '%s' "${COMMENT_BODY}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//')"
 
           reply() {
             gh api graphql \
@@ -104,7 +108,6 @@ Command digunakan sebagai komentar di GitHub Discussion."
             local TITLE="$2"
             local DESCRIPTION="$3"
             local REQUESTED_LABEL="$4"
-            local QUEUE_BODY
 
             ensure_label "queue-pending" "D97706" "Waiting to be processed"
             ensure_label "queue-request" "6F42C1" "Request submitted through a Discussion"
@@ -150,6 +153,7 @@ Gunakan /queue untuk melihat antrean."
             fi
 
             LIST="$(jq -r 'to_entries[] | "\(.key + 1). #\(.value.number) \(.value.title)"' <<< "$PENDING")"
+
             reply "DAFTAR ANTREAN
 
 $LIST
@@ -222,7 +226,7 @@ Gunakan /queue rv <nomor> untuk membatalkan antrean milik kamu."
 
             if [[ -z "$ARGS" ]]; then
               reply "Format:
-              
+
 /cissue <judul>, <keterangan>, <label>
 /cissue <keterangan>
 
@@ -278,7 +282,7 @@ Contoh:
           fi
 
   worker:
-    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    if: ${{ github.event_name == 'schedule' || github.event_name == 'workflow_dispatch' }}
     runs-on: ubuntu-latest
 
     steps:
