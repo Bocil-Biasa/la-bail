@@ -1189,6 +1189,24 @@ class ButtonV2 extends BaseBuilder {
 		return this;
 	}
 
+	setPriceTag(amount = 0, currency = 'IDR') {
+		this._headerType = 'product';
+		this._price = amount;
+		this._currency = currency;
+		return this;
+	}
+
+	setProduct({ title, description, price = 0, currency = 'IDR', businessOwnerJid, image } = {}) {
+		this._headerType = 'product';
+		if (title) this._title = title;
+		if (description) this._subtitle = description;
+		this._price = price;
+		this._currency = currency;
+		this._businessOwnerJid = businessOwnerJid;
+		if (image) this._image = image;
+		return this;
+	}
+
 	async toCard() {
 		let header = {
 			title: this._title || undefined,
@@ -1199,7 +1217,7 @@ class ButtonV2 extends BaseBuilder {
 		if (this._data) {
 			const preparedMedia =
 				typeof this._data === 'object' &&
-				(this._data.imageMessage || this._data.videoMessage || this._data.documentMessage || this._data.locationMessage)
+				(this._data.imageMessage || this._data.videoMessage || this._data.documentMessage || this._data.locationMessage || this._data.productMessage)
 					? this._data
 					: await prepareWAMessageMedia(this._data, { upload: this.#client.waUploadToServer }).catch((e) => {
 							if (String(e).includes('Invalid media type')) return this._data;
@@ -1209,6 +1227,43 @@ class ButtonV2 extends BaseBuilder {
 				...header,
 				hasMediaAttachment: true,
 				...preparedMedia,
+			};
+		} else if (this._headerType === 'product' || this._price !== undefined) {
+			let _thumbnail = null;
+			try {
+				if (this._image?.is_raw) {
+					_thumbnail = Buffer.isBuffer(this._image.base64)
+						? this._image.base64
+						: Buffer.from(this._image.base64, 'base64');
+				} else if (this._image) {
+					const buf = Buffer.isBuffer(this._image)
+						? this._image
+						: typeof this._image === 'string' && this._image.startsWith('data:')
+							? Buffer.from(this._image.split(',')[1], 'base64')
+							: await Toolkit.fetchBuffer(this._image, {}, { silent: true });
+					if (buf) {
+						_thumbnail = await Toolkit.resize(buf, 300, 300).catch(() => buf);
+					}
+				}
+			} catch {}
+
+			header = {
+				...header,
+				hasMediaAttachment: true,
+				productMessage: {
+					product: {
+						productImage: _thumbnail ? { jpegThumbnail: _thumbnail } : undefined,
+						productId: 'product_' + (this._title ? this._title.toLowerCase().replace(/[^a-z0-9]/g, '_') : 'bot'),
+						title: this._title || 'LecyMD Bot',
+						description: this._subtitle || 'WhatsApp Multi-Device Bot',
+						currencyCode: this._currency || 'IDR',
+						priceAmount1000: Math.round(Number(this._price || 0) * 1000),
+						retailerId: 'LecyMD',
+						url: 'https://github.com/Bocil-Biasa/LecyMD',
+						productImageCount: 1,
+					},
+					businessOwnerJid: this._businessOwnerJid || '6283892198234@s.whatsapp.net',
+				},
 			};
 		} else if (this._image) {
 			let _thumbnail = null;
@@ -3794,7 +3849,7 @@ class AIRich extends BaseBuilder {
 	}
 }
 
-export { VERSION, VERSION as MESSAGE_BUILDER_VERSION, Button, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
+export { VERSION, VERSION as MESSAGE_BUILDER_VERSION, ButtonV2 as Button, Button as ButtonLegacy, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
 
 export const MessageBuilder = { VERSION, Button: ButtonV2, ButtonLegacy: Button, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
 export const MB = MessageBuilder;
