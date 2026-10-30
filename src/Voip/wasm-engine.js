@@ -445,27 +445,33 @@ export class WasmEngine {
         let result;
 
         try {
-            console.log("[VOIP STATE]", {
-                callId: options.callId,
-                groupJid: options.groupJid,
-                isVideo: options.isVideo ?? false,
-                isLightWeight: options.isLightWeight ?? false,
-                scheduleId: options.scheduleId ?? "",
-                chatName: options.chatName ?? "",
-                chatIcon: options.chatIcon ?? "",
-                callFromUI: options.callFromUI ?? 0,
-                lobbyEntryType: options.lobbyEntryType ?? 0,
-                username: options.username ?? ""
-            });
+            // FIX: log ini sebelumnya nggak di-gate `enableLogs` (beda dari pola
+            // di tempat lain di file ini, mis. baris ~879/~1095) — jadi selalu
+            // nyala di produksi dan nge-print metadata call (groupJid, chatName,
+            // username) ke console tiap startGroupCall() dipanggil.
+            if (this.#config.enableLogs) {
+                console.log("[VOIP STATE]", {
+                    callId: options.callId,
+                    groupJid: options.groupJid,
+                    isVideo: options.isVideo ?? false,
+                    isLightWeight: options.isLightWeight ?? false,
+                    scheduleId: options.scheduleId ?? "",
+                    chatName: options.chatName ?? "",
+                    chatIcon: options.chatIcon ?? "",
+                    callFromUI: options.callFromUI ?? 0,
+                    lobbyEntryType: options.lobbyEntryType ?? 0,
+                    username: options.username ?? ""
+                });
 
-            console.log("[VOIP INSTANCE]", {
-                startVoipGroupCall: typeof this.#instance.startVoipGroupCall,
-                own: Object.getOwnPropertyNames(this.#instance)
-                    .filter(x => /voip|call|rtc|debug/i.test(x)),
-                proto: Object.getOwnPropertyNames(
-                    Object.getPrototypeOf(this.#instance)
-                ).filter(x => /voip|call|rtc|debug/i.test(x))
-            });
+                console.log("[VOIP INSTANCE]", {
+                    startVoipGroupCall: typeof this.#instance.startVoipGroupCall,
+                    own: Object.getOwnPropertyNames(this.#instance)
+                        .filter(x => /voip|call|rtc|debug/i.test(x)),
+                    proto: Object.getOwnPropertyNames(
+                        Object.getPrototypeOf(this.#instance)
+                    ).filter(x => /voip|call|rtc|debug/i.test(x))
+                });
+            }
             result = this.#instance.startVoipGroupCall(
                 pnUserJids, 
                 lidUserJids, 
@@ -482,20 +488,24 @@ export class WasmEngine {
                 options.username ?? ""
             );
 
-            console.log("[VOIP NATIVE RESULT]", result);
-
-            try {
-                console.log(
-                    "[VOIP DEBUG STAT]",
-                    this.#instance.getDebugStatisticString()
-                );
-            } catch (e) {
-                console.log("[VOIP DEBUG STAT ERROR]", e);
+            if (this.#config.enableLogs) {
+                console.log("[VOIP NATIVE RESULT]", result);
+                try {
+                    // FIX: getDebugStatisticString() dipanggil tiap startGroupCall()
+                    // walau hasilnya cuma dibuang kalau logging mati — sekarang
+                    // cuma jalan pas enableLogs true, ngurangin kerja native tiap call.
+                    console.log(
+                        "[VOIP DEBUG STAT]",
+                        this.#instance.getDebugStatisticString()
+                    );
+                } catch (e) {
+                    console.log("[VOIP DEBUG STAT ERROR]", e);
+                }
             }
 
             return result;
         } catch (e) {
-            console.log("[VOIP NATIVE THROW]", e);
+            if (this.#config.enableLogs) console.log("[VOIP NATIVE THROW]", e);
             throw e;
         } finally {
             pnUserJids?.delete?.();
@@ -1296,10 +1306,15 @@ export class WasmEngine {
                 spawnThread: (params) => {
                     const worker = this.#unusedWorkers.pop();
 
-                    console.log("[PTHREAD SPAWN]", {
-                        pthread_ptr: params.pthread_ptr,
-                        available: this.#unusedWorkers.length
-                    });
+                    // FIX: sama kayak di atas — gate ke enableLogs. Ini dipanggil
+                    // berkali-kali tiap ada worker thread baru selama 1 call aktif,
+                    // jadi kalau nggak di-gate bisa jadi log-spam yang lumayan berat.
+                    if (this.#config.enableLogs) {
+                        console.log("[PTHREAD SPAWN]", {
+                            pthread_ptr: params.pthread_ptr,
+                            available: this.#unusedWorkers.length
+                        });
+                    }
                     if (!worker) {
                         console.error("[PTHREAD SPAWN] ❌ NO WORKER");
                         return 6;

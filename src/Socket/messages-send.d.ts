@@ -39,6 +39,11 @@ export function makeMessagesSocket(config: any): {
         video: any;
         caption?: string;
     }, options?: any) => Promise<any>;
+    editMessage: (jid: string, key: any, newContent: any, options?: any) => Promise<any>;
+    pinMessage: (jid: string, key: any, type?: number, time?: number, options?: any) => Promise<any>;
+    sendAlbumMessage: (jid: string, medias: any[], options?: any) => Promise<any>;
+    sendStatusMention: (content: any, jids?: string[], options?: any) => Promise<any>;
+    starMessage: (jid: string, messages: any[], isStar?: boolean) => Promise<any>;
     sendReceipt: (jid: any, participant: any, messageIds: any, type: any) => Promise<void>;
     sendReceipts: (keys: any, type: any) => Promise<void>;
     readMessages: (keys: any) => Promise<void>;

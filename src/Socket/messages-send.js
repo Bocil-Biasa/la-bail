@@ -1154,7 +1154,7 @@ export const makeMessagesSocket = (config) => {
     };
     const sendImgVid = async (jid, content, options = {}) => {
         const userJid = authState.creds.me.id;
-        const { image, video, caption } = content;
+        const { image, video, caption, ...restContent } = content;
         if (!image || !video) {
             throw new Boom('sendImgVid needs { image, video }', { statusCode: 400 });
         }
@@ -1177,10 +1177,10 @@ export const makeMessagesSocket = (config) => {
                 process.nextTick(() => { messageMutex.mutex(() => upsertMessage(message, 'append')); });
             }
         };
-        const parent = await generateWAMessage(jid, { image, caption }, { ...genOpts, messageId: generateMessageIDV2(userJid) });
+        const parent = await generateWAMessage(jid, { image, caption, ...restContent }, { ...genOpts, messageId: generateMessageIDV2(userJid) });
         await relayMessage(jid, parent.message, { messageId: parent.key.id, ...relayOpts });
         emit(parent);
-        const child = await generateWAMessage(jid, { video }, { ...genOpts, messageId: generateMessageIDV2(userJid) });
+        const child = await generateWAMessage(jid, { video, mimetype: 'video/mp4' }, { ...genOpts, messageId: generateMessageIDV2(userJid) });
         child.message.messageContextInfo = { ...(child.message.messageContextInfo || {}), messageAssociation: { associationType: AssociationType.MOTION_PHOTO, parentMessageKey: parent.key } };
         await relayMessage(jid, child.message, { messageId: child.key.id, ...relayOpts });
         emit(child);
@@ -1195,6 +1195,75 @@ export const makeMessagesSocket = (config) => {
         relayMessage,
         sendHD,
         sendImgVid,
+        rejectCall: async (callId, callCreator) => {
+            await sendNode({
+                tag: 'call',
+                attrs: {
+                    from: authState.creds.me.id,
+                    to: callCreator,
+                },
+                content: [
+                    {
+                        tag: 'reject',
+                        attrs: {
+                            'call-id': callId,
+                            'call-creator': callCreator,
+                            count: '0',
+                        },
+                        content: undefined
+                    }
+                ]
+            });
+        },
+        sendPoll: async (jid, poll, options = {}) => {
+            return await sendMessage(jid, {
+                poll: {
+                    name: poll.name,
+                    values: poll.values,
+                    selectableCount: poll.selectableCount || 1,
+                    toAnnouncementGroup: poll.toAnnouncementGroup,
+                },
+                ...options
+            }, options);
+        },
+        sendContact: async (jid, contact, options = {}) => {
+            const displayName = contact.displayName || contact.name || 'Contact';
+            const number = String(contact.number || '').replace(/[^0-9]/g, '');
+            const vcard = contact.vcard || `BEGIN:VCARD\nVERSION:3.0\nFN:${displayName}\nTEL;type=CELL;type=VOICE;waid=${number}:+${number}\nEND:VCARD`;
+            return await sendMessage(jid, {
+                contacts: {
+                    displayName,
+                    contacts: [{ vcard }]
+                },
+                ...options
+            }, options);
+        },
+        editMessage: async (jid, key, newContent, options = {}) => {
+            const editContent = typeof newContent === 'string' ? { text: newContent } : newContent;
+            return await sendMessage(jid, {
+                edit: key,
+                ...editContent
+            }, options);
+        },
+        pinMessage: async (jid, key, type = 1, time = 86400, options = {}) => {
+            return await sendMessage(jid, {
+                pin: key,
+                type,
+                time
+            }, options);
+        },
+        sendAlbumMessage: async (jid, medias, options = {}) => {
+            return await sendMessage(jid, {
+                album: medias,
+                ...options
+            }, options);
+        },
+        sendStatusMention: async (content, jids = [], options = {}) => {
+            return await sendMessage(jids, content, options);
+        },
+        starMessage: async (jid, messages, isStar = true) => {
+            return await sock.star(jid, messages, isStar);
+        },
         outboundResendCache,
         sendReceipt,
         sendReceipts,
@@ -1202,6 +1271,8 @@ export const makeMessagesSocket = (config) => {
         refreshMediaConn,
 
         getMediaHost: () => mediaHost,
+        getPNForLID: (lid) => signalRepository.lidMapping.getPNForLID(lid),
+        getLIDForPN: (pn) => signalRepository.lidMapping.getLIDForPN(pn),
         waUploadToServer,
         fetchPrivacySettings,
         sendPeerDataOperationMessage,

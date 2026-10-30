@@ -57,3 +57,5 @@ Baca file itu dulu sebelum merilis apa pun yang bergantung pada API channel yang
 ## Lisensi dan kredit
 
 La-Bail adalah library WhatsApp Multi-Device untuk Node.js, di-fork dari `@rexxhayanasi/elaina-baileys` yang merupakan fork dari `WhiskeySockets/Baileys`. Pemberitahuan upstream dan lisensi MIT disimpan di `LICENSE` dan `NOTICE.md`, dan daftar kredit pengembang ada di README repositori.
+
+- [Metadata moderasi](./moderation-hooks.html) — metadata pesan dan batasan deteksi status grup

@@ -975,70 +975,169 @@ class ButtonV2 extends BaseBuilder {
 		}
 
 		this.#client = client;
-		this._image;
-		this._data;
+		this._image = undefined;
+		this._data = undefined;
 		this._buttons = [];
+		this._currentSelectionIndex = -1;
+		this._currentSectionIndex = -1;
 	}
 
 	loadFrom(msg) {
-		if (!msg) throw new Error('buttonsMessage needed');
-		if (!msg.buttonsMessage) throw new Error('buttonsMessage not found');
+		if (!msg) throw new Error('Message needed');
+		const normalized = msg.interactiveMessage || msg.viewOnceMessage?.message?.interactiveMessage || msg.buttonsMessage;
+		if (!normalized) throw new Error('interactiveMessage or buttonsMessage not found');
 
-		const { buttonsMessage, ...extraPayload } = msg;
-		const bM = buttonsMessage;
+		const { ...extraPayload } = msg;
+		this._extraPayload = extraPayload;
+
+		if (msg.interactiveMessage || msg.viewOnceMessage?.message?.interactiveMessage) {
+			const iM = msg.interactiveMessage || msg.viewOnceMessage.message.interactiveMessage;
+			this._title = iM.header?.title || iM.header?.locationMessage?.name || '';
+			this._subtitle = iM.header?.subtitle || iM.header?.locationMessage?.address || '';
+			this._body = iM.body?.text || '';
+			this._footer = iM.footer?.text || '';
+			this._contextInfo = iM.contextInfo || {};
+			this._buttons = Array.isArray(iM.nativeFlowMessage?.buttons)
+				? iM.nativeFlowMessage.buttons.map((b) => ({
+						name: b.name,
+						buttonParamsJson: typeof b.buttonParamsJson === 'string' ? b.buttonParamsJson : JSON.stringify(b.buttonParamsJson || {}),
+				  }))
+				: [];
+			this._image = iM.header?.locationMessage?.jpegThumbnail || iM.header?.jpegThumbnail || undefined;
+			return this;
+		}
+
+		// Fallback for legacy buttonsMessage
+		const bM = msg.buttonsMessage;
 		const location = bM.locationMessage || {};
-
 		this._title = location.name || '';
 		this._subtitle = location.address || '';
 		this._body = bM.contentText || '';
 		this._footer = bM.footerText || '';
 		this._contextInfo = bM.contextInfo || {};
-		this._extraPayload = extraPayload;
-
 		this._buttons = Array.isArray(bM.buttons)
 			? bM.buttons.map((button) => ({
-					...button,
-					...(button.nativeFlowInfo
-						? {
-								nativeFlowInfo: {
-									...button.nativeFlowInfo,
-									paramsJson: typeof button.nativeFlowInfo.paramsJson === 'string' ? button.nativeFlowInfo.paramsJson : JSON.stringify(button.nativeFlowInfo.paramsJson || {}),
-								},
-							}
-						: {}),
-				}))
+					name: button.nativeFlowInfo?.name || 'quick_reply',
+					buttonParamsJson:
+						typeof button.nativeFlowInfo?.paramsJson === 'string'
+							? button.nativeFlowInfo.paramsJson
+							: JSON.stringify({
+									display_text: button.buttonText?.displayText || '',
+									id: button.buttonId || '',
+							  }),
+			  }))
 			: [];
-
 		this._image = location.jpegThumbnail || undefined;
+		return this;
+	}
 
-		if (!this._image && bM.locationMessage) {
-			this._image = undefined;
-		}
-
-		if (!bM.locationMessage && bM.headerType === 6) {
-			this._image = undefined;
-		}
-
-		this._data = Object.keys(bM).reduce((data, key) => {
-			if (!['contentText', 'footerText', 'contextInfo', 'buttons', 'headerType', 'locationMessage', 'viewOnce'].includes(key)) {
-				data[key] = bM[key];
-			}
-			return data;
-		}, {});
-
-		if (!Object.keys(this._data).length) {
-			this._data = undefined;
-		}
-
+	clearButtons() {
+		this._buttons = [];
+		this._currentSelectionIndex = -1;
+		this._currentSectionIndex = -1;
 		return this;
 	}
 
 	addButton(displayText = '', buttonId = crypto.randomUUID()) {
 		this._buttons.push({
-			buttonId,
-			buttonText: { displayText },
-			type: 1,
+			name: 'quick_reply',
+			buttonParamsJson: JSON.stringify({
+				display_text: String(displayText),
+				id: String(buttonId),
+			}),
 		});
+		return this;
+	}
+
+	addReply(displayText = '', id = crypto.randomUUID(), options = {}) {
+		this._buttons.push({
+			name: 'quick_reply',
+			buttonParamsJson: JSON.stringify({
+				display_text: String(displayText),
+				id: String(id),
+				...options,
+			}),
+		});
+		return this;
+	}
+
+	addUrl(displayText = '', url = '', options = {}) {
+		this._buttons.push({
+			name: 'cta_url',
+			buttonParamsJson: JSON.stringify({
+				display_text: String(displayText),
+				url: String(url),
+				...options,
+			}),
+		});
+		return this;
+	}
+
+	addCall(displayText = '', phoneNumber = '', options = {}) {
+		this._buttons.push({
+			name: 'cta_call',
+			buttonParamsJson: JSON.stringify({
+				display_text: String(displayText),
+				phone_number: String(phoneNumber),
+				...options,
+			}),
+		});
+		return this;
+	}
+
+	addCopy(displayText = '', copyCode = '', options = {}) {
+		this._buttons.push({
+			name: 'cta_copy',
+			buttonParamsJson: JSON.stringify({
+				display_text: String(displayText),
+				copy_code: String(copyCode),
+				...options,
+			}),
+		});
+		return this;
+	}
+
+	addSelection(title, options = {}) {
+		this._buttons.push({
+			name: 'single_select',
+			buttonParamsJson: JSON.stringify({
+				title: String(title),
+				sections: [],
+				...options,
+			}),
+		});
+		this._currentSelectionIndex = this._buttons.length - 1;
+		this._currentSectionIndex = -1;
+		return this;
+	}
+
+	makeSection(title = '', highlight_label = '') {
+		if (this._currentSelectionIndex === -1) {
+			throw new Error('You need to create a selection first');
+		}
+		const sel = this._buttons[this._currentSelectionIndex];
+		const params = JSON.parse(sel.buttonParamsJson || '{}');
+		params.sections = params.sections || [];
+		params.sections.push({ title, highlight_label, rows: [] });
+		this._currentSectionIndex = params.sections.length - 1;
+		sel.buttonParamsJson = JSON.stringify(params);
+		return this;
+	}
+
+	makeRow(header = '', title = '', description = '', id = '') {
+		if (this._currentSelectionIndex === -1 || this._currentSectionIndex === -1) {
+			throw new Error('You need to create a selection and a section first');
+		}
+		const sel = this._buttons[this._currentSelectionIndex];
+		const params = JSON.parse(sel.buttonParamsJson || '{}');
+		params.sections = params.sections || [];
+		if (!params.sections[this._currentSectionIndex]) {
+			params.sections.push({ title: '', rows: [] });
+			this._currentSectionIndex = params.sections.length - 1;
+		}
+		params.sections[this._currentSectionIndex].rows = params.sections[this._currentSectionIndex].rows || [];
+		params.sections[this._currentSectionIndex].rows.push({ header, title, description, id });
+		sel.buttonParamsJson = JSON.stringify(params);
 		return this;
 	}
 
@@ -1048,6 +1147,24 @@ class ButtonV2 extends BaseBuilder {
 		}
 
 		this._buttons.push(obj);
+		return this;
+	}
+
+	setImage(path, options = {}) {
+		if (!path) throw new Error('Url or buffer needed');
+		Buffer.isBuffer(path) ? (this._data = { image: path, ...options }) : (this._data = { image: { url: path }, ...options });
+		return this;
+	}
+
+	setVideo(path, options = {}) {
+		if (!path) throw new Error('Url or buffer needed');
+		Buffer.isBuffer(path) ? (this._data = { video: path, ...options }) : (this._data = { video: { url: path }, ...options });
+		return this;
+	}
+
+	setDocument(path, options = {}) {
+		if (!path) throw new Error('Url or buffer needed');
+		Buffer.isBuffer(path) ? (this._data = { document: path, ...options }) : (this._data = { document: { url: path }, ...options });
 		return this;
 	}
 
@@ -1072,36 +1189,125 @@ class ButtonV2 extends BaseBuilder {
 		return this;
 	}
 
-	async build(jid, { messageId, ...options } = {}) {
-		const _thumbnail = this._image?.is_raw
-			? this._image.base64
-			: this._image
-				? await Toolkit.resize(Buffer.isBuffer(this._image) ? this._image : await Toolkit.fetchBuffer(this._image, {}, { silent: true }), 300, 300)
-				: null;
+	async toCard() {
+		let header = {
+			title: this._title || undefined,
+			subtitle: this._subtitle || undefined,
+			hasMediaAttachment: false,
+		};
+
+		if (this._data) {
+			const preparedMedia =
+				typeof this._data === 'object' &&
+				(this._data.imageMessage || this._data.videoMessage || this._data.documentMessage || this._data.locationMessage)
+					? this._data
+					: await prepareWAMessageMedia(this._data, { upload: this.#client.waUploadToServer }).catch((e) => {
+							if (String(e).includes('Invalid media type')) return this._data;
+							throw e;
+					  });
+			header = {
+				...header,
+				hasMediaAttachment: true,
+				...preparedMedia,
+			};
+		} else if (this._image) {
+			let _thumbnail = null;
+			try {
+				if (this._image?.is_raw) {
+					_thumbnail = Buffer.isBuffer(this._image.base64)
+						? this._image.base64
+						: Buffer.from(this._image.base64, 'base64');
+				} else {
+					const buf = Buffer.isBuffer(this._image)
+						? this._image
+						: typeof this._image === 'string' && this._image.startsWith('data:')
+							? Buffer.from(this._image.split(',')[1], 'base64')
+							: await Toolkit.fetchBuffer(this._image, {}, { silent: true });
+					if (buf) {
+						_thumbnail = await Toolkit.resize(buf, 300, 300).catch(() => buf);
+					}
+				}
+			} catch {}
+
+			if (_thumbnail) {
+				header = {
+					...header,
+					hasMediaAttachment: true,
+					locationMessage: {
+						degreesLatitude: 0,
+						degreesLongitude: 0,
+						name: this._title || '',
+						address: this._subtitle || '',
+						jpegThumbnail: _thumbnail,
+					},
+				};
+			}
+		}
+
+		const formattedButtons = this._buttons.map((b) => {
+			if (b.name && b.buttonParamsJson) {
+				return {
+					name: b.name,
+					buttonParamsJson: typeof b.buttonParamsJson === 'string' ? b.buttonParamsJson : JSON.stringify(b.buttonParamsJson),
+				};
+			}
+			if (b.nativeFlowInfo) {
+				return {
+					name: b.nativeFlowInfo.name || 'quick_reply',
+					buttonParamsJson:
+						typeof b.nativeFlowInfo.paramsJson === 'string'
+							? b.nativeFlowInfo.paramsJson
+							: JSON.stringify(b.nativeFlowInfo.paramsJson || {}),
+				};
+			}
+			return {
+				name: 'quick_reply',
+				buttonParamsJson: JSON.stringify({
+					display_text: b.buttonText?.displayText || b.displayText || '',
+					id: b.buttonId || b.id || '',
+				}),
+			};
+		});
+
+		return {
+			header,
+			body: { text: this._body || '' },
+			footer: { text: this._footer || '' },
+			nativeFlowMessage: {
+				buttons: formattedButtons,
+				messageParamsJson: '',
+			},
+		};
+	}
+
+	async build(jid, { messageId, viewOnce = false, ...options } = {}) {
+		const card = await this.toCard();
+		const interactiveMessage = {
+			...card,
+			contextInfo: this._contextInfo || {},
+		};
+
+		const content = viewOnce
+			? {
+					...this._extraPayload,
+					viewOnceMessage: {
+						message: {
+							messageContextInfo: {
+								deviceListMetadata: {},
+								deviceListMetadataVersion: 2,
+							},
+							interactiveMessage,
+						},
+					},
+			  }
+			: {
+					...this._extraPayload,
+					interactiveMessage,
+			  };
+
 		const msg = generateWAMessageFromContent(
 			jid,
-			{
-				...this._extraPayload,
-				buttonsMessage: {
-					contentText: this._body,
-					footerText: this._footer,
-					...(this._data
-						? this._data
-						: {
-								headerType: 6,
-								locationMessage: {
-									degreesLatitude: 0,
-									degreesLongitude: 0,
-									name: this._title,
-									address: this._subtitle,
-									jpegThumbnail: _thumbnail,
-								},
-							}),
-					viewOnce: true,
-					contextInfo: this._contextInfo,
-					buttons: [...this._buttons],
-				},
-			},
+			content,
 			{ messageId: messageId || generateMessageIDV2(), ...options }
 		);
 		return msg;
@@ -3590,5 +3796,5 @@ class AIRich extends BaseBuilder {
 
 export { VERSION, VERSION as MESSAGE_BUILDER_VERSION, Button, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
 
-export const MessageBuilder = { VERSION, Button, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
+export const MessageBuilder = { VERSION, Button: ButtonV2, ButtonLegacy: Button, ButtonV2, Carousel, AIRich, Toolkit, AIRichError, ItemNotFoundError, DuplicateIdError, InvalidTargetError, ContentValidationError };
 export const MB = MessageBuilder;

@@ -1294,7 +1294,7 @@ test('airich-namespace', async () => {
         assert.equal(typeof MB[name], 'function', `MB.${name} has to be the class`);
     }
     assert.equal(MB.AIRich, AIRich, 'MB holds the same class, not a copy');
-    assert.equal(Object.keys(MB).length, 212, 'the README quotes this count, update both together');
+    assert.equal(Object.keys(MB).length, 213, 'the README quotes this count, update both together');
 
     const lib = await import('../src/index.js');
     for (const builder of [Button, ButtonV2, Carousel, AIRich, Toolkit]) {

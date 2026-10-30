@@ -22,9 +22,12 @@ export * from './MessageBuilder/metaai.js';
 export * from './MessageBuilder/bot-signature.js';
 export * from './Voip/index.js';
 
-console.log(chalk.cyan(figlet.textSync('La-Bail', { font: 'Standard' })));
-console.log(chalk.magenta(' A WhatsApp multi-device library for NodeJS'));
-console.log(chalk.gray(' Modified by Bocil-Biasa (c) 2026 - la-bail\n'));
+if (!global._laBailBannerLogged) {
+    global._laBailBannerLogged = true;
+    console.log(chalk.cyan(figlet.textSync('La-Bail', { font: 'Standard' })));
+    console.log(chalk.magenta(' A WhatsApp multi-device library for NodeJS'));
+    console.log(chalk.gray(' Modified by Bocil-Biasa (c) 2026 - la-bail\n'));
+}
 
 const builderMembers = [
     ...Object.entries(messageBuilderExtras),

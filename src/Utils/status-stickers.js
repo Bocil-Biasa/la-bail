@@ -228,12 +228,13 @@ const assertMusicHost = (value, label) => {
 
 const embeddedMusicOf = (options) => musicSticker(options).embeddedContent.embeddedMusic
 
-export const buildMusicMessage = ({ songUri, artworkUri, style = MusicMessageStyle.VINYL, contextInfo, ...music } = {}) =>
+export const buildMusicMessage = ({ songUri, artworkUri, style = MusicMessageStyle.VINYL, lyrics, contextInfo, ...music } = {}) =>
     trimUndefined({
         embeddedMusic: embeddedMusicOf(music),
         songUri: assertMusicHost(songUri, 'songUri'),
         artworkUri: assertMusicHost(artworkUri, 'artworkUri'),
         style,
+        lyrics: lyrics && typeof lyrics === 'object' ? lyrics : undefined,
         contextInfo
     })
 
@@ -256,6 +257,7 @@ export const readMusicMessage = (msg) => {
         songUri: music.songUri,
         artworkUri: music.artworkUri,
         style: music.style,
+        lyrics: music.lyrics ?? null,
         embeddedMusic: embedded
     }
 }

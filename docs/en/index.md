@@ -57,3 +57,5 @@ Read that file before shipping anything that depends on the newer channel APIs.
 ## Licence and credit
 
 La-Bail is an actively maintained WhatsApp Multi-Device library for Node.js, forked from `@rexxhayanasi/elaina-baileys` which is a fork of `WhiskeySockets/Baileys`. Upstream notices and MIT license are preserved in `LICENSE` and `NOTICE.md`, and developer credits are listed in the repository README.
+
+- [Moderation metadata hooks](../moderation-hooks.md) — available metadata fields and protocol limitations

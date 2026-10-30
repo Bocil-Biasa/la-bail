@@ -83,7 +83,15 @@ export declare class Button extends BaseBuilder {
 export declare class ButtonV2 extends BaseBuilder {
   constructor(client: any);
   loadFrom(msg: any): this;
+  clearButtons(): this;
   addButton(displayText?: string, buttonId?: string): this;
+  addReply(displayText?: string, id?: string, options?: Record<string, any>): this;
+  addUrl(displayText?: string, url?: string, options?: Record<string, any>): this;
+  addCall(displayText?: string, phoneNumber?: string, options?: Record<string, any>): this;
+  addCopy(displayText?: string, copyCode?: string, options?: Record<string, any>): this;
+  addSelection(title: string, options?: Record<string, any>): this;
+  makeSection(title?: string, highlight_label?: string): this;
+  makeRow(header?: string, title?: string, description?: string, id?: string): this;
   addRawButton(obj: Record<string, any>): this;
   setRawThumbnail(thumbnail: string): this;
   setThumbnail(path: any): this;

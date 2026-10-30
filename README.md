@@ -1400,7 +1400,7 @@ MessageBuilder v4.7 sudah disertakan langsung di dalam `@nixzzy/la-bail`.
 
 ### Satu impor, seluruh builder
 
-Permukaan builder-nya terdiri dari 212 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
+Permukaan builder-nya terdiri dari 213 nama yang tersebar di empat modul, dan itulah kenapa satu bot bisa berakhir dengan satu paragraf impor cuma untuk menggambar satu kartu. `MB` (nama panjangnya: `MessageBuilder`) membawa semuanya — kelima kelas builder, semua pabrik section dan item, semua enum, pemeriksa native flow, helper tanda tangan. Tidak ada lagi yang perlu ikut di baris impor:
 
 ```js
 import { MB } from '@nixzzy/la-bail'
